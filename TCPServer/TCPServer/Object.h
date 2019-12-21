@@ -1,5 +1,7 @@
-#ifndef __PLAYER_H__
-#define __PLAYER_H__
+#ifndef __OBJECT_H__
+#define __OBJECT_H__
+
+#include "Iocp.h"
 
 struct Location {
 	int x;
@@ -20,6 +22,8 @@ struct BULLET {
 
 struct PLAYER {
 	SOCKET sock;
+	stOverlappedEx	m_stRecvOverlappedEx;		//RECV Overlapped I/O작업을 위한 변수
+	stOverlappedEx	m_stSendOverlappedEx;	//SEND Overlapped I/O작업을 위한 변수
 	int cliend_id = -1;			// 클라이언트 고유 번호
 	bool connect = false;		// 클라이언트 연결 여부
 	int hp;						// 클라이언트 체력
@@ -29,6 +33,11 @@ struct PLAYER {
 	Location position;			// 클라이언트 위치
 	std::list<ITEM> item;		// 클라이언트 아이템
 	std::list<BULLET> bullet;	// 클라이언트 총알
+	PLAYER() {
+		ZeroMemory(&m_stRecvOverlappedEx, sizeof(stOverlappedEx));
+		ZeroMemory(&m_stSendOverlappedEx, sizeof(stOverlappedEx));
+		sock = INVALID_SOCKET;
+	}
 };
 
 #endif

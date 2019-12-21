@@ -4,6 +4,7 @@
 #include "Object.h"
 
 #define SERVERPORT 9000
+#define MAX_SOCKBUF	 1024	// 최대 패킷 사이즈
 
 #define VK_UP_UP 100
 #define VK_DOWN_UP 101
@@ -26,10 +27,12 @@ const enum ProtocolType {
 	CLIENT_BASE = PACKET_PROTOCOL_BASE,				// Client to Server
 	CLIENT_DIR,
 
+	MAX_CLIENT_PROTOCOL_NO,
+
 	SERVER_BASE = CLIENT_BASE + PACKET_RANG_SIZE,	// Server to Client
 	SERVER_CLIENT_NO,
 
-	MAX_PROTOCOL_NO,
+	MAX_SERVER_PROTOCOL_NO,
 };
 
 
