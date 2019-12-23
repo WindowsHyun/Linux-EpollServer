@@ -75,13 +75,13 @@ bool IOCP_Server::StartServer()
 	return true;
 }
 
-void IOCP_Server::initClient(std::list<class PLAYER>& player)
+void IOCP_Server::initClient(std::list<class PLAYER *>& player)
 {
 	// 플레이어 데이터를 미리 추가해 놓는다.
 	for (int i = 0; i < MAX_PLAYER; ++i) {
-		PLAYER tmp_player;
-		tmp_player.set_init_player();
-		player.emplace_back(tmp_player);
+		class PLAYER * tmp_player = new class PLAYER;
+		tmp_player->set_init_player();
+		player.push_back(tmp_player);
 	}
 
 }

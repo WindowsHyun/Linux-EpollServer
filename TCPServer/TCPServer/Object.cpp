@@ -1,23 +1,23 @@
 #include "Main.h"
 
-void PLAYER::set_sock(SOCKET g_sock)
+void PLAYER::set_sock(const SOCKET g_sock)
 {
-	this->sock = g_sock;
+	sock = g_sock;
 }
 
-void PLAYER::set_unique_id(unsigned __int64 id)
+void PLAYER::set_unique_id(const unsigned __int64 id)
 {
-	this->unique_id = id;
+	unique_id = id;
 }
 
 void PLAYER::set_init_player()
 {
-	ZeroMemory(&this->m_stRecvOverlappedEx, sizeof(stOverlappedEx));
-	ZeroMemory(&this->m_stSendOverlappedEx, sizeof(stOverlappedEx));
-	ZeroMemory(&this->nickName, sizeof(char));
-	this->sock = INVALID_SOCKET;
-	this->unique_id = -1;
-	this->connect = false;
-	this->live = false;
-	this->game_play = false;
+	ZeroMemory(&m_stRecvOverlappedEx, sizeof(stOverlappedEx));
+	ZeroMemory(&m_stSendOverlappedEx, sizeof(stOverlappedEx));
+	ZeroMemory(&nickName, sizeof(char));
+	sock = INVALID_SOCKET;
+	unique_id = 0;
+	connect = false;
+	live = false;
+	game_play = false;
 }

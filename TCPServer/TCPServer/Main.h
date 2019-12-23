@@ -28,5 +28,5 @@
 #include "Object.h"
 
 extern IOCP_Server iocp_server;
-extern std::list<PLAYER> player;
+extern std::list<PLAYER *> player;
 #endif

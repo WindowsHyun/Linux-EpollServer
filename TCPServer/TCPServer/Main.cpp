@@ -1,7 +1,7 @@
 #include "Main.h"
 
 IOCP_Server iocp_server;
-std::list<PLAYER> player;
+std::list<PLAYER *> player;
 
 int main() {
 	std::cout << "Client Start Packet No : " << CLIENT_BASE << std::endl;
@@ -15,7 +15,6 @@ int main() {
 	iocp_server.StartServer();				// Server 시작
 
 	for (auto& client : player) {
-		client.set_unique_id(-1);
-		std::cout << client.get_unique_id() << std::endl;
+		std::cout << client->get_unique_id() << std::endl;
 	}
 }

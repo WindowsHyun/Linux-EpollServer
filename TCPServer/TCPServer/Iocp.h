@@ -20,6 +20,15 @@ struct stOverlappedEx {
 };
 
 class IOCP_Server {
+public:
+	HANDLE getHandle() { return g_hiocp; }							// Handle Return
+	IOCP_Server();													// init IOCP
+	~IOCP_Server();													// remove IOCP
+	bool initServer();
+	bool BindandListen(const u_short port);
+	bool StartServer();
+	void initClient(std::list<class PLAYER *>& player);
+
 private:
 	SOCKET g_socket;													// Socket
 	std::chrono::high_resolution_clock::time_point serverTimer;			// 서버 기준 시간
@@ -36,15 +45,6 @@ private:
 	void AccepterThread();												// AcceptThread
 
 	void CloseSocket(class PLAYER* pClientInfo, bool bIsForce = false);	// Socket 연결을 끊는다.
-
-public:
-	HANDLE getHandle() { return g_hiocp; }							// Handle Return
-	IOCP_Server();													// init IOCP
-	~IOCP_Server();													// remove IOCP
-	bool initServer();
-	bool BindandListen(const u_short port);
-	bool StartServer();
-	void initClient(std::list<class PLAYER>& player);
 };
 
 #endif
