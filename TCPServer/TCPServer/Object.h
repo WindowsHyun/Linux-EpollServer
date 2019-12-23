@@ -14,30 +14,39 @@ struct ITEM {
 };
 
 struct BULLET {
-	Location position;	// ÃÑ¾ËÀÇ À§Ä¡
-	int type;			// ¾î¶² °´Ã¼ÀÇ ÃÑ¾ËÀÎ°¡
-	int dir;			// ¾î¶² ¹æÇâÀ¸·Î °¥Áö
-	int bullet_type;	// ÃÑ¾Ë ±×¸®±â Å¸ÀÔ
+	Location position;	// ì´ì•Œì˜ ìœ„ì¹˜
+	int type;			// ì–´ë–¤ ê°ì²´ì˜ ì´ì•Œì¸ê°€
+	int dir;			// ì–´ë–¤ ë°©í–¥ìœ¼ë¡œ ê°ˆì§€
+	int bullet_type;	// ì´ì•Œ ê·¸ë¦¬ê¸° íƒ€ì…
 };
 
-struct PLAYER {
+class PLAYER {
+private:
 	SOCKET sock;
-	stOverlappedEx	m_stRecvOverlappedEx;		//RECV Overlapped I/OÀÛ¾÷À» À§ÇÑ º¯¼ö
-	stOverlappedEx	m_stSendOverlappedEx;	//SEND Overlapped I/OÀÛ¾÷À» À§ÇÑ º¯¼ö
-	int cliend_id = -1;			// Å¬¶óÀÌ¾ğÆ® °íÀ¯ ¹øÈ£
-	bool connect = false;		// Å¬¶óÀÌ¾ğÆ® ¿¬°á ¿©ºÎ
-	int hp;						// Å¬¶óÀÌ¾ğÆ® Ã¼·Â
-	bool live = true;			// Å¬¶óÀÌ¾ğÆ® »ıÁ¸ ¿©ºÎ
-	bool game_play = false;		// Å¬¶óÀÌ¾ğÆ® ÇÃ·¹ÀÌ ¿©ºÎ
-	char nickName[16];			// Å¬¶óÀÌ¾ğÆ® ÀÌ¸§
-	Location position;			// Å¬¶óÀÌ¾ğÆ® À§Ä¡
-	std::list<ITEM> item;		// Å¬¶óÀÌ¾ğÆ® ¾ÆÀÌÅÛ
-	std::list<BULLET> bullet;	// Å¬¶óÀÌ¾ğÆ® ÃÑ¾Ë
+	stOverlappedEx	m_stRecvOverlappedEx;		//RECV Overlapped I/Oì‘ì—…ì„ ìœ„í•œ ë³€ìˆ˜
+	stOverlappedEx	m_stSendOverlappedEx;		//SEND Overlapped I/Oì‘ì—…ì„ ìœ„í•œ ë³€ìˆ˜
+	unsigned __int64 unique_id;				// í´ë¼ì´ì–¸íŠ¸ ê³ ìœ  ë²ˆí˜¸
+	bool connect;				// í´ë¼ì´ì–¸íŠ¸ ì—°ê²° ì—¬ë¶€
+	int hp;						// í´ë¼ì´ì–¸íŠ¸ ì²´ë ¥
+	bool live;					// í´ë¼ì´ì–¸íŠ¸ ìƒì¡´ ì—¬ë¶€
+	bool game_play;				// í´ë¼ì´ì–¸íŠ¸ í”Œë ˆì´ ì—¬ë¶€
+	char nickName[16];			// í´ë¼ì´ì–¸íŠ¸ ì´ë¦„
+	Location position;			// í´ë¼ì´ì–¸íŠ¸ ìœ„ì¹˜
+	std::list<ITEM> item;		// í´ë¼ì´ì–¸íŠ¸ ì•„ì´í…œ
+	std::list<BULLET> bullet;	// í´ë¼ì´ì–¸íŠ¸ ì´ì•Œ
+
+public:
 	PLAYER() {
 		ZeroMemory(&m_stRecvOverlappedEx, sizeof(stOverlappedEx));
 		ZeroMemory(&m_stSendOverlappedEx, sizeof(stOverlappedEx));
+		ZeroMemory(&nickName, sizeof(char));
 		sock = INVALID_SOCKET;
+		unique_id = -1;
+		connect = false;
+		live = false;
+		game_play = false;
 	}
+	unsigned __int64 get_unique_id() { return unique_id; }
 };
 
 #endif

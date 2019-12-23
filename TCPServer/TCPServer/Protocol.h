@@ -1,21 +1,12 @@
-﻿#ifndef __PROTOCOL_H__
+#ifndef __PROTOCOL_H__
 #define __PROTOCOL_H__
 
 #include "Object.h"
 
 #define SERVERPORT 9000
+#define UNIQUE_START_NO 0	// 고유번호 시작
 #define MAX_SOCKBUF	 1024	// 최대 패킷 사이즈
-
-#define VK_UP_UP 100
-#define VK_DOWN_UP 101
-#define VK_UP_DOWN 200
-#define VK_DOWN_DOWN 201
-#define VK_UP_LEFT 300
-#define VK_DOWN_LEFT 301
-#define VK_UP_RIGHT 400
-#define VK_DOWN_RIGHT 401
-#define VK_UP_SPACE 500
-#define VK_DOWN_SPACE 501
+#define MAX_PLAYER 10		// 최대 접속 인원
 
 // 프로토콜 타입
 const enum ProtocolType {
@@ -39,6 +30,7 @@ const enum ProtocolType {
 // ↓ 클라 -> 서버 패킷
 struct cs_packet_dir {
 	int type;
+	int byte;
 	//----------------
 	Location dir;
 };

@@ -3,12 +3,12 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-#define _WINSOCK_DEPRECATED_NO_WARNINGS	// À©¼Ó ¿À·ù ¹æÁö
-#define MAX_CONNECT 40											// ÃÖ´ë Á¢¼Ó ÀÎ¿ø
-#define MAX_WORKERTHREAD 4								// ¾²·¹µå Ç®¿¡ ³ÖÀ» ¾²·¹µå ¼ö
-#define DEBUG_MODE	TRUE										// printf Ãâ·Â ¿©ºÎ
+#define _WINSOCK_DEPRECATED_NO_WARNINGS					// ìœˆì† ì˜¤ë¥˜ ë°©ì§€
+#define MAX_CONNECT 40									// ìµœëŒ€ ì ‘ì† ì¸ì›
+#define MAX_WORKERTHREAD 4								// ì“°ë ˆë“œ í’€ì— ë„£ì„ ì“°ë ˆë“œ ìˆ˜
+#define DEBUG_MODE	TRUE								// printf ì¶œë ¥ ì—¬ë¶€
 
-// Header ¼±¾ğ
+// Header ì„ ì–¸
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 #include <stdio.h>
@@ -21,8 +21,11 @@
 #include <list>
 
 
-// Çì´õ °¡Á®¿À±â
+// í—¤ë” ê°€ì ¸ì˜¤ê¸°
 #include "Protocol.h"
 #include "Iocp.h"
 #include "Object.h"
+
+extern IOCP_Server iocp_server;
+extern std::list<PLAYER> player;
 #endif

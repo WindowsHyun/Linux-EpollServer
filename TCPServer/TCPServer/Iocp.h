@@ -1,37 +1,39 @@
 #ifndef __ICOP_H__
 #define __ICOP_H__
 
-#include "Main.h"
-#define MAX_SOCKBUF	 1024	// ÃÖ´ë ÆĞÅ¶ »çÀÌÁî
+#include "Object.h"
+
+#define MAX_SOCKBUF	 1024	// ìµœëŒ€ íŒ¨í‚· ì‚¬ì´ì¦ˆ
 
 enum class IOOperation {
 	RECV,
 	SEND
 };
 
-// WSAOVERLAPPED±¸Á¶Ã¼¸¦ È®Àå ½ÃÄÑ¼­ ÇÊ¿äÇÑ Á¤º¸¸¦ ´õ ³Ö¾ú´Ù.
+// WSAOVERLAPPEDêµ¬ì¡°ì²´ë¥¼ í™•ì¥ ì‹œì¼œì„œ í•„ìš”í•œ ì •ë³´ë¥¼ ë” ë„£ì—ˆë‹¤.
 struct stOverlappedEx {
-	WSAOVERLAPPED m_wsaOverlapped;						// Overlapped I/O±¸Á¶Ã¼
-	SOCKET					m_socketClient;							// Å¬¶óÀÌ¾ğÆ® ¼ÒÄÏ
-	WSABUF					m_wsaBuf;									// Overlapped I/OÀÛ¾÷ ¹öÆÛ
-	char							m_szBuf[MAX_SOCKBUF];		// µ¥ÀÌÅÍ ¹öÆÛ
-	IOOperation			m_eOperation;							// ÀÛ¾÷ µ¿ÀÛ Á¾·ù
+	WSAOVERLAPPED			m_wsaOverlapped;			// Overlapped I/Oêµ¬ì¡°ì²´
+	SOCKET					m_socketClient;				// í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“
+	WSABUF					m_wsaBuf;					// Overlapped I/Oì‘ì—… ë²„í¼
+	char					m_szBuf[MAX_SOCKBUF];		// ë°ì´í„° ë²„í¼
+	IOOperation				m_eOperation;				// ì‘ì—… ë™ì‘ ì¢…ë¥˜
 };
 
 class IOCP_Server {
 private:
 	SOCKET g_socket;												// Socket
-	std::chrono::high_resolution_clock::time_point serverTimer;		// ¼­¹ö ±âÁØ ½Ã°£
-	HANDLE g_hiocp;													// handle ¼±¾ğ
-
-	bool initServer();
-	void err_quit(char *msg);										// Error ³ª¿Ã °æ¿ì Server Á¾·á
-	void err_display(char *msg, int err_no);						// Error Ç¥½Ã ÇØÁÖ±â
+	std::chrono::high_resolution_clock::time_point serverTimer;		// ì„œë²„ ê¸°ì¤€ ì‹œê°„
+	HANDLE g_hiocp;													// handle ì„ ì–¸
+	unsigned __int64 uniqueId;										// ì ‘ì† UniqueID
 
 public:
 	HANDLE getHandle() { return g_hiocp; }							// Handle Return
 	IOCP_Server();													// init IOCP
 	~IOCP_Server();													// remove IOCP
+	bool initServer();
+	bool BindandListen(const u_short port);
+	bool StartServer();
+	void initClient(std::list<class PLAYER>& player);
 };
 
 #endif
