@@ -46,7 +46,14 @@ public:
 		live = false;
 		game_play = false;
 	}
+	// get
+	SOCKET get_sock() { return sock; }
 	unsigned __int64 get_unique_id() { return unique_id; }
-};
 
+	// set
+	void set_sock(SOCKET g_sock);
+	void set_unique_id(unsigned __int64 id);
+	void set_init_player();
+	
+};
 #endif

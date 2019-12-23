@@ -19,6 +19,7 @@
 #include <time.h>
 #include <ctime>
 #include <list>
+#include <vector>
 
 
 // 헤더 가져오기

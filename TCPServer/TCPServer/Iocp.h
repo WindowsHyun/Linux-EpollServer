@@ -21,10 +21,21 @@ struct stOverlappedEx {
 
 class IOCP_Server {
 private:
-	SOCKET g_socket;												// Socket
-	std::chrono::high_resolution_clock::time_point serverTimer;		// 서버 기준 시간
-	HANDLE g_hiocp;													// handle 선언
-	unsigned __int64 uniqueId;										// 접속 UniqueID
+	SOCKET g_socket;													// Socket
+	std::chrono::high_resolution_clock::time_point serverTimer;			// 서버 기준 시간
+	HANDLE g_hiocp;														// handle 선언
+	std::vector<std::thread> mIOWorkerThreads;							// IO Worker 스레드
+	std::thread	mAccepterThread;										// Accept 스레드
+	unsigned __int64 uniqueId;											// 접속 UniqueID
+	bool mIsWorkerRun;													// 작업 Thread 동작 플래그
+
+	bool CreateWokerThread();											// WorkThread init
+	void WokerThread();													// WorkThread
+	bool mIsAccepterRun;												// Accept 
+	bool CreateAccepterThread();										// AcceptThread init
+	void AccepterThread();												// AcceptThread
+
+	void CloseSocket(class PLAYER* pClientInfo, bool bIsForce = false);	// Socket 연결을 끊는다.
 
 public:
 	HANDLE getHandle() { return g_hiocp; }							// Handle Return
