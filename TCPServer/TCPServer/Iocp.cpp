@@ -184,7 +184,8 @@ void IOCP_Server::WokerThread()
 
 		stOverlappedEx* pOverlappedEx = (stOverlappedEx*)lpOverlapped;
 		//Overlapped I/O Recv작업 결과 뒤 처리
-		if (IOOperation::RECV == pOverlappedEx->m_eOperation)
+		switch (pOverlappedEx->m_eOperation) {
+		case IOOperation::RECV:
 		{
 			pOverlappedEx->m_szBuf[dwIoSize] = NULL;
 			printf("[수신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_szBuf);
@@ -192,7 +193,7 @@ void IOCP_Server::WokerThread()
 			// 타이머 테스트
 			Timer_Event* t = new Timer_Event;
 			t->object_id = 0;
-			t->exec_time = high_resolution_clock::now() + 1024ms;
+			t->exec_time = high_resolution_clock::now() + 2048ms;
 			t->event = T_NormalTime;
 			timer.setTimerEvent(*t);
 			//----------------------------------------------------
@@ -200,15 +201,20 @@ void IOCP_Server::WokerThread()
 			/*SendMsg(pClientInfo, pOverlappedEx->m_szBuf, dwIoSize);
 			BindRecv(pClientInfo);*/
 		}
-		//Overlapped I/O Send작업 결과 뒤 처리
-		else if (IOOperation::SEND == pOverlappedEx->m_eOperation)
+		break;
+		case IOOperation::SEND:
 		{
+			// Overlapped I/O Send작업 결과 뒤 처리
 			printf("[송신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_szBuf);
 		}
-		//예외 상황
-		else
+		break;
+		default:
 		{
+			// 예외 상황
 			std::cout << "[Exception WokerThread(" << (int)pOverlappedEx->m_eOperation << ")] No value defined..!" << std::endl;
+		}
+		break;
+
 		}
 	}
 }
