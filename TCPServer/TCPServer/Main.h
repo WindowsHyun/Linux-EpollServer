@@ -26,6 +26,7 @@
 #include "Protocol.h"
 #include "Iocp.h"
 #include "Object.h"
+#include "Session.h"
 
 extern IOCP_Server iocp_server;
 extern std::list<PLAYER *> player;

@@ -12,8 +12,6 @@ void PLAYER::set_unique_id(const unsigned __int64 id)
 
 void PLAYER::set_init_player()
 {
-	ZeroMemory(&m_stRecvOverlappedEx, sizeof(stOverlappedEx));
-	ZeroMemory(&m_stSendOverlappedEx, sizeof(stOverlappedEx));
 	ZeroMemory(&nickName, sizeof(char));
 	sock = INVALID_SOCKET;
 	unique_id = 0;

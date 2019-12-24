@@ -84,6 +84,11 @@ void IOCP_Server::initClient(std::list<class PLAYER *>& player)
 		player.push_back(tmp_player);
 	}
 
+	// 세션 데이터도 미리 추가해 놓는다.
+	for (int i = 0; i < MAX_PLAYER; ++i) {
+		PLAYER_Session * tmp_session = new PLAYER_Session;
+		player_session.push_back(tmp_session);
+	}
 }
 
 bool IOCP_Server::CreateWokerThread()
@@ -103,7 +108,7 @@ bool IOCP_Server::CreateWokerThread()
 void IOCP_Server::WokerThread()
 {
 	//CompletionKey를 받을 포인터 변수
-	class PLAYER* pClientInfo = NULL;
+	class PLAYER_Session* pClientInfo = NULL;
 	//함수 호출 성공 여부
 	BOOL bSuccess = TRUE;
 	//Overlapped I/O작업에서 전송된 데이터 크기
@@ -168,12 +173,12 @@ void IOCP_Server::WokerThread()
 		//예외 상황
 		else
 		{
-			//printf("socket(%d)에서 예외상황\n", (int)pClientInfo->m_socketClient);
+			//printf("socket(%d)에서 예외상황\n", (int)pClientInfo->m_socketSession);
 		}
 	}
 }
 
-void IOCP_Server::CloseSocket(PLAYER * pClientInfo, bool bIsForce)
+void IOCP_Server::CloseSocket(PLAYER_Session * pClientInfo, bool bIsForce)
 {
 	struct linger stLinger = { 0, 0 };	// SO_DONTLINGER로 설정
 
@@ -184,14 +189,14 @@ void IOCP_Server::CloseSocket(PLAYER * pClientInfo, bool bIsForce)
 	}
 
 	//socketClose소켓의 데이터 송수신을 모두 중단 시킨다.
-	shutdown(pClientInfo->get_sock(), SD_BOTH);
+	shutdown(pClientInfo->m_socketSession, SD_BOTH);
 
 	//소켓 옵션을 설정한다.
-	setsockopt(pClientInfo->get_sock(), SOL_SOCKET, SO_LINGER, (char*)&stLinger, sizeof(stLinger));
+	setsockopt(pClientInfo->m_socketSession, SOL_SOCKET, SO_LINGER, (char*)&stLinger, sizeof(stLinger));
 
 	//소켓 연결을 종료 시킨다. 
-	closesocket(pClientInfo->get_sock());
-	pClientInfo->set_sock(INVALID_SOCKET);
+	closesocket(pClientInfo->m_socketSession);
+	pClientInfo->m_socketSession = INVALID_SOCKET;
 }
 
 bool IOCP_Server::CreateAccepterThread()
@@ -207,44 +212,93 @@ void IOCP_Server::AccepterThread()
 	SOCKADDR_IN		stClientAddr;
 	int nAddrLen = sizeof(SOCKADDR_IN);
 
-	//while (mIsAccepterRun)
-	//{
-	//	// 접속을 받을 구조체의 인덱스를 얻어온다.
-	//	class PLAYER* pClientInfo = GetEmptyClientInfo();
-	//	if (NULL == pClientInfo)
-	//	{
-	//		printf("[에러] Client Full\n");
-	//		return;
-	//	}
+	while (mIsAccepterRun)
+	{
+		// 접속을 받을 구조체의 인덱스를 얻어온다.
+		class PLAYER_Session* pClientInfo = GetEmptySession();
+		if (NULL == pClientInfo){
+			std::cout << "[Error] Client Full..!" << std::endl;
+			return;
+		}
 
-	//	//클라이언트 접속 요청이 들어올 때까지 기다린다.
-	//	pClientInfo->m_socketClient = accept(mListenSocket, (SOCKADDR*)&stClientAddr, &nAddrLen);
-	//	if (INVALID_SOCKET == pClientInfo->m_socketClient)
-	//	{
-	//		continue;
-	//	}
+		// 클라이언트 접속 요청이 들어올 때까지 기다린다.
+		pClientInfo->m_socketSession = WSAAccept(g_socket,(SOCKADDR*)&stClientAddr, &nAddrLen, NULL, NULL);
+		if (INVALID_SOCKET == pClientInfo->m_socketSession){
+			continue;
+		}
 
-	//	//I/O Completion Port객체와 소켓을 연결시킨다.
-	//	bool bRet = BindIOCompletionPort(pClientInfo);
-	//	if (false == bRet)
-	//	{
-	//		return;
-	//	}
+		// I/O Completion Port객체와 소켓을 연결시킨다.
+		bool bRet = BindIOCompletionPort(pClientInfo);
+		if (false == bRet){
+			return;
+		}
 
-	//	//Recv Overlapped I/O작업을 요청해 놓는다.
-	//	bRet = BindRecv(pClientInfo);
-	//	if (false == bRet)
-	//	{
-	//		return;
-	//	}
+		//Recv Overlapped I/O작업을 요청해 놓는다.
+		bRet = BindRecv(pClientInfo);
+		if (false == bRet){
+			return;
+		}
 
-	//	char clientIP[32] = { 0, };
-	//	inet_ntop(AF_INET, &(stClientAddr.sin_addr), clientIP, 32 - 1);
-	//	printf("클라이언트 접속 : IP(%s) SOCKET(%d)\n", clientIP, (int)pClientInfo->m_socketClient);
+		//클라이언트 갯수 증가
+		++uniqueId;
 
-	//	//클라이언트 갯수 증가
-	//	++mClientCnt;
-	//}
+		char clientIP[32] = { 0, };
+		inet_ntop(AF_INET, &(stClientAddr.sin_addr), clientIP, 32 - 1);
+		std::cout << "[접속(" << uniqueId << ")] Client IP : "<< clientIP << " / SOCKET : "<< (int)pClientInfo->m_socketSession << std::endl;
+
+		
+	}
+}
+
+PLAYER_Session* IOCP_Server::GetEmptySession()
+{
+	for (auto& client : player_session){
+		if (INVALID_SOCKET == client->m_socketSession){
+			return client;
+		}
+	}
+
+	return nullptr;
+}
+
+bool IOCP_Server::BindIOCompletionPort(PLAYER_Session * pClientInfo)
+{
+	// socket과 pClientInfo를 CompletionPort객체와 연결시킨다.
+	auto hIOCP = CreateIoCompletionPort((HANDLE)pClientInfo->m_socketSession, g_hiocp, (ULONG_PTR)(pClientInfo), 0);
+
+	if (NULL == hIOCP || g_hiocp != hIOCP){
+		std::cout << "[Error] CreateIoCompletionPort()함수 실패 : " << GetLastError() << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+bool IOCP_Server::BindRecv(PLAYER_Session * pClientInfo)
+{
+	DWORD dwFlag = 0;
+	DWORD dwRecvNumBytes = 0;
+
+	//Overlapped I/O을 위해 각 정보를 셋팅해 준다.
+	pClientInfo->get_Recv_over().m_wsaBuf.len = MAX_SOCKBUF;
+	pClientInfo->get_Recv_over().m_wsaBuf.buf = pClientInfo->get_Recv_over().m_szBuf;
+	pClientInfo->get_Recv_over().m_eOperation = IOOperation::RECV;
+
+	int nRet = WSARecv(pClientInfo->m_socketSession,
+		&(pClientInfo->get_Recv_over().m_wsaBuf),
+		1,
+		&dwRecvNumBytes,
+		&dwFlag,
+		(LPWSAOVERLAPPED) & (pClientInfo->get_Recv_over()),
+		NULL);
+
+	//socket_error이면 client socket이 끊어진걸로 처리한다.
+	if (nRet == SOCKET_ERROR && (WSAGetLastError() != ERROR_IO_PENDING)){
+		std::cout << "[Error] WSARecv()함수 실패 : " << WSAGetLastError() << std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 IOCP_Server::IOCP_Server()

@@ -15,6 +15,6 @@ int main() {
 	iocp_server.StartServer();				// Server 시작
 
 	for (auto& client : player) {
-		std::cout << client->get_unique_id() << std::endl;
+		//std::cout << client->get_unique_id() << std::endl;
 	}
 }

@@ -5,20 +5,6 @@
 
 #define MAX_SOCKBUF	 1024	// 최대 패킷 사이즈
 
-enum class IOOperation {
-	RECV,
-	SEND
-};
-
-// WSAOVERLAPPED구조체를 확장 시켜서 필요한 정보를 더 넣었다.
-struct stOverlappedEx {
-	WSAOVERLAPPED			m_wsaOverlapped;			// Overlapped I/O구조체
-	SOCKET					m_socketClient;				// 클라이언트 소켓
-	WSABUF					m_wsaBuf;					// Overlapped I/O작업 버퍼
-	char					m_szBuf[MAX_SOCKBUF];		// 데이터 버퍼
-	IOOperation				m_eOperation;				// 작업 동작 종류
-};
-
 class IOCP_Server {
 public:
 	HANDLE getHandle() { return g_hiocp; }							// Handle Return
@@ -35,6 +21,7 @@ private:
 	HANDLE g_hiocp;														// handle 선언
 	std::vector<std::thread> mIOWorkerThreads;							// IO Worker 스레드
 	std::thread	mAccepterThread;										// Accept 스레드
+	std::vector<class PLAYER_Session *> player_session;					// 플레이어 세션
 	unsigned __int64 uniqueId;											// 접속 UniqueID
 	bool mIsWorkerRun;													// 작업 Thread 동작 플래그
 
@@ -43,8 +30,10 @@ private:
 	bool mIsAccepterRun;												// Accept 
 	bool CreateAccepterThread();										// AcceptThread init
 	void AccepterThread();												// AcceptThread
-
-	void CloseSocket(class PLAYER* pClientInfo, bool bIsForce = false);	// Socket 연결을 끊는다.
+	PLAYER_Session* GetEmptySession();									// Empty Session Search
+	bool BindIOCompletionPort(PLAYER_Session* pClientInfo);				// Bind
+	bool BindRecv(PLAYER_Session* pClientInfo);							// WSARecv Overlapped I/O 작업을 시킨다.
+	void CloseSocket(class PLAYER_Session* pClientInfo, bool bIsForce = false);	// Socket 연결을 끊는다.
 };
 
 #endif

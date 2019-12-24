@@ -23,11 +23,9 @@ struct BULLET {
 class PLAYER {
 public:
 	PLAYER() {
-		ZeroMemory(&m_stRecvOverlappedEx, sizeof(stOverlappedEx));
-		ZeroMemory(&m_stSendOverlappedEx, sizeof(stOverlappedEx));
 		ZeroMemory(&nickName, sizeof(char));
 		sock = INVALID_SOCKET;
-		unique_id = 1;
+		unique_id = 0;
 		connect = false;
 		live = false;
 		game_play = false;
@@ -43,9 +41,7 @@ public:
 
 private:
 	SOCKET sock;
-	stOverlappedEx	m_stRecvOverlappedEx;		//RECV Overlapped I/O작업을 위한 변수
-	stOverlappedEx	m_stSendOverlappedEx;		//SEND Overlapped I/O작업을 위한 변수
-	unsigned __int64 unique_id;				// 클라이언트 고유 번호
+	unsigned __int64 unique_id;	// 클라이언트 고유 번호
 	bool connect;				// 클라이언트 연결 여부
 	int hp;						// 클라이언트 체력
 	bool live;					// 클라이언트 생존 여부
