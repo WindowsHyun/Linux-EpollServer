@@ -5,7 +5,7 @@ bool IOCP_Server::initServer()
 	WSADATA wsaData;
 
 	int nRet = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (0 != nRet){
+	if (0 != nRet) {
 		std::cout << "[Error] WSAStartup()함수 실패 : " << WSAGetLastError() << std::endl;
 		return false;
 	}
@@ -13,7 +13,7 @@ bool IOCP_Server::initServer()
 	//연결지향형 TCP , Overlapped I/O 소켓을 생성
 	listenSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, NULL, WSA_FLAG_OVERLAPPED);
 
-	if (INVALID_SOCKET == listenSocket){
+	if (INVALID_SOCKET == listenSocket) {
 		std::cout << "[Error] socket()함수 실패 : " << WSAGetLastError() << std::endl;
 		return false;
 	}
@@ -30,11 +30,12 @@ bool IOCP_Server::BindandListen(const u_short port)
 	// 어떤 주소에서 들어오는 접속이라도 받아들이겠다.
 	// 보통 서버라면 이렇게 설정한다. 만약 한 아이피에서만 접속을 받고 싶다면
 	// 그 주소를 inet_addr함수를 이용해 넣으면 된다.
-	stServerAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	stServerAddr.sin_addr.s_addr = INADDR_ANY;
 
 	// 위에서 지정한 서버 주소 정보와 cIOCompletionPort 소켓을 연결한다.
-	int nRet = ::bind(listenSocket, (SOCKADDR*)&stServerAddr, sizeof(SOCKADDR_IN));
-	if (0 != nRet){
+	//int nRet = ::bind(listenSocket, (SOCKADDR*)&stServerAddr, sizeof(SOCKADDR_IN));
+	int nRet = ::bind(listenSocket, reinterpret_cast<sockaddr *>(&stServerAddr), sizeof(SOCKADDR_IN));
+	if (0 != nRet) {
 		std::cout << "[Error] bind()함수 실패 : " << WSAGetLastError() << std::endl;
 		return false;
 	}
@@ -42,10 +43,14 @@ bool IOCP_Server::BindandListen(const u_short port)
 	// 접속 요청을 받아들이기 위해 cIOCompletionPort소켓을 등록하고 
 	// 접속 대기큐를 5개로 설정 한다.
 	nRet = ::listen(listenSocket, 5);
-	if (0 != nRet){
+	if (0 != nRet) {
 		std::cout << "[Error] listen()함수 실패 : " << WSAGetLastError() << std::endl;
 		return false;
 	}
+
+	// 네이글 알고리즘 OFF
+	int option = TRUE;
+	setsockopt(listenSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&option, sizeof(option));
 
 	std::cout << "Server Registration Successful..!" << std::endl;
 	return true;
@@ -55,7 +60,7 @@ bool IOCP_Server::StartServer()
 {
 	// CompletionPort객체 생성 요청을 한다.
 	g_hiocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, MAX_WORKERTHREAD);
-	if (NULL == g_hiocp){
+	if (NULL == g_hiocp) {
 		std::cout << "[Error] CreateIoCompletionPort()함수 실패 : " << GetLastError() << std::endl;
 		return false;
 	}
@@ -97,8 +102,8 @@ void IOCP_Server::destroyThread()
 	mIsWorkerRun = false;
 	CloseHandle(g_hiocp);
 
-	for (auto& th : mIOWorkerThreads){
-		if (th.joinable()){
+	for (auto& th : mIOWorkerThreads) {
+		if (th.joinable()) {
 			th.join();
 		}
 	}
@@ -107,7 +112,7 @@ void IOCP_Server::destroyThread()
 	mIsAccepterRun = false;
 	closesocket(listenSocket);
 
-	if (mAccepterThread.joinable()){
+	if (mAccepterThread.joinable()) {
 		mAccepterThread.join();
 	}
 }
@@ -118,7 +123,7 @@ bool IOCP_Server::CreateWokerThread()
 	mIOWorkerThreads.reserve(MAX_WORKERTHREAD + 1);
 
 	// WaingThread Queue에 대기 상태로 넣을 쓰레드들 생성 권장되는 개수 : (cpu개수 * 2) + 1 
-	for (int i = 0; i < MAX_WORKERTHREAD; i++){
+	for (int i = 0; i < MAX_WORKERTHREAD; i++) {
 		mIOWorkerThreads.emplace_back([this]() { WokerThread(); });
 	}
 
@@ -232,34 +237,33 @@ void IOCP_Server::AccepterThread()
 {
 	SOCKADDR_IN client_addr;
 	auto client_len = static_cast<int>(sizeof(client_addr));
-	
+
 
 	while (mIsAccepterRun)
 	{
 		// 접속을 받을 구조체의 인덱스를 얻어온다.
 		PLAYER_Session* pClientInfo = GetEmptySession();
-		if (NULL == pClientInfo){
+		if (NULL == pClientInfo) {
 			std::cout << "[Error] Client Full..!" << std::endl;
 			return;
 		}
 
 		// 클라이언트 접속 요청이 들어올 때까지 기다린다.
-		pClientInfo->m_socketSession = WSAAccept(listenSocket, (SOCKADDR*)& client_addr, &client_len, NULL, NULL);
-		std::cout << "여기 들어오면 안됨." << std::endl;
-		std::cout << (int)pClientInfo->m_socketSession << std::endl;
-		if (INVALID_SOCKET == pClientInfo->m_socketSession){
+		pClientInfo->m_socketSession = WSAAccept(listenSocket, reinterpret_cast<sockaddr *>(&client_addr), &client_len, NULL, NULL);
+		std::cout << pClientInfo->get_unique_id() << " | " << (int)pClientInfo->m_socketSession << " | " << (int)listenSocket << std::endl;
+		if (INVALID_SOCKET == pClientInfo->m_socketSession) {
 			continue;
 		}
 
 		// I/O Completion Port객체와 소켓을 연결시킨다.
 		bool bRet = BindIOCompletionPort(pClientInfo);
-		if (false == bRet){
+		if (false == bRet) {
 			return;
 		}
 
 		//Recv Overlapped I/O작업을 요청해 놓는다.
 		bRet = BindRecv(pClientInfo);
-		if (false == bRet){
+		if (false == bRet) {
 			return;
 		}
 
@@ -268,16 +272,16 @@ void IOCP_Server::AccepterThread()
 
 		char clientIP[32] = { 0, };
 		inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
-		std::cout << "[접속(" << uniqueId << ")] Client IP : "<< clientIP << " / SOCKET : "<< (int)pClientInfo->m_socketSession << std::endl;
+		std::cout << "[접속(" << uniqueId << ")] Client IP : " << clientIP << " / SOCKET : " << (int)pClientInfo->m_socketSession << std::endl;
 
-		
+
 	}
 }
 
 PLAYER_Session* IOCP_Server::GetEmptySession()
 {
-	for (auto& client : player_session){
-		if (INVALID_SOCKET == client->m_socketSession){
+	for (auto& client : player_session) {
+		if (INVALID_SOCKET == client->m_socketSession) {
 			return client;
 		}
 	}
@@ -290,7 +294,7 @@ bool IOCP_Server::BindIOCompletionPort(PLAYER_Session * pClientInfo)
 	// socket과 pClientInfo를 CompletionPort객체와 연결시킨다.
 	auto hIOCP = CreateIoCompletionPort((HANDLE)pClientInfo->m_socketSession, g_hiocp, (ULONG_PTR)(pClientInfo), 0);
 
-	if (NULL == hIOCP || g_hiocp != hIOCP){
+	if (NULL == hIOCP || g_hiocp != hIOCP) {
 		std::cout << "[Error] CreateIoCompletionPort()함수 실패 : " << GetLastError() << std::endl;
 		return false;
 	}
@@ -317,7 +321,7 @@ bool IOCP_Server::BindRecv(PLAYER_Session * pClientInfo)
 		NULL);
 
 	//socket_error이면 client socket이 끊어진걸로 처리한다.
-	if (nRet == SOCKET_ERROR && (WSAGetLastError() != ERROR_IO_PENDING)){
+	if (nRet == SOCKET_ERROR && (WSAGetLastError() != ERROR_IO_PENDING)) {
 		std::cout << "[Error] WSARecv()함수 실패 : " << WSAGetLastError() << std::endl;
 		return false;
 	}
@@ -328,9 +332,11 @@ bool IOCP_Server::BindRecv(PLAYER_Session * pClientInfo)
 IOCP_Server::IOCP_Server()
 {
 	std::wcout.imbue(std::locale("korean"));	// Locale Korean
+	g_hiocp = INVALID_HANDLE_VALUE;
+	listenSocket = INVALID_SOCKET;
+	uniqueId = UNIQUE_START_NO;
 	mIsWorkerRun = true;
 	mIsAccepterRun = true;
-	uniqueId = UNIQUE_START_NO;
 }
 
 IOCP_Server::~IOCP_Server()

@@ -4,9 +4,9 @@
 #include "Object.h"
 
 #define SERVERPORT 9000
-#define UNIQUE_START_NO 0	// 고유번호 시작
-#define MAX_SOCKBUF	 1024	// 최대 패킷 사이즈
-#define MAX_PLAYER 10		// 최대 접속 인원
+#define UNIQUE_START_NO 1000	// 고유번호 시작
+#define MAX_SOCKBUF	 1024		// 최대 패킷 사이즈
+#define MAX_PLAYER 10			// 최대 접속 인원
 
 // 프로토콜 타입
 const enum ProtocolType {
