@@ -20,6 +20,9 @@
 #include <ctime>
 #include <list>
 #include <vector>
+#include <chrono>
+#include <queue>
+#include <mutex>
 
 
 // 헤더 가져오기
@@ -27,7 +30,9 @@
 #include "Iocp.h"
 #include "Object.h"
 #include "Session.h"
+#include "Timer.h"
 
 extern IOCP_Server iocp_server;
 extern std::list<PLAYER *> player;
+extern SERVER_Timer timer;
 #endif

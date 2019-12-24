@@ -180,12 +180,19 @@ void IOCP_Server::WokerThread()
 
 
 		stOverlappedEx* pOverlappedEx = (stOverlappedEx*)lpOverlapped;
-
 		//Overlapped I/O Recv작업 결과 뒤 처리
 		if (IOOperation::RECV == pOverlappedEx->m_eOperation)
 		{
 			pOverlappedEx->m_szBuf[dwIoSize] = NULL;
 			printf("[수신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_szBuf);
+			//----------------------------------------------------
+			// 타이머 테스트
+			Timer_Event* t = new Timer_Event;
+			t->object_id = 0;
+			t->exec_time = high_resolution_clock::now() + 1024ms;
+			t->event = T_NormalTime;
+			timer.setTimerEvent(*t);
+			//----------------------------------------------------
 
 			//클라이언트에 메세지를 에코한다.
 			/*SendMsg(pClientInfo, pOverlappedEx->m_szBuf, dwIoSize);
@@ -199,7 +206,7 @@ void IOCP_Server::WokerThread()
 		//예외 상황
 		else
 		{
-			//printf("socket(%d)에서 예외상황\n", (int)pClientInfo->m_socketSession);
+			std::cout << "[Exception WokerThread(" << (int)pOverlappedEx->m_eOperation << ")] No value defined..!" << std::endl;
 		}
 	}
 }
@@ -250,7 +257,6 @@ void IOCP_Server::AccepterThread()
 
 		// 클라이언트 접속 요청이 들어올 때까지 기다린다.
 		pClientInfo->m_socketSession = WSAAccept(listenSocket, reinterpret_cast<sockaddr *>(&client_addr), &client_len, NULL, NULL);
-		std::cout << pClientInfo->get_unique_id() << " | " << (int)pClientInfo->m_socketSession << " | " << (int)listenSocket << std::endl;
 		if (INVALID_SOCKET == pClientInfo->m_socketSession) {
 			continue;
 		}

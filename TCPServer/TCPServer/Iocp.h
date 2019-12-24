@@ -7,7 +7,7 @@
 
 class IOCP_Server {
 public:
-	HANDLE getHandle() { return g_hiocp; }							// Handle Return
+	HANDLE& getHandle() { return g_hiocp; }							// Handle Return
 	IOCP_Server();													// init IOCP
 	~IOCP_Server();													// remove IOCP
 	bool initServer();

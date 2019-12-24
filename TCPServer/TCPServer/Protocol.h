@@ -26,6 +26,10 @@ const enum ProtocolType {
 	MAX_SERVER_PROTOCOL_NO,
 };
 
+// 타이머 타입
+enum TimerType { 
+	T_NormalTime,
+};
 
 // ↓ 클라 -> 서버 패킷
 struct cs_packet_dir {
