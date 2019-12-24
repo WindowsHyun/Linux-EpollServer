@@ -1,4 +1,4 @@
-#include "Main.h"
+﻿#include "Main.h"
 
 bool IOCP_Server::initServer()
 {
@@ -11,9 +11,9 @@ bool IOCP_Server::initServer()
 	}
 
 	//연결지향형 TCP , Overlapped I/O 소켓을 생성
-	g_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, NULL, WSA_FLAG_OVERLAPPED);
+	listenSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, NULL, WSA_FLAG_OVERLAPPED);
 
-	if (INVALID_SOCKET == g_socket){
+	if (INVALID_SOCKET == listenSocket){
 		std::cout << "[Error] socket()함수 실패 : " << WSAGetLastError() << std::endl;
 		return false;
 	}
@@ -27,21 +27,21 @@ bool IOCP_Server::BindandListen(const u_short port)
 	SOCKADDR_IN		stServerAddr;
 	stServerAddr.sin_family = AF_INET;
 	stServerAddr.sin_port = htons(port); //서버 포트를 설정한다.		
-	//어떤 주소에서 들어오는 접속이라도 받아들이겠다.
-	//보통 서버라면 이렇게 설정한다. 만약 한 아이피에서만 접속을 받고 싶다면
-	//그 주소를 inet_addr함수를 이용해 넣으면 된다.
+	// 어떤 주소에서 들어오는 접속이라도 받아들이겠다.
+	// 보통 서버라면 이렇게 설정한다. 만약 한 아이피에서만 접속을 받고 싶다면
+	// 그 주소를 inet_addr함수를 이용해 넣으면 된다.
 	stServerAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	//위에서 지정한 서버 주소 정보와 cIOCompletionPort 소켓을 연결한다.
-	int nRet = bind(g_socket, (SOCKADDR*)&stServerAddr, sizeof(SOCKADDR_IN));
+	// 위에서 지정한 서버 주소 정보와 cIOCompletionPort 소켓을 연결한다.
+	int nRet = ::bind(listenSocket, (SOCKADDR*)&stServerAddr, sizeof(SOCKADDR_IN));
 	if (0 != nRet){
 		std::cout << "[Error] bind()함수 실패 : " << WSAGetLastError() << std::endl;
 		return false;
 	}
 
-	//접속 요청을 받아들이기 위해 cIOCompletionPort소켓을 등록하고 
-	//접속대기큐를 5개로 설정 한다.
-	nRet = listen(g_socket, 5);
+	// 접속 요청을 받아들이기 위해 cIOCompletionPort소켓을 등록하고 
+	// 접속 대기큐를 5개로 설정 한다.
+	nRet = ::listen(listenSocket, 5);
 	if (0 != nRet){
 		std::cout << "[Error] listen()함수 실패 : " << WSAGetLastError() << std::endl;
 		return false;
@@ -79,7 +79,7 @@ void IOCP_Server::initClient(std::list<class PLAYER *>& player)
 {
 	// 플레이어 데이터를 미리 추가해 놓는다.
 	for (int i = 0; i < MAX_PLAYER; ++i) {
-		class PLAYER * tmp_player = new class PLAYER;
+		PLAYER * tmp_player = new PLAYER;
 		tmp_player->set_init_player();
 		player.push_back(tmp_player);
 	}
@@ -87,7 +87,28 @@ void IOCP_Server::initClient(std::list<class PLAYER *>& player)
 	// 세션 데이터도 미리 추가해 놓는다.
 	for (int i = 0; i < MAX_PLAYER; ++i) {
 		PLAYER_Session * tmp_session = new PLAYER_Session;
+		tmp_session->set_init_session();
 		player_session.push_back(tmp_session);
+	}
+}
+
+void IOCP_Server::destroyThread()
+{
+	mIsWorkerRun = false;
+	CloseHandle(g_hiocp);
+
+	for (auto& th : mIOWorkerThreads){
+		if (th.joinable()){
+			th.join();
+		}
+	}
+
+	//Accepter 쓰레드를 종요한다.
+	mIsAccepterRun = false;
+	closesocket(listenSocket);
+
+	if (mAccepterThread.joinable()){
+		mAccepterThread.join();
 	}
 }
 
@@ -108,7 +129,7 @@ bool IOCP_Server::CreateWokerThread()
 void IOCP_Server::WokerThread()
 {
 	//CompletionKey를 받을 포인터 변수
-	class PLAYER_Session* pClientInfo = NULL;
+	PLAYER_Session* pClientInfo = NULL;
 	//함수 호출 성공 여부
 	BOOL bSuccess = TRUE;
 	//Overlapped I/O작업에서 전송된 데이터 크기
@@ -209,20 +230,23 @@ bool IOCP_Server::CreateAccepterThread()
 
 void IOCP_Server::AccepterThread()
 {
-	SOCKADDR_IN		stClientAddr;
-	int nAddrLen = sizeof(SOCKADDR_IN);
+	SOCKADDR_IN client_addr;
+	auto client_len = static_cast<int>(sizeof(client_addr));
+	
 
 	while (mIsAccepterRun)
 	{
 		// 접속을 받을 구조체의 인덱스를 얻어온다.
-		class PLAYER_Session* pClientInfo = GetEmptySession();
+		PLAYER_Session* pClientInfo = GetEmptySession();
 		if (NULL == pClientInfo){
 			std::cout << "[Error] Client Full..!" << std::endl;
 			return;
 		}
 
 		// 클라이언트 접속 요청이 들어올 때까지 기다린다.
-		pClientInfo->m_socketSession = WSAAccept(g_socket,(SOCKADDR*)&stClientAddr, &nAddrLen, NULL, NULL);
+		pClientInfo->m_socketSession = WSAAccept(listenSocket, (SOCKADDR*)& client_addr, &client_len, NULL, NULL);
+		std::cout << "여기 들어오면 안됨." << std::endl;
+		std::cout << (int)pClientInfo->m_socketSession << std::endl;
 		if (INVALID_SOCKET == pClientInfo->m_socketSession){
 			continue;
 		}
@@ -243,7 +267,7 @@ void IOCP_Server::AccepterThread()
 		++uniqueId;
 
 		char clientIP[32] = { 0, };
-		inet_ntop(AF_INET, &(stClientAddr.sin_addr), clientIP, 32 - 1);
+		inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
 		std::cout << "[접속(" << uniqueId << ")] Client IP : "<< clientIP << " / SOCKET : "<< (int)pClientInfo->m_socketSession << std::endl;
 
 		
@@ -312,4 +336,5 @@ IOCP_Server::IOCP_Server()
 IOCP_Server::~IOCP_Server()
 {
 	WSACleanup();
+	destroyThread();
 }

@@ -1,4 +1,4 @@
-#include "Main.h"
+﻿#include "Main.h"
 
 IOCP_Server iocp_server;
 std::list<PLAYER *> player;
@@ -14,6 +14,7 @@ int main() {
 	iocp_server.initClient(player);			// Player Init
 	iocp_server.StartServer();				// Server 시작
 
+	//iocp_server.destroyThread();
 	for (auto& client : player) {
 		//std::cout << client->get_unique_id() << std::endl;
 	}

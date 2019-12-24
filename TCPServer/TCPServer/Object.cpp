@@ -1,4 +1,4 @@
-#include "Main.h"
+﻿#include "Main.h"
 
 void PLAYER::set_sock(const SOCKET g_sock)
 {

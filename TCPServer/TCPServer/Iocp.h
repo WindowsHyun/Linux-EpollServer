@@ -1,4 +1,4 @@
-#ifndef __ICOP_H__
+﻿#ifndef __ICOP_H__
 #define __ICOP_H__
 
 #include "Object.h"
@@ -14,9 +14,10 @@ public:
 	bool BindandListen(const u_short port);
 	bool StartServer();
 	void initClient(std::list<class PLAYER *>& player);
+	void destroyThread();
 
 private:
-	SOCKET g_socket;													// Socket
+	SOCKET listenSocket;												// Socket
 	std::chrono::high_resolution_clock::time_point serverTimer;			// 서버 기준 시간
 	HANDLE g_hiocp;														// handle 선언
 	std::vector<std::thread> mIOWorkerThreads;							// IO Worker 스레드

@@ -1,4 +1,4 @@
-#ifndef __SESSION_H__
+ï»¿#ifndef __SESSION_H__
 #define __SESSION_H__
 
 enum class IOOperation {
@@ -6,18 +6,18 @@ enum class IOOperation {
 	SEND
 };
 
-// WSAOVERLAPPED±¸Á¶Ã¼¸¦ È®Àå ½ÃÄÑ¼­ ÇÊ¿äÇÑ Á¤º¸¸¦ ´õ ³Ö¾ú´Ù.
+// WSAOVERLAPPEDêµ¬ì¡°ì²´ë¥¼ í™•ì¥ ì‹œì¼œì„œ í•„ìš”í•œ ì •ë³´ë¥¼ ë” ë„£ì—ˆë‹¤.
 struct stOverlappedEx {
-	WSAOVERLAPPED			m_wsaOverlapped;			// Overlapped I/O±¸Á¶Ã¼
-	SOCKET					m_socketSession;				// Å¬¶óÀÌ¾ğÆ® ¼ÒÄÏ
-	WSABUF					m_wsaBuf;					// Overlapped I/OÀÛ¾÷ ¹öÆÛ
-	char					m_szBuf[MAX_SOCKBUF];		// µ¥ÀÌÅÍ ¹öÆÛ
-	IOOperation				m_eOperation;				// ÀÛ¾÷ µ¿ÀÛ Á¾·ù
+	WSAOVERLAPPED			m_wsaOverlapped;			// Overlapped I/Oêµ¬ì¡°ì²´
+	SOCKET					m_socketSession;				// í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“
+	WSABUF					m_wsaBuf;					// Overlapped I/Oì‘ì—… ë²„í¼
+	char					m_szBuf[MAX_SOCKBUF];		// ë°ì´í„° ë²„í¼
+	IOOperation				m_eOperation;				// ì‘ì—… ë™ì‘ ì¢…ë¥˜
 };
 
 class PLAYER_Session {
 public:
-	SOCKET			m_socketSession;			// Cliet¿Í ¿¬°áµÇ´Â ¼ÒÄÏ
+	SOCKET			m_socketSession;			// Clietì™€ ì—°ê²°ë˜ëŠ” ì†Œì¼“
 	PLAYER_Session()
 	{
 		ZeroMemory(&m_stRecvOverlappedEx, sizeof(stOverlappedEx));
@@ -35,8 +35,8 @@ public:
 	void set_init_session();
 
 private:
-	stOverlappedEx	m_stRecvOverlappedEx;	// RECV Overlapped I/OÀÛ¾÷À» À§ÇÑ º¯¼ö
-	stOverlappedEx	m_stSendOverlappedEx;	// SEND Overlapped I/OÀÛ¾÷À» À§ÇÑ º¯¼ö
-	unsigned __int64 unique_id;				// °íÀ¯ ¾ÆÀÌµğ
+	stOverlappedEx	m_stRecvOverlappedEx;	// RECV Overlapped I/Oì‘ì—…ì„ ìœ„í•œ ë³€ìˆ˜
+	stOverlappedEx	m_stSendOverlappedEx;	// SEND Overlapped I/Oì‘ì—…ì„ ìœ„í•œ ë³€ìˆ˜
+	unsigned __int64 unique_id;				// ê³ ìœ  ì•„ì´ë””
 };
 #endif
