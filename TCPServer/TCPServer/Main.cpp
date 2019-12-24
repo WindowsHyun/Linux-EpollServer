@@ -15,10 +15,4 @@ int main() {
 	iocp_server.initClient(player);				// Player Init
 	iocp_server.StartServer();					// Server 시작
 	timer.startTimer(iocp_server.getHandle());	// Timer 시작
-
-	getchar();
-	//iocp_server.destroyThread();
-	//for (auto& client : player) {
-	//	//std::cout << client->get_unique_id() << std::endl;
-	//}
 }

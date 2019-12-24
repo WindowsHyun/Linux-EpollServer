@@ -99,22 +99,25 @@ void IOCP_Server::initClient(std::list<class PLAYER *>& player)
 
 void IOCP_Server::destroyThread()
 {
+	// Worker Thread 종료한다.
 	mIsWorkerRun = false;
 	CloseHandle(g_hiocp);
-
 	for (auto& th : mIOWorkerThreads) {
 		if (th.joinable()) {
 			th.join();
 		}
 	}
 
-	//Accepter 쓰레드를 종요한다.
+	// Accepter Thread 종료한다.
 	mIsAccepterRun = false;
 	closesocket(listenSocket);
 
 	if (mAccepterThread.joinable()) {
 		mAccepterThread.join();
 	}
+
+	// 타이머 Thread를 종료 한다.
+	timer.destroyTimer();
 }
 
 bool IOCP_Server::CreateWokerThread()
@@ -193,7 +196,6 @@ void IOCP_Server::WokerThread()
 			t->event = T_NormalTime;
 			timer.setTimerEvent(*t);
 			//----------------------------------------------------
-
 			//클라이언트에 메세지를 에코한다.
 			/*SendMsg(pClientInfo, pOverlappedEx->m_szBuf, dwIoSize);
 			BindRecv(pClientInfo);*/

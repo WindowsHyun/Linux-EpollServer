@@ -22,6 +22,7 @@ class SERVER_Timer {
 public:
 	void setTimerEvent(Timer_Event t);
 	void startTimer(HANDLE& handle);
+	void destroyTimer();
 	SERVER_Timer();
 	~SERVER_Timer();
 
@@ -29,7 +30,7 @@ public:
 private:
 	HANDLE g_hiocp;
 	std::thread timer_tread;
-	std::mutex tq_lock;
+	std::mutex	mLock;
 	std::chrono::high_resolution_clock::time_point serverTimer;
 	std::priority_queue <Timer_Event, std::vector<Timer_Event>, comparison> timer_queue;
 	void Timer_Thread();
