@@ -37,13 +37,13 @@ void SERVER_Timer::setTimerEvent(Timer_Event t)
 void SERVER_Timer::startTimer(HANDLE& handle)
 {
 	g_hiocp = handle;
-	timer_tread = std::thread([this]() { Timer_Thread(); });
-	timer_tread.join();
+	timer_thread = std::thread([this]() { Timer_Thread(); });
+	timer_thread.join();
 }
 
 void SERVER_Timer::destroyTimer()
 {
-	timer_tread.join();
+	timer_thread.join();
 }
 
 SERVER_Timer::SERVER_Timer()
@@ -53,5 +53,5 @@ SERVER_Timer::SERVER_Timer()
 
 SERVER_Timer::~SERVER_Timer()
 {
-	timer_tread.join();
+	timer_thread.join();
 }

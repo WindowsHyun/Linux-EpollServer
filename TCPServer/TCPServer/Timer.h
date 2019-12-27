@@ -29,7 +29,7 @@ public:
 
 private:
 	HANDLE g_hiocp;
-	std::thread timer_tread;
+	std::thread timer_thread;
 	std::mutex	mLock;
 	std::chrono::high_resolution_clock::time_point serverTimer;
 	std::priority_queue <Timer_Event, std::vector<Timer_Event>, comparison> timer_queue;

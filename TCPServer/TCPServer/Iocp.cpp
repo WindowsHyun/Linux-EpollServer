@@ -80,20 +80,17 @@ bool IOCP_Server::StartServer()
 	return true;
 }
 
-void IOCP_Server::initClient(std::list<class PLAYER *>& player)
+void IOCP_Server::initClient()
 {
-	// 플레이어 데이터를 미리 추가해 놓는다.
-	for (int i = 0; i < MAX_PLAYER; ++i) {
-		PLAYER * tmp_player = new PLAYER;
-		tmp_player->set_init_player();
-		player.push_back(tmp_player);
-	}
+	// 미리 player, player_session 공간을 할당 한다.
+	player_session.reserve(MAX_PLAYER);
+	player.reserve(MAX_PLAYER);
 
 	// 세션 데이터도 미리 추가해 놓는다.
 	for (int i = 0; i < MAX_PLAYER; ++i) {
-		PLAYER_Session * tmp_session = new PLAYER_Session;
-		tmp_session->set_init_session();
-		player_session.push_back(tmp_session);
+		PLAYER_Session * pPlayerSession = new PLAYER_Session;
+		pPlayerSession->set_init_session();
+		player_session.push_back(pPlayerSession);
 	}
 }
 
@@ -137,7 +134,7 @@ bool IOCP_Server::CreateWokerThread()
 void IOCP_Server::WokerThread()
 {
 	//CompletionKey를 받을 포인터 변수
-	PLAYER_Session* pClientInfo = NULL;
+	PLAYER_Session* pPlayerSession = NULL;
 	//함수 호출 성공 여부
 	BOOL bSuccess = TRUE;
 	//Overlapped I/O작업에서 전송된 데이터 크기
@@ -157,7 +154,7 @@ void IOCP_Server::WokerThread()
 		//////////////////////////////////////////////////////
 		bSuccess = GetQueuedCompletionStatus(g_hiocp,
 			&dwIoSize,					// 실제로 전송된 바이트
-			(PULONG_PTR)&pClientInfo,	// CompletionKey
+			(PULONG_PTR)&pPlayerSession,	// CompletionKey
 			&lpOverlapped,				// Overlapped IO 객체
 			INFINITE);					// 대기할 시간
 
@@ -176,8 +173,9 @@ void IOCP_Server::WokerThread()
 		//client가 접속을 끊었을때..			
 		if (FALSE == bSuccess || (0 == dwIoSize && TRUE == bSuccess))
 		{
-			std::cout << "[" << (int)pClientInfo->get_unique_id() << "]" << "Socket 접속 끊김..." << std::endl;
-			CloseSocket(pClientInfo);
+			std::cout << "[" << (int)pPlayerSession->get_unique_id() << "] Socket 접속 끊김..." << std::endl;
+			ClosePlayer(pPlayerSession->get_unique_id());
+			CloseSocket(pPlayerSession);
 			continue;
 		}
 
@@ -197,9 +195,12 @@ void IOCP_Server::WokerThread()
 			t->event = T_NormalTime;
 			timer.setTimerEvent(*t);
 			//----------------------------------------------------
-			//클라이언트에 메세지를 에코한다.
-			/*SendMsg(pClientInfo, pOverlappedEx->m_szBuf, dwIoSize);
-			BindRecv(pClientInfo);*/
+			//클라이언트에 메세지를 에코한다. 'kch'일 경우에만 리턴을 하도록 하였다.
+			if (!strcmp(pOverlappedEx->m_szBuf, "kch")) {
+				SendMsg(pPlayerSession, pOverlappedEx->m_szBuf, dwIoSize);
+				BindRecv(pPlayerSession);
+			}
+
 		}
 		break;
 		case IOOperation::SEND:
@@ -219,7 +220,7 @@ void IOCP_Server::WokerThread()
 	}
 }
 
-void IOCP_Server::CloseSocket(PLAYER_Session * pClientInfo, bool bIsForce)
+void IOCP_Server::CloseSocket(PLAYER_Session * pPlayerSession, bool bIsForce)
 {
 	struct linger stLinger = { 0, 0 };	// SO_DONTLINGER로 설정
 
@@ -230,14 +231,49 @@ void IOCP_Server::CloseSocket(PLAYER_Session * pClientInfo, bool bIsForce)
 	}
 
 	//socketClose소켓의 데이터 송수신을 모두 중단 시킨다.
-	shutdown(pClientInfo->m_socketSession, SD_BOTH);
+	shutdown(pPlayerSession->m_socketSession, SD_BOTH);
 
 	//소켓 옵션을 설정한다.
-	setsockopt(pClientInfo->m_socketSession, SOL_SOCKET, SO_LINGER, (char*)&stLinger, sizeof(stLinger));
+	setsockopt(pPlayerSession->m_socketSession, SOL_SOCKET, SO_LINGER, (char*)&stLinger, sizeof(stLinger));
 
 	//소켓 연결을 종료 시킨다. 
-	closesocket(pClientInfo->m_socketSession);
-	pClientInfo->m_socketSession = INVALID_SOCKET;
+	closesocket(pPlayerSession->m_socketSession);
+	pPlayerSession->m_socketSession = INVALID_SOCKET;
+}
+
+void IOCP_Server::ClosePlayer(unsigned __int64 uniqueId)
+{
+	player.erase(uniqueId);
+}
+
+bool IOCP_Server::SendMsg(PLAYER_Session * pPlayerSession, char * pMsg, int nLen)
+{
+	DWORD dwRecvNumBytes = 0;
+
+	// 전송될 메세지를 복사
+	CopyMemory(pPlayerSession->get_Send_over().m_szBuf, pMsg, nLen);
+
+
+	// Overlapped I/O을 위해 각 정보를 셋팅해 준다.
+	pPlayerSession->get_Send_over().m_wsaBuf.len = nLen;
+	pPlayerSession->get_Send_over().m_wsaBuf.buf = pPlayerSession->get_Send_over().m_szBuf;
+	pPlayerSession->get_Send_over().m_eOperation = IOOperation::SEND;
+
+	int nRet = WSASend(pPlayerSession->m_socketSession,
+		&(pPlayerSession->get_Send_over().m_wsaBuf),
+		1,
+		&dwRecvNumBytes,
+		0,
+		(LPWSAOVERLAPPED) & (pPlayerSession->get_Send_over()),
+		NULL);
+
+	// socket_error이면 client socket이 끊어진걸로 처리한다.
+	if (nRet == SOCKET_ERROR && (WSAGetLastError() != ERROR_IO_PENDING))
+	{
+		std::cout << "[Error] WSASend()함수 실패..! " << WSAGetLastError() << std::endl;
+		return false;
+	}
+	return true;
 }
 
 bool IOCP_Server::CreateAccepterThread()
@@ -257,36 +293,45 @@ void IOCP_Server::AccepterThread()
 	while (mIsAccepterRun)
 	{
 		// 접속을 받을 구조체의 인덱스를 얻어온다.
-		PLAYER_Session* pClientInfo = GetEmptySession();
-		if (NULL == pClientInfo) {
+		PLAYER_Session* pPlayerSession = GetEmptySession();
+		if (NULL == pPlayerSession) {
 			std::cout << "[Error] Client Full..!" << std::endl;
 			return;
 		}
 
 		// 클라이언트 접속 요청이 들어올 때까지 기다린다.
-		pClientInfo->m_socketSession = WSAAccept(listenSocket, reinterpret_cast<sockaddr *>(&client_addr), &client_len, NULL, NULL);
-		if (INVALID_SOCKET == pClientInfo->m_socketSession) {
+		pPlayerSession->m_socketSession = WSAAccept(listenSocket, reinterpret_cast<sockaddr *>(&client_addr), &client_len, NULL, NULL);
+		if (INVALID_SOCKET == pPlayerSession->m_socketSession) {
 			continue;
 		}
 
 		// I/O Completion Port객체와 소켓을 연결시킨다.
-		bool bRet = BindIOCompletionPort(pClientInfo);
+		bool bRet = BindIOCompletionPort(pPlayerSession);
 		if (false == bRet) {
 			return;
 		}
 
-		//Recv Overlapped I/O작업을 요청해 놓는다.
-		bRet = BindRecv(pClientInfo);
+		// Recv Overlapped I/O작업을 요청해 놓는다.
+		bRet = BindRecv(pPlayerSession);
 		if (false == bRet) {
 			return;
 		}
+
+		// session에 set 해준다.
+		pPlayerSession->set_unique_id(uniqueId);
+
+		// 플레이어를 set 해준다.
+		class PLAYER * acceptPlayer = new class PLAYER;
+		acceptPlayer->set_sock(pPlayerSession->m_socketSession);
+		acceptPlayer->set_unique_id(uniqueId);
+		player.insert(std::unordered_map<unsigned __int64, class PLAYER *>::value_type(uniqueId, acceptPlayer));
 
 		//클라이언트 갯수 증가
 		++uniqueId;
 
 		char clientIP[32] = { 0, };
 		inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
-		std::cout << "[접속(" << uniqueId << ")] Client IP : " << clientIP << " / SOCKET : " << (int)pClientInfo->m_socketSession << std::endl;
+		std::cout << "[접속(" << uniqueId << ")] Client IP : " << clientIP << " / SOCKET : " << (int)pPlayerSession->m_socketSession << std::endl;
 
 
 	}
@@ -303,10 +348,10 @@ PLAYER_Session* IOCP_Server::GetEmptySession()
 	return nullptr;
 }
 
-bool IOCP_Server::BindIOCompletionPort(PLAYER_Session * pClientInfo)
+bool IOCP_Server::BindIOCompletionPort(PLAYER_Session * pPlayerSession)
 {
-	// socket과 pClientInfo를 CompletionPort객체와 연결시킨다.
-	auto hIOCP = CreateIoCompletionPort((HANDLE)pClientInfo->m_socketSession, g_hiocp, (ULONG_PTR)(pClientInfo), 0);
+	// socket과 pPlayerSession를 CompletionPort객체와 연결시킨다.
+	auto hIOCP = CreateIoCompletionPort((HANDLE)pPlayerSession->m_socketSession, g_hiocp, (ULONG_PTR)(pPlayerSession), 0);
 
 	if (NULL == hIOCP || g_hiocp != hIOCP) {
 		std::cout << "[Error] CreateIoCompletionPort()함수 실패 : " << GetLastError() << std::endl;
@@ -316,22 +361,22 @@ bool IOCP_Server::BindIOCompletionPort(PLAYER_Session * pClientInfo)
 	return true;
 }
 
-bool IOCP_Server::BindRecv(PLAYER_Session * pClientInfo)
+bool IOCP_Server::BindRecv(PLAYER_Session * pPlayerSession)
 {
 	DWORD dwFlag = 0;
 	DWORD dwRecvNumBytes = 0;
 
 	//Overlapped I/O을 위해 각 정보를 셋팅해 준다.
-	pClientInfo->get_Recv_over().m_wsaBuf.len = MAX_SOCKBUF;
-	pClientInfo->get_Recv_over().m_wsaBuf.buf = pClientInfo->get_Recv_over().m_szBuf;
-	pClientInfo->get_Recv_over().m_eOperation = IOOperation::RECV;
+	pPlayerSession->get_Recv_over().m_wsaBuf.len = MAX_SOCKBUF;
+	pPlayerSession->get_Recv_over().m_wsaBuf.buf = pPlayerSession->get_Recv_over().m_szBuf;
+	pPlayerSession->get_Recv_over().m_eOperation = IOOperation::RECV;
 
-	int nRet = WSARecv(pClientInfo->m_socketSession,
-		&(pClientInfo->get_Recv_over().m_wsaBuf),
+	int nRet = WSARecv(pPlayerSession->m_socketSession,
+		&(pPlayerSession->get_Recv_over().m_wsaBuf),
 		1,
 		&dwRecvNumBytes,
 		&dwFlag,
-		(LPWSAOVERLAPPED) & (pClientInfo->get_Recv_over()),
+		(LPWSAOVERLAPPED) & (pPlayerSession->get_Recv_over()),
 		NULL);
 
 	//socket_error이면 client socket이 끊어진걸로 처리한다.

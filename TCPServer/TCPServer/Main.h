@@ -20,6 +20,7 @@
 #include <ctime>
 #include <list>
 #include <vector>
+#include <unordered_map>
 #include <chrono>
 #include <queue>
 #include <mutex>
@@ -33,6 +34,6 @@
 #include "Timer.h"
 
 extern IOCP_Server iocp_server;
-extern std::list<PLAYER *> player;
+extern std::unordered_map<unsigned __int64, PLAYER *> player;
 extern SERVER_Timer timer;
 #endif
