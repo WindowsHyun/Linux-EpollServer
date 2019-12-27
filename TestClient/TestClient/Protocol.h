@@ -1,14 +1,14 @@
-ï»¿#ifndef __PROTOCOL_H__
+#ifndef __PROTOCOL_H__
 #define __PROTOCOL_H__
 
 #include "Object.h"
 
 #define SERVERPORT 9000
-#define UNIQUE_START_NO 1000	// ê³ ìœ ë²ˆí˜¸ ì‹œìž‘
-#define MAX_SOCKBUF	 1024		// ìµœëŒ€ íŒ¨í‚· ì‚¬ì´ì¦ˆ
-#define MAX_PLAYER 10			// ìµœëŒ€ ì ‘ì† ì¸ì›
+#define UNIQUE_START_NO 1000	// °íÀ¯¹øÈ£ ½ÃÀÛ
+#define MAX_SOCKBUF	 1024		// ÃÖ´ë ÆÐÅ¶ »çÀÌÁî
+#define MAX_PLAYER 10			// ÃÖ´ë Á¢¼Ó ÀÎ¿ø
 
-// í”„ë¡œí† ì½œ íƒ€ìž…
+// ÇÁ·ÎÅäÄÝ Å¸ÀÔ
 const enum ProtocolType {
 	None = 0,
 
@@ -26,17 +26,12 @@ const enum ProtocolType {
 	MAX_SERVER_PROTOCOL_NO,
 };
 
-struct PACKET_HEADER {
-	unsigned short packet_len;
-	unsigned short packet_type;
-};
-
-// íƒ€ì´ë¨¸ íƒ€ìž…
+// Å¸ÀÌ¸Ó Å¸ÀÔ
 enum TimerType {
 	T_NormalTime,
 };
 
-// â†“ í´ë¼ -> ì„œë²„ íŒ¨í‚·
+// ¡é Å¬¶ó -> ¼­¹ö ÆÐÅ¶
 struct cs_packet_dir {
 	int size;
 	int type;
@@ -45,7 +40,7 @@ struct cs_packet_dir {
 };
 
 
-// â†“ ì„œë²„ -> í´ë¼ íŒ¨í‚·
+// ¡é ¼­¹ö -> Å¬¶ó ÆÐÅ¶
 struct sc_packet_clientno {
 	int size;
 	int type;

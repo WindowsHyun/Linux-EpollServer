@@ -158,7 +158,7 @@ void IOCP_Server::WokerThread()
 			&lpOverlapped,				// Overlapped IO 객체
 			INFINITE);					// 대기할 시간
 
-		//사용자 쓰레드 종료 메세지 처리..
+		// 사용자 쓰레드 종료 메세지 처리..
 		if (TRUE == bSuccess && 0 == dwIoSize && NULL == lpOverlapped)
 		{
 			mIsWorkerRun = false;
@@ -170,7 +170,7 @@ void IOCP_Server::WokerThread()
 			continue;
 		}
 
-		//client가 접속을 끊었을때..			
+		// client가 접속을 끊었을때..			
 		if (FALSE == bSuccess || (0 == dwIoSize && TRUE == bSuccess))
 		{
 			std::cout << "[" << (int)pPlayerSession->get_unique_id() << "] Socket 접속 끊김..." << std::endl;
@@ -181,26 +181,27 @@ void IOCP_Server::WokerThread()
 
 
 		stOverlappedEx* pOverlappedEx = (stOverlappedEx*)lpOverlapped;
-		//Overlapped I/O Recv작업 결과 뒤 처리
+		// Overlapped I/O Recv작업 결과 뒤 처리
 		switch (pOverlappedEx->m_eOperation) {
 		case IOOperation::RECV:
 		{
 			pOverlappedEx->m_szBuf[dwIoSize] = NULL;
+			
+			ProcessPacket(pPlayerSession, pOverlappedEx->m_szBuf[0], pOverlappedEx->m_szBuf);
 			printf("[수신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_szBuf);
-			//----------------------------------------------------
-			// 타이머 테스트
-			Timer_Event* t = new Timer_Event;
-			t->object_id = 0;
-			t->exec_time = high_resolution_clock::now() + 2048ms;
-			t->event = T_NormalTime;
-			timer.setTimerEvent(*t);
-			//----------------------------------------------------
-			//클라이언트에 메세지를 에코한다. 'kch'일 경우에만 리턴을 하도록 하였다.
-			if (!strcmp(pOverlappedEx->m_szBuf, "kch")) {
-				SendMsg(pPlayerSession, pOverlappedEx->m_szBuf, dwIoSize);
-				BindRecv(pPlayerSession);
-			}
-
+			////----------------------------------------------------
+			//// 타이머 테스트
+			//Timer_Event* t = new Timer_Event;
+			//t->object_id = 0;
+			//t->exec_time = high_resolution_clock::now() + 2048ms;
+			//t->event = T_NormalTime;
+			//timer.setTimerEvent(*t);
+			////----------------------------------------------------
+			////클라이언트에 메세지를 에코한다. 'kch'일 경우에만 리턴을 하도록 하였다.
+			//if (!strcmp(pOverlappedEx->m_szBuf, "kch")) {
+			//	SendMsg(pPlayerSession, pOverlappedEx->m_szBuf, dwIoSize);
+			//	BindRecv(pPlayerSession);
+			//}
 		}
 		break;
 		case IOOperation::SEND:
@@ -274,6 +275,21 @@ bool IOCP_Server::SendMsg(PLAYER_Session * pPlayerSession, char * pMsg, int nLen
 		return false;
 	}
 	return true;
+}
+
+void IOCP_Server::ProcessPacket(PLAYER_Session * pPlayerSession, const int protocolType,char * packet)
+{
+
+	cs_packet_dir *my_packet = reinterpret_cast<cs_packet_dir *>(packet);
+
+	my_packet->type;
+	switch (protocolType) {
+	case CLIENT_DIR:
+		break;
+	default:
+		std::cout << "[Error] ProcessPacket ProtocolType(" << protocolType << ")이 없습니다..!" << std::endl;
+		break;
+	}
 }
 
 bool IOCP_Server::CreateAccepterThread()
