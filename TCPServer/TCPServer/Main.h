@@ -32,6 +32,7 @@
 #include "Object.h"
 #include "Session.h"
 #include "Timer.h"
+#include "ReadBuffer.h"
 
 extern IOCP_Server iocp_server;
 extern std::unordered_map<unsigned __int64, PLAYER *> player;

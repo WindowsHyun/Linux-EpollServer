@@ -127,6 +127,7 @@
     <ClCompile Include="Iocp.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="ReadBuffer.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
@@ -135,6 +136,7 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="Protocol.h" />
     <ClInclude Include="Iocp.h" />
+    <ClInclude Include="ReadBuffer.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>

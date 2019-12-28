@@ -1,6 +1,8 @@
 ﻿#ifndef __SESSION_H__
 #define __SESSION_H__
 
+#include "ReadBuffer.h"
+
 enum class IOOperation {
 	RECV,
 	SEND,
@@ -12,18 +14,26 @@ struct stOverlappedEx {
 	WSAOVERLAPPED			m_wsaOverlapped;			// Overlapped I/O구조체
 	SOCKET					m_socketSession;			// 클라이언트 소켓
 	WSABUF					m_wsaBuf;					// Overlapped I/O작업 버퍼
-	char					m_szBuf[MAX_SOCKBUF];		// 데이터 버퍼
 	IOOperation				m_eOperation;				// 작업 동작 종류
 	unsigned __int64		m_unique_id;				// 유저 고유 번호
+
+	stOverlappedEx() {
+		memset(&m_wsaOverlapped, 0, sizeof(OVERLAPPED));
+		memset(&m_wsaBuf, 0, sizeof(OVERLAPPED));
+		m_socketSession = INVALID_SOCKET;
+		m_unique_id = 0;
+	}
 };
 
 class PLAYER_Session {
 public:
 	SOCKET			m_socketSession;			// Cliet와 연결되는 소켓
+	ReadBuffer		m_readBuffer;				// readBuffet
 	PLAYER_Session()
 	{
 		ZeroMemory(&m_stRecvOverlappedEx, sizeof(stOverlappedEx));
 		ZeroMemory(&m_stSendOverlappedEx, sizeof(stOverlappedEx));
+		m_readBuffer.init(MAX_SOCKBUF);
 		m_socketSession = INVALID_SOCKET;
 		unique_id = 0;
 	}

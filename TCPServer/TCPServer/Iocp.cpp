@@ -185,29 +185,13 @@ void IOCP_Server::WokerThread()
 		switch (pOverlappedEx->m_eOperation) {
 		case IOOperation::RECV:
 		{
-			pOverlappedEx->m_szBuf[dwIoSize] = NULL;
-			
-			ProcessPacket(pPlayerSession, pOverlappedEx->m_szBuf[0], pOverlappedEx->m_szBuf);
-			printf("[수신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_szBuf);
-			////----------------------------------------------------
-			//// 타이머 테스트
-			//Timer_Event* t = new Timer_Event;
-			//t->object_id = 0;
-			//t->exec_time = high_resolution_clock::now() + 2048ms;
-			//t->event = T_NormalTime;
-			//timer.setTimerEvent(*t);
-			////----------------------------------------------------
-			////클라이언트에 메세지를 에코한다. 'kch'일 경우에만 리턴을 하도록 하였다.
-			//if (!strcmp(pOverlappedEx->m_szBuf, "kch")) {
-			//	SendMsg(pPlayerSession, pOverlappedEx->m_szBuf, dwIoSize);
-			//	BindRecv(pPlayerSession);
-			//}
+			OnRecv(pOverlappedEx, dwIoSize);
 		}
 		break;
 		case IOOperation::SEND:
 		{
 			// Overlapped I/O Send작업 결과 뒤 처리
-			printf("[송신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_szBuf);
+			printf("[송신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
 		}
 		break;
 		default:
@@ -247,17 +231,26 @@ void IOCP_Server::ClosePlayer(unsigned __int64 uniqueId)
 	player.erase(uniqueId);
 }
 
-bool IOCP_Server::SendMsg(PLAYER_Session * pPlayerSession, char * pMsg, int nLen)
+bool IOCP_Server::SendPacket(PLAYER_Session * pPlayerSession, char * pMsg, int nLen)
 {
 	DWORD dwRecvNumBytes = 0;
 
+	//PACKET_HEADER packetHader;
+	//packetHader.packet_len = sizeof(pMsg);
+	//packetHader.packet_type = CLIENT_BASE;
+	//std::cout << packetHader.packet_len << std::endl;
+
+	//reinterpret_cast<const char *>(&packetHader)
+
+	//char sendMSG[MAX_SOCKBUF]{ 0 };
+
 	// 전송될 메세지를 복사
-	CopyMemory(pPlayerSession->get_Send_over().m_szBuf, pMsg, nLen);
+	CopyMemory(pPlayerSession->get_Send_over().m_wsaBuf.buf, pMsg, nLen);
 
 
 	// Overlapped I/O을 위해 각 정보를 셋팅해 준다.
 	pPlayerSession->get_Send_over().m_wsaBuf.len = nLen;
-	pPlayerSession->get_Send_over().m_wsaBuf.buf = pPlayerSession->get_Send_over().m_szBuf;
+	pPlayerSession->get_Send_over().m_wsaBuf.buf = pPlayerSession->get_Send_over().m_wsaBuf.buf;
 	pPlayerSession->get_Send_over().m_eOperation = IOOperation::SEND;
 
 	int nRet = WSASend(pPlayerSession->m_socketSession,
@@ -282,7 +275,7 @@ void IOCP_Server::ProcessPacket(PLAYER_Session * pPlayerSession, const int proto
 
 	cs_packet_dir *my_packet = reinterpret_cast<cs_packet_dir *>(packet);
 
-	my_packet->type;
+	my_packet->packet_type;
 	switch (protocolType) {
 	case CLIENT_DIR:
 		break;
@@ -290,6 +283,41 @@ void IOCP_Server::ProcessPacket(PLAYER_Session * pPlayerSession, const int proto
 		std::cout << "[Error] ProcessPacket ProtocolType(" << protocolType << ")이 없습니다..!" << std::endl;
 		break;
 	}
+}
+
+void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
+{
+	// 해결해야 한다 : playerSession은 vector로 되어 있어서 unique_id로 진행을 하게 될 경우
+	// vector 범위가 벗어 난다. 등록 자체를 std::unordered_map<unsigned __int64, PLAYER *> 로 만들어
+	// find로 찾는 방법을 진행 하는 것이 더 좋을 듯 하다.
+	auto pPlayerSession = getPlayerSession(pOver->m_unique_id);
+	std::cout << "(" << pPlayerSession->get_unique_id() << ") OnRecv..!" << std::endl;
+	//pOverlappedEx->m_szBuf[dwIoSize] = NULL;
+
+	//PACKET_HEADER *my_packet = reinterpret_cast<PACKET_HEADER *>(pOverlappedEx->m_wsaBuf.buf);
+	//my_packet->packet_type;
+	//ProcessPacket(pPlayerSession, pOverlappedEx->m_wsaBuf.buf[0], pOverlappedEx->m_wsaBuf.buf);
+	//printf("[수신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
+	//////----------------------------------------------------
+	////// 타이머 테스트
+	////Timer_Event* t = new Timer_Event;
+	////t->object_id = 0;
+	////t->exec_time = high_resolution_clock::now() + 2048ms;
+	////t->event = T_NormalTime;
+	////timer.setTimerEvent(*t);
+	//////----------------------------------------------------
+	////클라이언트에 메세지를 에코한다. 'kch'일 경우에만 리턴을 하도록 하였다.
+	//if (!strcmp(pOverlappedEx->m_wsaBuf.buf, "kch")) {
+	//	//sc_packet_clientno packet;
+	//	//packet.packet_len = sizeof(packet);
+	//	//packet.packet_type = SERVER_CLIENT_NO;
+	//	//packet.no = 0;
+
+
+	//	SendPacket(pPlayerSession, pOverlappedEx->m_wsaBuf.buf, dwIoSize);
+	//	BindRecv(pPlayerSession);
+	//}
+
 }
 
 bool IOCP_Server::CreateAccepterThread()
@@ -327,12 +355,6 @@ void IOCP_Server::AccepterThread()
 			return;
 		}
 
-		// Recv Overlapped I/O작업을 요청해 놓는다.
-		bRet = BindRecv(pPlayerSession);
-		if (false == bRet) {
-			return;
-		}
-
 		// session에 set 해준다.
 		pPlayerSession->set_unique_id(uniqueId);
 
@@ -347,8 +369,13 @@ void IOCP_Server::AccepterThread()
 
 		char clientIP[32] = { 0, };
 		inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
-		std::cout << "[접속(" << uniqueId << ")] Client IP : " << clientIP << " / SOCKET : " << (int)pPlayerSession->m_socketSession << std::endl;
+		std::cout << "[접속(" << acceptPlayer->get_unique_id() << ")] Client IP : " << clientIP << " / SOCKET : " << (int)pPlayerSession->m_socketSession << std::endl;
 
+		// Recv Overlapped I/O작업을 요청해 놓는다.
+		bRet = BindRecv(pPlayerSession);
+		if (false == bRet) {
+			return;
+		}
 
 	}
 }
@@ -381,14 +408,17 @@ bool IOCP_Server::BindRecv(PLAYER_Session * pPlayerSession)
 {
 	DWORD dwFlag = 0;
 	DWORD dwRecvNumBytes = 0;
+	WSABUF wBuf;
 
 	//Overlapped I/O을 위해 각 정보를 셋팅해 준다.
-	pPlayerSession->get_Recv_over().m_wsaBuf.len = MAX_SOCKBUF;
-	pPlayerSession->get_Recv_over().m_wsaBuf.buf = pPlayerSession->get_Recv_over().m_szBuf;
+	wBuf.len = MAX_SOCKBUF;
+	wBuf.buf = pPlayerSession->m_readBuffer.getReadBuffer();
 	pPlayerSession->get_Recv_over().m_eOperation = IOOperation::RECV;
+	pPlayerSession->get_Recv_over().m_unique_id = pPlayerSession->get_unique_id();
+	pPlayerSession->get_Recv_over().m_socketSession = pPlayerSession->m_socketSession;
 
 	int nRet = WSARecv(pPlayerSession->m_socketSession,
-		&(pPlayerSession->get_Recv_over().m_wsaBuf),
+		&wBuf,
 		1,
 		&dwRecvNumBytes,
 		&dwFlag,

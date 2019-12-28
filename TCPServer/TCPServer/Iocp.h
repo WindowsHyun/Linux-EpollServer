@@ -36,8 +36,11 @@ private:
 	bool BindRecv(PLAYER_Session* pPlayerSession);						// WSARecv Overlapped I/O 작업을 시킨다.
 	void CloseSocket(class PLAYER_Session* pPlayerSession, bool bIsForce = false);	// Socket 연결을 끊는다.
 	void ClosePlayer(unsigned __int64 uniqueId);						// Socket 연결을 끊는다.
-	bool SendMsg(PLAYER_Session* pPlayerSession, char* pMsg, int nLen);	// Packet Send 처리를 한다.
+	bool SendPacket(PLAYER_Session* pPlayerSession, char* pMsg, int nLen);	// Packet Send 처리를 한다.
 	void ProcessPacket(PLAYER_Session* pPlayerSession, const int protocolType, char *packet);	// Packet 처리를 한다.
+	void OnRecv(struct stOverlappedEx* pOver, int ioSize);				// Recv 처리를 진행 한다.
+	PLAYER_Session* getPlayerSession(int index) { return player_session[index]; }	// 플레이어 세션은 전달해 준다.
+
 };
 
 #endif

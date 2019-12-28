@@ -8,10 +8,10 @@ int main() {
 
 
 	cs_packet_dir sendPacket;
-	sendPacket.type = CLIENT_DIR;
-	sendPacket.size = sizeof(sendPacket);
-	sendPacket.dir.x = 10;
-	sendPacket.dir.y = 10;
+	sendPacket.packet_len = sizeof(sendPacket);
+	sendPacket.packet_type = CLIENT_DIR;
+	sendPacket.dir.x = 930616;
+	sendPacket.dir.y = 123456;
 
 	int retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
 	getchar();
