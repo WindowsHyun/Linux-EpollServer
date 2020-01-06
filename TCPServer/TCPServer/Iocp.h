@@ -22,7 +22,7 @@ private:
 	HANDLE g_hiocp;														// handle 선언
 	std::vector<std::thread> mIOWorkerThreads;							// IO Worker 스레드
 	std::thread	mAccepterThread;										// Accept 스레드
-	std::vector<class PLAYER_Session *> player_session;					// 플레이어 세션
+	std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;	// 플레이어 세션
 	unsigned __int64 uniqueId;											// 접속 UniqueID
 	bool mIsWorkerRun;													// 작업 Thread 동작 플래그
 
@@ -31,7 +31,6 @@ private:
 	bool mIsAccepterRun;												// Accept 
 	bool CreateAccepterThread();										// AcceptThread init
 	void AccepterThread();												// AcceptThread
-	PLAYER_Session* GetEmptySession();									// Empty Session Search
 	bool BindIOCompletionPort(PLAYER_Session* pPlayerSession);			// Bind
 	bool BindRecv(PLAYER_Session* pPlayerSession);						// WSARecv Overlapped I/O 작업을 시킨다.
 	void CloseSocket(class PLAYER_Session* pPlayerSession, bool bIsForce = false);	// Socket 연결을 끊는다.
@@ -39,7 +38,7 @@ private:
 	bool SendPacket(PLAYER_Session* pPlayerSession, char* pMsg, int nLen);	// Packet Send 처리를 한다.
 	void ProcessPacket(PLAYER_Session* pPlayerSession, const int protocolType, char *packet);	// Packet 처리를 한다.
 	void OnRecv(struct stOverlappedEx* pOver, int ioSize);				// Recv 처리를 진행 한다.
-	PLAYER_Session* getPlayerSession(int index) { return player_session[index]; }	// 플레이어 세션은 전달해 준다.
+	PLAYER_Session* getPlayerSession(unsigned __int64 index) { return  player_session.find(index)->second; } // 플레이어 세션은 전달해 준다.
 
 };
 

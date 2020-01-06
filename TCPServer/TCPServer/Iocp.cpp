@@ -85,13 +85,6 @@ void IOCP_Server::initClient()
 	// 미리 player, player_session 공간을 할당 한다.
 	player_session.reserve(MAX_PLAYER);
 	player.reserve(MAX_PLAYER);
-
-	// 세션 데이터도 미리 추가해 놓는다.
-	for (int i = 0; i < MAX_PLAYER; ++i) {
-		PLAYER_Session * pPlayerSession = new PLAYER_Session;
-		pPlayerSession->set_init_session();
-		player_session.push_back(pPlayerSession);
-	}
 }
 
 void IOCP_Server::destroyThread()
@@ -229,6 +222,7 @@ void IOCP_Server::CloseSocket(PLAYER_Session * pPlayerSession, bool bIsForce)
 void IOCP_Server::ClosePlayer(unsigned __int64 uniqueId)
 {
 	player.erase(uniqueId);
+	player_session.erase(uniqueId);
 }
 
 bool IOCP_Server::SendPacket(PLAYER_Session * pPlayerSession, char * pMsg, int nLen)
@@ -270,9 +264,8 @@ bool IOCP_Server::SendPacket(PLAYER_Session * pPlayerSession, char * pMsg, int n
 	return true;
 }
 
-void IOCP_Server::ProcessPacket(PLAYER_Session * pPlayerSession, const int protocolType,char * packet)
+void IOCP_Server::ProcessPacket(PLAYER_Session * pPlayerSession, const int protocolType, char * packet)
 {
-
 	cs_packet_dir *my_packet = reinterpret_cast<cs_packet_dir *>(packet);
 
 	my_packet->packet_type;
@@ -291,6 +284,10 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 	// vector 범위가 벗어 난다. 등록 자체를 std::unordered_map<unsigned __int64, PLAYER *> 로 만들어
 	// find로 찾는 방법을 진행 하는 것이 더 좋을 듯 하다.
 	auto pPlayerSession = getPlayerSession(pOver->m_unique_id);
+	if (pPlayerSession == player_session.end()->second) {
+		std::cout << "[Error] Not Exit Session..!" << std::endl;
+		return;
+	}
 	std::cout << "(" << pPlayerSession->get_unique_id() << ") OnRecv..!" << std::endl;
 	//pOverlappedEx->m_szBuf[dwIoSize] = NULL;
 
@@ -336,9 +333,12 @@ void IOCP_Server::AccepterThread()
 
 	while (mIsAccepterRun)
 	{
-		// 접속을 받을 구조체의 인덱스를 얻어온다.
-		PLAYER_Session* pPlayerSession = GetEmptySession();
-		if (NULL == pPlayerSession) {
+		// 접속 받을 유저 소켓을 생성 한다.
+		PLAYER_Session* pPlayerSession = new PLAYER_Session;
+		if (player_session.size() <= MAX_PLAYER) {
+			pPlayerSession->set_init_session();
+		}
+		else {
 			std::cout << "[Error] Client Full..!" << std::endl;
 			return;
 		}
@@ -357,6 +357,9 @@ void IOCP_Server::AccepterThread()
 
 		// session에 set 해준다.
 		pPlayerSession->set_unique_id(uniqueId);
+
+		// player_session에 추가 한다.
+		player_session.insert(std::unordered_map<unsigned __int64, class PLAYER_Session *>::value_type(uniqueId, pPlayerSession));
 
 		// 플레이어를 set 해준다.
 		class PLAYER * acceptPlayer = new class PLAYER;
@@ -378,17 +381,6 @@ void IOCP_Server::AccepterThread()
 		}
 
 	}
-}
-
-PLAYER_Session* IOCP_Server::GetEmptySession()
-{
-	for (auto& client : player_session) {
-		if (INVALID_SOCKET == client->m_socketSession) {
-			return client;
-		}
-	}
-
-	return nullptr;
 }
 
 bool IOCP_Server::BindIOCompletionPort(PLAYER_Session * pPlayerSession)
