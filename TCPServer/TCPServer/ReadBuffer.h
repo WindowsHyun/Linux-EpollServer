@@ -9,13 +9,17 @@ public:
 	ReadBuffer();
 	~ReadBuffer();
 	void init(int size);
-	char * getHeaderPacket();
+	int getHeaderSize(char* pData, int size);
 	char * getReadBuffer(void) { return &buffer[readPos]; }
+	bool moveWritePos(int size);
+	void moveReadPos(int size);
+	int	getReadAbleSize(void);
 
 private:
 	char* buffer;
 	int totalSize = 0;
 	int readPos = 0;
+	int writePos = 0;
 	std::mutex	mLock;
 };
 

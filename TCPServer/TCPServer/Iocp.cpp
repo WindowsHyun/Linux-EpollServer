@@ -280,15 +280,59 @@ void IOCP_Server::ProcessPacket(PLAYER_Session * pPlayerSession, const int proto
 
 void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 {
-	// 해결해야 한다 : playerSession은 vector로 되어 있어서 unique_id로 진행을 하게 될 경우
-	// vector 범위가 벗어 난다. 등록 자체를 std::unordered_map<unsigned __int64, PLAYER *> 로 만들어
-	// find로 찾는 방법을 진행 하는 것이 더 좋을 듯 하다.
-	auto pPlayerSession = getPlayerSession(pOver->m_unique_id);
-	if (pPlayerSession == player_session.end()->second) {
+	// 플레이어 세션 에서 플레이어 데이터 가져오기
+	auto pTempPlayerSession = getPlayerSession(pOver->m_unique_id);
+	if (pTempPlayerSession == player_session.end()  ) {
 		std::cout << "[Error] Not Exit Session..!" << std::endl;
 		return;
 	}
-	std::cout << "(" << pPlayerSession->get_unique_id() << ") OnRecv..!" << std::endl;
+	auto pPlayerSession = pTempPlayerSession->second;
+	
+	std::cout << "User No : " << pPlayerSession->get_unique_id() << " | OnRecv..!" << std::endl;
+
+	// 쓰기를 위한 위치를 옮겨준다.
+	if (!pPlayerSession->m_readBuffer.moveWritePos(ioSize))
+	{
+		std::cout << "[Error] ReadBuffer Over Flow" << std::endl;
+	}
+
+	PACKET_HEADER header;
+	int remainSize = 0;
+	while (pPlayerSession->m_readBuffer.getReadAbleSize() > 0) {
+		// ???
+		if (pPlayerSession->m_readBuffer.getReadAbleSize() <= sizeof(header)) {
+			break;
+		}
+
+		// Packet_Header 를 가져온다.
+		auto PacketSize = pPlayerSession->m_readBuffer.getHeaderSize((char*)&header, sizeof(header));
+		if (PacketSize == -1) {
+			std::cout << "[Error] getHeaderSize" << std::endl;
+		}
+
+		if (pPlayerSession->m_readBuffer.getReadAbleSize() < header.packet_len) {
+			break;
+		}
+		else {
+			// 실제로 처리를 하는 위치
+			/*char *packetHeader = new char[header.packet_len];
+			memcpy(packetHeader, pPlayerSession->m_readBuffer.getReadBuffer(), header.packet_len);
+			auto pHeader = (PACKET_HEADER*)pPlayerSession->m_readBuffer.getReadBuffer();
+			PACKET_HEADER packet;
+			packet.packet_type = pHeader->packet_type;
+			packet.packet_len = pHeader->packet_len;*/
+
+			std::cout << "Packet Type : " << header.packet_type << std::endl << "Packet Size : " << header.packet_len << std::endl;
+
+			// 패킷을 읽고 나서의 처리
+			pPlayerSession->m_readBuffer.moveReadPos(header.packet_len);
+			remainSize += (ioSize - header.packet_len);
+
+		}
+
+	}
+	
+
 	//pOverlappedEx->m_szBuf[dwIoSize] = NULL;
 
 	//PACKET_HEADER *my_packet = reinterpret_cast<PACKET_HEADER *>(pOverlappedEx->m_wsaBuf.buf);
@@ -312,9 +356,10 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 
 
 	//	SendPacket(pPlayerSession, pOverlappedEx->m_wsaBuf.buf, dwIoSize);
-	//	BindRecv(pPlayerSession);
+		
 	//}
 
+	BindRecv(pPlayerSession);
 }
 
 bool IOCP_Server::CreateAccepterThread()

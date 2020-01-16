@@ -6,14 +6,16 @@ int main() {
 	SOCKET socket = INVALID_SOCKET;
 	init_sock(socket);
 
+	for (int i = 0; i < 5; ++i) {
+		cs_packet_dir sendPacket;
+		sendPacket.packet_len = sizeof(sendPacket);
+		sendPacket.packet_type = CLIENT_DIR - i;
+		sendPacket.dir.x = 930616 + i;
+		sendPacket.dir.y = 123456 - i;
 
-	cs_packet_dir sendPacket;
-	sendPacket.packet_len = sizeof(sendPacket);
-	sendPacket.packet_type = CLIENT_DIR;
-	sendPacket.dir.x = 930616;
-	sendPacket.dir.y = 123456;
-
-	int retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+		int retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+		std::cout << sizeof(sendPacket) << std::endl;
+	}
 	getchar();
 }
 

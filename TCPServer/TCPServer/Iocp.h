@@ -38,7 +38,7 @@ private:
 	bool SendPacket(PLAYER_Session* pPlayerSession, char* pMsg, int nLen);	// Packet Send 처리를 한다.
 	void ProcessPacket(PLAYER_Session* pPlayerSession, const int protocolType, char *packet);	// Packet 처리를 한다.
 	void OnRecv(struct stOverlappedEx* pOver, int ioSize);				// Recv 처리를 진행 한다.
-	PLAYER_Session* getPlayerSession(unsigned __int64 index) { return  player_session.find(index)->second; } // 플레이어 세션은 전달해 준다.
+	auto getPlayerSession(unsigned __int64 index) { return  player_session.find(index); } // 플레이어 세션은 전달해 준다.
 
 };
 
