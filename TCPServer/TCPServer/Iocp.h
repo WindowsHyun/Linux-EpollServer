@@ -31,7 +31,7 @@ private:
 	bool CreateAccepterThread();										// AcceptThread init
 	void AccepterThread();												// AcceptThread
 	bool BindIOCompletionPort(class PLAYER_Session* pPlayerSession);				// Bind
-	bool BindRecv(class PLAYER_Session* pPlayerSession);							// WSARecv Overlapped I/O 작업을 시킨다.
+	bool BindRecv(class PLAYER_Session* pPlayerSession, int remainSize);			// WSARecv Overlapped I/O 작업을 시킨다.
 	void CloseSocket(class PLAYER_Session* pPlayerSession, bool bIsForce = false);	// Socket 연결을 끊는다.
 	void ClosePlayer(unsigned __int64 uniqueId);									// Socket 연결을 끊는다.
 	bool SendPacket(class PLAYER_Session* pPlayerSession, char* pMsg, int nLen);	// Packet Send 처리를 한다.

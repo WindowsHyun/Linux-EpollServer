@@ -40,7 +40,7 @@ bool ReadBuffer::moveWritePos(int size)
 {
 	std::lock_guard<std::mutex> guard(mLock);
 
-	// 무조건 잘못 된거 
+	// totalSize보다 큰 패킷이 올리가 없다.
 	if (size > totalSize) {
 		return false;
 	}
@@ -63,4 +63,26 @@ int ReadBuffer::getReadAbleSize(void)
 	else {
 		return (totalSize - readPos) + writePos;
 	}
+}
+
+void ReadBuffer::checkWrite(int size)
+{
+	std::lock_guard<std::mutex> guard(mLock);
+
+	// 순환
+	if (writePos + size > totalSize)
+	{
+		printf("[INFO] writePos : %d, readPos : %d, size : %d\n", writePos, readPos , size);
+		memcpy_s(buffer, writePos - readPos,
+			&buffer[readPos], writePos - readPos);
+
+		readPos = 0;
+		writePos = writePos - readPos;
+		//printf("Because Packet split and buffer over ... (%d)\n", writePos);
+	}
+}
+
+void ReadBuffer::show_readWrite()
+{
+	printf("[INFO] read : %d, write : %d\n", readPos, writePos);
 }

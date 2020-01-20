@@ -52,9 +52,9 @@ void Logic_API::API_Thread()
 	while (threadRun) {
 		if (!recvPacketQueue.empty()) {
 			// 로직 처리를 진행
+			//std::cout << "[INFO] API Queue : " << recvPacketQueue.size() << std::endl;
 			std::lock_guard<std::mutex> guard(mLock);
 			auto packet = recvPacketQueue.front();
-			recvPacketQueue.pop();
 
 			// Protocol Base값 을 가져온다.
 			ProtocolType protocolBase = (ProtocolType)((int)packet.packet_type / (int)PACKET_RANG_SIZE * (int)PACKET_RANG_SIZE);
@@ -70,9 +70,9 @@ void Logic_API::API_Thread()
 
 			case CLIENT_AUTH_BASE:
 			{
-				AuthRoute* auth = new AuthRoute(packet);
-				auth->ApiProcessing();
-				delete[] auth;
+				AuthRoute* auth = new AuthRoute();
+				auth->ApiProcessing(packet);
+				//delete[] auth;
 			}
 			break;
 
@@ -100,7 +100,7 @@ void Logic_API::API_Thread()
 
 			}
 
-
+			recvPacketQueue.pop();
 			delete[] packet.pData;
 
 

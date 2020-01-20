@@ -5,11 +5,11 @@
 
 class AuthRoute {
 public:
-	AuthRoute(Packet_Frame packet);
-	void ApiProcessing();	// API 贸府
+	AuthRoute();
+	~AuthRoute();
+	void ApiProcessing(Packet_Frame packet);	// API 贸府
 
 private:
-	Packet_Frame pk;
 
 };
 

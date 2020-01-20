@@ -14,6 +14,8 @@ public:
 	bool moveWritePos(int size);
 	void moveReadPos(int size);
 	int	getReadAbleSize(void);
+	void checkWrite(int size);
+	void show_readWrite();
 
 private:
 	char* buffer;
