@@ -1,15 +1,9 @@
-﻿#include "Main.h"
+﻿#include "Timer.h"
 
 void SERVER_Timer::Timer_Thread()
 {
-	for (;;) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		for (;;) {
-			// 큐가 비어있으면 꺼내면 안되니까
-			if (0 == timer_queue.size()) {
-				break;
-			}
-
+	while (threadRun) {
+		if (!timer_queue.empty()) {
 			// 여러 이벤트 중에 실행시간이 제일 최근인 이벤트를 실행해야 하므로 우선순위 큐를 만듬
 			std::lock_guard<std::mutex> guard(mLock);
 			Timer_Event t = timer_queue.top();
@@ -25,6 +19,9 @@ void SERVER_Timer::Timer_Thread()
 			}
 			PostQueuedCompletionStatus(g_hiocp, 1, t.object_id, &over->m_wsaOverlapped);
 		}
+		else {
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
 	}
 }
 
@@ -34,24 +31,29 @@ void SERVER_Timer::setTimerEvent(Timer_Event t)
 	timer_queue.push(t);
 }
 
-void SERVER_Timer::startTimer(HANDLE& handle)
+bool SERVER_Timer::start(HANDLE& handle)
 {
 	g_hiocp = handle;
+	threadRun = true;
 	timer_thread = std::thread([this]() { Timer_Thread(); });
-	timer_thread.join();
+	return true;
 }
 
-void SERVER_Timer::destroyTimer()
+bool SERVER_Timer::stop()
 {
+	threadRun = false;
 	timer_thread.join();
+
+	return true;
 }
 
 SERVER_Timer::SERVER_Timer()
 {
+	threadRun = false;
 	serverTimer = high_resolution_clock::now();
 }
 
 SERVER_Timer::~SERVER_Timer()
 {
-	timer_thread.join();
+	stop();
 }

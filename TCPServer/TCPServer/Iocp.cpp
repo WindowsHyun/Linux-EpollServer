@@ -106,8 +106,9 @@ void IOCP_Server::destroyThread()
 		mAccepterThread.join();
 	}
 
-	// 타이머 Thread를 종료 한다.
-	timer.destroyTimer();
+	// Timer, API Thread를 종료 한다.
+	api.stop();
+	timer.stop();
 }
 
 bool IOCP_Server::CreateWokerThread()
@@ -209,14 +210,14 @@ void IOCP_Server::CloseSocket(class PLAYER_Session * pPlayerSession, bool bIsFor
 	}
 
 	//socketClose소켓의 데이터 송수신을 모두 중단 시킨다.
-	shutdown(pPlayerSession->m_socketSession, SD_BOTH);
+	shutdown(pPlayerSession->get_sock(), SD_BOTH);
 
 	//소켓 옵션을 설정한다.
-	setsockopt(pPlayerSession->m_socketSession, SOL_SOCKET, SO_LINGER, (char*)&stLinger, sizeof(stLinger));
+	setsockopt(pPlayerSession->get_sock(), SOL_SOCKET, SO_LINGER, (char*)&stLinger, sizeof(stLinger));
 
 	//소켓 연결을 종료 시킨다. 
-	closesocket(pPlayerSession->m_socketSession);
-	pPlayerSession->m_socketSession = INVALID_SOCKET;
+	closesocket(pPlayerSession->get_sock());
+	pPlayerSession->get_sock() = INVALID_SOCKET;
 }
 
 void IOCP_Server::ClosePlayer(unsigned __int64 uniqueId)
@@ -247,7 +248,7 @@ bool IOCP_Server::SendPacket(class PLAYER_Session * pPlayerSession, char * pMsg,
 	pPlayerSession->get_Send_over().m_wsaBuf.buf = pPlayerSession->get_Send_over().m_wsaBuf.buf;
 	pPlayerSession->get_Send_over().m_eOperation = IOOperation::SEND;
 
-	int nRet = WSASend(pPlayerSession->m_socketSession,
+	int nRet = WSASend(pPlayerSession->get_sock(),
 		&(pPlayerSession->get_Send_over().m_wsaBuf),
 		1,
 		&dwRecvNumBytes,
@@ -270,7 +271,7 @@ void IOCP_Server::ProcessPacket(class PLAYER_Session * pPlayerSession, const int
 
 	my_packet->packet_type;
 	switch (protocolType) {
-	case CLIENT_DIR:
+	case CLIENT_INFO_TEST:
 		break;
 	default:
 		std::cout << "[Error] ProcessPacket ProtocolType(" << protocolType << ")이 없습니다..!" << std::endl;
@@ -288,44 +289,40 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 	}
 	auto pPlayerSession = pTempPlayerSession->second;
 	
-	std::cout << "User No : " << pPlayerSession->get_unique_id() << " | OnRecv..!" << std::endl;
+	//std::cout << "User No : " << pPlayerSession->get_unique_id() << " | OnRecv..!" << std::endl;
 
 	// 쓰기를 위한 위치를 옮겨준다.
-	if (!pPlayerSession->m_readBuffer.moveWritePos(ioSize))
+	if (!pPlayerSession->get_buffer().moveWritePos(ioSize))
 	{
 		std::cout << "[Error] ReadBuffer Over Flow" << std::endl;
 	}
 
 	PACKET_HEADER header;
 	int remainSize = 0;
-	while (pPlayerSession->m_readBuffer.getReadAbleSize() > 0) {
+	while (pPlayerSession->get_buffer().getReadAbleSize() > 0) {
 		// ???
-		if (pPlayerSession->m_readBuffer.getReadAbleSize() <= sizeof(header)) {
+		if (pPlayerSession->get_buffer().getReadAbleSize() <= sizeof(header)) {
 			break;
 		}
 
 		// Packet_Header 를 가져온다.
-		auto PacketSize = pPlayerSession->m_readBuffer.getHeaderSize((char*)&header, sizeof(header));
+		auto PacketSize = pPlayerSession->get_buffer().getHeaderSize((char*)&header, sizeof(header));
 		if (PacketSize == -1) {
 			std::cout << "[Error] getHeaderSize" << std::endl;
 		}
 
-		if (pPlayerSession->m_readBuffer.getReadAbleSize() < header.packet_len) {
+		if (pPlayerSession->get_buffer().getReadAbleSize() < header.packet_len) {
 			break;
 		}
 		else {
 			// 실제로 처리를 하는 위치
-			/*char *packetHeader = new char[header.packet_len];
-			memcpy(packetHeader, pPlayerSession->m_readBuffer.getReadBuffer(), header.packet_len);
-			auto pHeader = (PACKET_HEADER*)pPlayerSession->m_readBuffer.getReadBuffer();
-			PACKET_HEADER packet;
-			packet.packet_type = pHeader->packet_type;
-			packet.packet_len = pHeader->packet_len;*/
+			//std::cout << "Packet Type : " << header.packet_type << std::endl << "Packet Size : " << header.packet_len << std::endl;
 
-			std::cout << "Packet Type : " << header.packet_type << std::endl << "Packet Size : " << header.packet_len << std::endl;
+			// API 라이브러리로 해당 값을 전달 시켜 준다.
+			api.packet_Add(pPlayerSession->get_unique_id(), pPlayerSession->get_buffer().getReadBuffer(), header.packet_len);
 
-			// 패킷을 읽고 나서의 처리
-			pPlayerSession->m_readBuffer.moveReadPos(header.packet_len);
+			// 읽기 완료 처리
+			pPlayerSession->get_buffer().moveReadPos(header.packet_len);
 			remainSize += (ioSize - header.packet_len);
 
 		}
@@ -389,8 +386,8 @@ void IOCP_Server::AccepterThread()
 		}
 
 		// 클라이언트 접속 요청이 들어올 때까지 기다린다.
-		pPlayerSession->m_socketSession = WSAAccept(listenSocket, reinterpret_cast<sockaddr *>(&client_addr), &client_len, NULL, NULL);
-		if (INVALID_SOCKET == pPlayerSession->m_socketSession) {
+		pPlayerSession->get_sock() = WSAAccept(listenSocket, reinterpret_cast<sockaddr *>(&client_addr), &client_len, NULL, NULL);
+		if (INVALID_SOCKET == pPlayerSession->get_sock()) {
 			continue;
 		}
 
@@ -408,7 +405,7 @@ void IOCP_Server::AccepterThread()
 
 		// 플레이어를 set 해준다.
 		class PLAYER * acceptPlayer = new class PLAYER;
-		acceptPlayer->set_sock(pPlayerSession->m_socketSession);
+		acceptPlayer->set_sock(pPlayerSession->get_sock());
 		acceptPlayer->set_unique_id(uniqueId);
 		player.insert(std::unordered_map<unsigned __int64, class PLAYER *>::value_type(uniqueId, acceptPlayer));
 
@@ -417,7 +414,7 @@ void IOCP_Server::AccepterThread()
 
 		char clientIP[32] = { 0, };
 		inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
-		std::cout << "[접속(" << acceptPlayer->get_unique_id() << ")] Client IP : " << clientIP << " / SOCKET : " << (int)pPlayerSession->m_socketSession << std::endl;
+		std::cout << "[접속(" << acceptPlayer->get_unique_id() << ")] Client IP : " << clientIP << " / SOCKET : " << (int)pPlayerSession->get_sock() << std::endl;
 
 		// Recv Overlapped I/O작업을 요청해 놓는다.
 		bRet = BindRecv(pPlayerSession);
@@ -431,7 +428,7 @@ void IOCP_Server::AccepterThread()
 bool IOCP_Server::BindIOCompletionPort(class PLAYER_Session * pPlayerSession)
 {
 	// socket과 pPlayerSession를 CompletionPort객체와 연결시킨다.
-	auto hIOCP = CreateIoCompletionPort((HANDLE)pPlayerSession->m_socketSession, g_hiocp, (ULONG_PTR)(pPlayerSession), 0);
+	auto hIOCP = CreateIoCompletionPort((HANDLE)pPlayerSession->get_sock(), g_hiocp, (ULONG_PTR)(pPlayerSession), 0);
 
 	if (NULL == hIOCP || g_hiocp != hIOCP) {
 		std::cout << "[Error] CreateIoCompletionPort()함수 실패 : " << GetLastError() << std::endl;
@@ -449,12 +446,12 @@ bool IOCP_Server::BindRecv(class PLAYER_Session * pPlayerSession)
 
 	//Overlapped I/O을 위해 각 정보를 셋팅해 준다.
 	wBuf.len = MAX_SOCKBUF;
-	wBuf.buf = pPlayerSession->m_readBuffer.getReadBuffer();
+	wBuf.buf = pPlayerSession->get_buffer().getReadBuffer();
 	pPlayerSession->get_Recv_over().m_eOperation = IOOperation::RECV;
 	pPlayerSession->get_Recv_over().m_unique_id = pPlayerSession->get_unique_id();
-	pPlayerSession->get_Recv_over().m_socketSession = pPlayerSession->m_socketSession;
+	pPlayerSession->get_Recv_over().m_socketSession = pPlayerSession->get_sock();
 
-	int nRet = WSARecv(pPlayerSession->m_socketSession,
+	int nRet = WSARecv(pPlayerSession->get_sock(),
 		&wBuf,
 		1,
 		&dwRecvNumBytes,

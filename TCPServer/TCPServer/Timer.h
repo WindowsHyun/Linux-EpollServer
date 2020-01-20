@@ -1,6 +1,8 @@
 ﻿#ifndef __TIMER_H__
 #define __TIMER_H__
 
+#include "Main.h"
+
 using namespace std::chrono;
 
 struct Timer_Event {
@@ -21,14 +23,15 @@ public:
 class SERVER_Timer {
 public:
 	void setTimerEvent(Timer_Event t);
-	void startTimer(HANDLE& handle);
-	void destroyTimer();
+	bool start(HANDLE& handle);
+	bool stop();
 	SERVER_Timer();
 	~SERVER_Timer();
 
 
 private:
 	HANDLE g_hiocp;
+	bool threadRun;
 	std::thread timer_thread;
 	std::mutex	mLock;
 	std::chrono::high_resolution_clock::time_point serverTimer;

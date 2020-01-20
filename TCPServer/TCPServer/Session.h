@@ -1,6 +1,7 @@
 ﻿#ifndef __SESSION_H__
 #define __SESSION_H__
 
+#include "Main.h"
 #include "ReadBuffer.h"
 
 enum class IOOperation {
@@ -27,10 +28,7 @@ struct stOverlappedEx {
 
 class PLAYER_Session {
 public:
-	SOCKET			m_socketSession;			// Cliet와 연결되는 소켓
-	ReadBuffer		m_readBuffer;				// readBuffet
-	PLAYER_Session()
-	{
+	PLAYER_Session() {
 		ZeroMemory(&m_stRecvOverlappedEx, sizeof(stOverlappedEx));
 		ZeroMemory(&m_stSendOverlappedEx, sizeof(stOverlappedEx));
 		m_readBuffer.init(MAX_SOCKBUF);
@@ -38,6 +36,8 @@ public:
 		unique_id = 0;
 	}
 	// get
+	SOCKET& get_sock() { return m_socketSession; }
+	ReadBuffer& get_buffer() { return m_readBuffer; }
 	unsigned __int64 get_unique_id() { return unique_id; }
 	stOverlappedEx& get_Recv_over() { return m_stRecvOverlappedEx; }
 	stOverlappedEx& get_Send_over() { return m_stSendOverlappedEx; }
@@ -47,6 +47,8 @@ public:
 	void set_init_session();
 
 private:
+	SOCKET			m_socketSession;		// Cliet와 연결되는 소켓
+	ReadBuffer		m_readBuffer;			// readBuffet
 	stOverlappedEx	m_stRecvOverlappedEx;	// RECV Overlapped I/O작업을 위한 변수
 	stOverlappedEx	m_stSendOverlappedEx;	// SEND Overlapped I/O작업을 위한 변수
 	unsigned __int64 unique_id;				// 고유 아이디

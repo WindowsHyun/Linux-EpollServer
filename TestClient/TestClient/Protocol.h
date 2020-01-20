@@ -14,20 +14,58 @@ const enum ProtocolType {
 	None = 0,
 
 	PACKET_PROTOCOL_BASE = 1000,
-	PACKET_RANG_SIZE = 1000,
+	PACKET_RANG_SIZE = 100,
 
 	// Client to Server
 	CLIENT_BASE = PACKET_PROTOCOL_BASE,
-	CLIENT_DIR,
-	CLIENT_TEST,
+	CLIENT_AUTH_BASE = CLIENT_BASE + PACKET_RANG_SIZE,
+	CLIENT_FRONT_BASE = CLIENT_AUTH_BASE + PACKET_RANG_SIZE,
+	CLIENT_GOODS_BASE = CLIENT_FRONT_BASE + PACKET_RANG_SIZE,
+	CLIENT_INFO_BASE = CLIENT_GOODS_BASE + PACKET_RANG_SIZE,
 
+	// Auth
+	CLIENT_AUTH_LOGIN = CLIENT_AUTH_BASE,
+	CLIENT_AUTH_TEST,
+	CLIENT_AUTH_TEST2,
+	CLIENT_AUTH_TEST3,
+	CLIENT_AUTH_TEST4,
+
+	// Front
+	CLIENT_FRONT_ACCOUNT = CLIENT_FRONT_BASE,
+	CLIENT_FRONT_TEST,
+
+	// Goods
+	CLIENT_GOODS_INFO = CLIENT_GOODS_BASE,
+	CLIENT_GOODS_TEST,
+
+	// Info
+	CLIENT_INFO_DATA = CLIENT_INFO_BASE,
+	CLIENT_INFO_TEST,
+
+	// Max Protocol No (Client)
 	MAX_CLIENT_PROTOCOL_NO,
 
-	// Server to Client
-	SERVER_BASE = CLIENT_BASE + PACKET_RANG_SIZE,
-	SERVER_CLIENT_NO,
-	SERVER_CLIENT_DIR,
 
+	// Server to Client
+	SERVER_BASE = MAX_CLIENT_PROTOCOL_NO + PACKET_RANG_SIZE - 1,	// Client 마지막 번호 에서 부터 시작한다.
+	SERVER_AUTH_BASE = SERVER_BASE + PACKET_RANG_SIZE,
+	SERVER_FRONT_BASE = SERVER_AUTH_BASE + PACKET_RANG_SIZE,
+	SERVER_GOODS_BASE = SERVER_FRONT_BASE + PACKET_RANG_SIZE,
+	SERVER_INFO_BASE = SERVER_GOODS_BASE + PACKET_RANG_SIZE,
+
+	// Auth
+	SERVER_CLIENT_NO = SERVER_AUTH_BASE,
+
+	// Front
+	SERVER_FRONT_ACCOUNT = SERVER_FRONT_BASE,
+
+	// Goods
+	SERVER_GOODS_INFO = SERVER_GOODS_BASE,
+
+	// Info
+	SERVER_INFO_TEST = SERVER_INFO_BASE,
+
+	// Max Protocol No (Server)
 	MAX_SERVER_PROTOCOL_NO,
 };
 
@@ -35,6 +73,13 @@ const enum ProtocolType {
 struct PACKET_HEADER {
 	unsigned short packet_len;
 	unsigned short packet_type;
+};
+
+struct Packet_Frame {
+	unsigned short packet_type = -1; // NONE
+	unsigned short size = 0;
+	unsigned __int64 unique_id = 0;
+	char* pData = nullptr;
 };
 
 // 타이머 타입
@@ -56,7 +101,7 @@ struct cs_packet_test : public PACKET_HEADER {
 
 // ↓ 서버 -> 클라 패킷
 struct sc_packet_clientno : public PACKET_HEADER {
-	int no;
+	unsigned __int64 no;
 };
 
 struct sc_packet_dir : public PACKET_HEADER {

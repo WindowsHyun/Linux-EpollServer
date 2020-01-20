@@ -6,16 +6,50 @@ int main() {
 	SOCKET socket = INVALID_SOCKET;
 	init_sock(socket);
 
-	for (int i = 0; i < 5; ++i) {
-		cs_packet_dir sendPacket;
-		sendPacket.packet_len = sizeof(sendPacket);
-		sendPacket.packet_type = CLIENT_DIR - i;
-		sendPacket.dir.x = 930616 + i;
-		sendPacket.dir.y = 123456 - i;
+	/*for (int i = 0; i < 5; ++i) {
+		
+	}*/
+	cs_packet_dir sendPacket;
+	sendPacket.packet_len = sizeof(sendPacket);
+	sendPacket.packet_type = CLIENT_AUTH_TEST;
+	sendPacket.dir.x = 1;
+	sendPacket.dir.y = 123456;
 
-		int retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
-		std::cout << sizeof(sendPacket) << std::endl;
-	}
+	int retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+	std::cout << sizeof(sendPacket) << std::endl;
+
+	sendPacket.packet_len = sizeof(sendPacket);
+	sendPacket.packet_type = CLIENT_AUTH_TEST2;
+	sendPacket.dir.x = 2;
+	sendPacket.dir.y = 123456;
+
+	 retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+	std::cout << sizeof(sendPacket) << std::endl;
+
+	sendPacket.packet_len = sizeof(sendPacket);
+	sendPacket.packet_type = CLIENT_AUTH_TEST3;
+	sendPacket.dir.x = 3;
+	sendPacket.dir.y = 123456;
+
+	 retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+	std::cout << sizeof(sendPacket) << std::endl;
+
+	sendPacket.packet_len = sizeof(sendPacket);
+	sendPacket.packet_type = CLIENT_AUTH_TEST4;
+	sendPacket.dir.x = 4;
+	sendPacket.dir.y = 123456;
+
+	retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+	std::cout << sizeof(sendPacket) << std::endl;
+
+	sendPacket.packet_len = sizeof(sendPacket);
+	sendPacket.packet_type = CLIENT_AUTH_TEST4 + 1;
+	sendPacket.dir.x = 4;
+	sendPacket.dir.y = 123456;
+
+	retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+	std::cout << sizeof(sendPacket) << std::endl;
+
 	getchar();
 }
 

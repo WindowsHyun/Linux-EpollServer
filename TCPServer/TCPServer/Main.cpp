@@ -1,9 +1,11 @@
 ﻿#include "Main.h"
 
 class IOCP_Server iocp_server;
+class SERVER_Timer timer;
+class Logic_API api;
+std::queue<Packet_Frame> recvPacketQueue;
 std::unordered_map<unsigned __int64, class PLAYER *> player;
 std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;
-SERVER_Timer timer;
 
 int main() {
 	std::cout << "Client Start Packet No : " << CLIENT_BASE << std::endl;
@@ -14,5 +16,9 @@ int main() {
 	iocp_server.BindandListen(SERVERPORT);		// Listen 처리
 	iocp_server.initClient();					// Player Init
 	iocp_server.StartServer();					// Server 시작
-	timer.startTimer(iocp_server.getHandle());	// Timer 시작
+	api.start();								// API처리 시작
+	timer.start(iocp_server.getHandle());		// Timer 시작
+
+	getchar();
+	return 0;
 }

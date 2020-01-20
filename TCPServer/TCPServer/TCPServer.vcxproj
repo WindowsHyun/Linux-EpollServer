@@ -126,6 +126,7 @@
   <ItemGroup>
     <ClCompile Include="Api.cpp" />
     <ClCompile Include="Iocp.cpp" />
+    <ClCompile Include="L_Auth.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ReadBuffer.cpp" />
@@ -134,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Api.h" />
+    <ClInclude Include="L_Auth.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Protocol.h" />
