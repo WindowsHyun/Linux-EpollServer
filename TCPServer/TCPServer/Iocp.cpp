@@ -1,4 +1,4 @@
-﻿#include "Main.h"
+﻿#include "iocp.h"
 
 bool IOCP_Server::initServer()
 {
@@ -198,7 +198,7 @@ void IOCP_Server::WokerThread()
 	}
 }
 
-void IOCP_Server::CloseSocket(PLAYER_Session * pPlayerSession, bool bIsForce)
+void IOCP_Server::CloseSocket(class PLAYER_Session * pPlayerSession, bool bIsForce)
 {
 	struct linger stLinger = { 0, 0 };	// SO_DONTLINGER로 설정
 
@@ -225,7 +225,7 @@ void IOCP_Server::ClosePlayer(unsigned __int64 uniqueId)
 	player_session.erase(uniqueId);
 }
 
-bool IOCP_Server::SendPacket(PLAYER_Session * pPlayerSession, char * pMsg, int nLen)
+bool IOCP_Server::SendPacket(class PLAYER_Session * pPlayerSession, char * pMsg, int nLen)
 {
 	DWORD dwRecvNumBytes = 0;
 
@@ -264,7 +264,7 @@ bool IOCP_Server::SendPacket(PLAYER_Session * pPlayerSession, char * pMsg, int n
 	return true;
 }
 
-void IOCP_Server::ProcessPacket(PLAYER_Session * pPlayerSession, const int protocolType, char * packet)
+void IOCP_Server::ProcessPacket(class PLAYER_Session * pPlayerSession, const int protocolType, char * packet)
 {
 	cs_packet_dir *my_packet = reinterpret_cast<cs_packet_dir *>(packet);
 
@@ -281,7 +281,7 @@ void IOCP_Server::ProcessPacket(PLAYER_Session * pPlayerSession, const int proto
 void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 {
 	// 플레이어 세션 에서 플레이어 데이터 가져오기
-	auto pTempPlayerSession = getPlayerSession(pOver->m_unique_id);
+	auto pTempPlayerSession = player_session.find(pOver->m_unique_id); // getPlayerSession(pOver->m_unique_id);
 	if (pTempPlayerSession == player_session.end()  ) {
 		std::cout << "[Error] Not Exit Session..!" << std::endl;
 		return;
@@ -428,7 +428,7 @@ void IOCP_Server::AccepterThread()
 	}
 }
 
-bool IOCP_Server::BindIOCompletionPort(PLAYER_Session * pPlayerSession)
+bool IOCP_Server::BindIOCompletionPort(class PLAYER_Session * pPlayerSession)
 {
 	// socket과 pPlayerSession를 CompletionPort객체와 연결시킨다.
 	auto hIOCP = CreateIoCompletionPort((HANDLE)pPlayerSession->m_socketSession, g_hiocp, (ULONG_PTR)(pPlayerSession), 0);
@@ -441,7 +441,7 @@ bool IOCP_Server::BindIOCompletionPort(PLAYER_Session * pPlayerSession)
 	return true;
 }
 
-bool IOCP_Server::BindRecv(PLAYER_Session * pPlayerSession)
+bool IOCP_Server::BindRecv(class PLAYER_Session * pPlayerSession)
 {
 	DWORD dwFlag = 0;
 	DWORD dwRecvNumBytes = 0;

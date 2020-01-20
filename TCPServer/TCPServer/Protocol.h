@@ -16,13 +16,17 @@ const enum ProtocolType {
 	PACKET_PROTOCOL_BASE = 1000,
 	PACKET_RANG_SIZE = 1000,
 
-	CLIENT_BASE = PACKET_PROTOCOL_BASE,				// Client to Server
+	// Client to Server
+	CLIENT_BASE = PACKET_PROTOCOL_BASE,
 	CLIENT_DIR,
+	CLIENT_TEST,
 
 	MAX_CLIENT_PROTOCOL_NO,
 
-	SERVER_BASE = CLIENT_BASE + PACKET_RANG_SIZE,	// Server to Client
+	// Server to Client
+	SERVER_BASE = CLIENT_BASE + PACKET_RANG_SIZE,
 	SERVER_CLIENT_NO,
+	SERVER_CLIENT_DIR,
 
 	MAX_SERVER_PROTOCOL_NO,
 };
@@ -43,10 +47,20 @@ struct cs_packet_dir : public PACKET_HEADER {
 	Location dir;
 };
 
+struct cs_packet_test : public PACKET_HEADER {
+	int tp;
+	int cp;
+	int xp;
+};
+
 
 // ↓ 서버 -> 클라 패킷
 struct sc_packet_clientno : public PACKET_HEADER {
 	int no;
+};
+
+struct sc_packet_dir : public PACKET_HEADER {
+	Location dir;
 };
 
 #endif

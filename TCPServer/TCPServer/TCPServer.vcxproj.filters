@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="소스 파일\Library">
+      <UniqueIdentifier>{3f3494d1-3f40-4c98-8b4d-899aed58dff1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Library">
+      <UniqueIdentifier>{0ed71449-1115-4a12-98a3-e46c3b5447e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Object.cpp">
@@ -32,6 +38,9 @@
     </ClCompile>
     <ClCompile Include="ReadBuffer.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Api.cpp">
+      <Filter>소스 파일\Library</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="ReadBuffer.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Api.h">
+      <Filter>헤더 파일\Library</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -33,8 +33,10 @@
 #include "Session.h"
 #include "Timer.h"
 #include "ReadBuffer.h"
+#include "Api.h"
 
-extern IOCP_Server iocp_server;
-extern std::unordered_map<unsigned __int64, PLAYER *> player;
+extern class IOCP_Server iocp_server;
+extern std::unordered_map<unsigned __int64, class PLAYER *> player;					// 플레이어 데이터
+extern std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;	// 플레이어 세션
 extern SERVER_Timer timer;
 #endif

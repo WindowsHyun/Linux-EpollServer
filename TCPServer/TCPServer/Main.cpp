@@ -1,7 +1,8 @@
 ﻿#include "Main.h"
 
-IOCP_Server iocp_server;
-std::unordered_map<unsigned __int64, PLAYER *> player;
+class IOCP_Server iocp_server;
+std::unordered_map<unsigned __int64, class PLAYER *> player;
+std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;
 SERVER_Timer timer;
 
 int main() {
