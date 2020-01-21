@@ -39,10 +39,10 @@
     <ClCompile Include="ReadBuffer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Api.cpp">
+    <ClCompile Include="Library\Api.cpp">
       <Filter>소스 파일\Library</Filter>
     </ClCompile>
-    <ClCompile Include="L_Auth.cpp">
+    <ClCompile Include="Library\L_Auth.cpp">
       <Filter>소스 파일\Library</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,11 +68,14 @@
     <ClInclude Include="ReadBuffer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Api.h">
+    <ClInclude Include="Library\Api.h">
       <Filter>헤더 파일\Library</Filter>
     </ClInclude>
-    <ClInclude Include="L_Auth.h">
+    <ClInclude Include="Library\L_Auth.h">
       <Filter>헤더 파일\Library</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

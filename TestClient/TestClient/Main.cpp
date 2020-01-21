@@ -15,53 +15,55 @@ int main() {
 		sendPacket.packet_len = sizeof(sendPacket);
 		sendPacket.packet_type = CLIENT_AUTH_TEST;
 		sendPacket.dir.x = 1;
-		sendPacket.dir.y = 1;
+		sendPacket.dir.y = totalPacket_cnt;
 
 		int retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
 		totalPacket_cnt++;
-		std::cout << "[INFO] Total Packet Count : " << totalPacket_cnt << std::endl;
-	}
-	exit(1);
+		Sleep(1);
 		//std::cout << sizeof(sendPacket) << std::endl;
 
-	//	sendPacket.packet_len = sizeof(sendPacket);
-	//	sendPacket.packet_type = CLIENT_AUTH_TEST2;
-	//	sendPacket.dir.x = 2;
-	//	sendPacket.dir.y = totalPacket_cnt;
+		sendPacket.packet_len = sizeof(sendPacket);
+		sendPacket.packet_type = CLIENT_AUTH_TEST2;
+		sendPacket.dir.x = 2;
+		sendPacket.dir.y = totalPacket_cnt;
 
-	//	retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
-	//	totalPacket_cnt++;
-	//	//std::cout << sizeof(sendPacket) << std::endl;
+		retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+		totalPacket_cnt++;
+		Sleep(1);
+		//std::cout << sizeof(sendPacket) << std::endl;
 
-	//	sendPacket.packet_len = sizeof(sendPacket);
-	//	sendPacket.packet_type = CLIENT_AUTH_TEST3;
-	//	sendPacket.dir.x = 3;
-	//	sendPacket.dir.y = totalPacket_cnt;
+		sendPacket.packet_len = sizeof(sendPacket);
+		sendPacket.packet_type = CLIENT_AUTH_TEST3;
+		sendPacket.dir.x = 3;
+		sendPacket.dir.y = totalPacket_cnt;
 
-	//	retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
-	//	totalPacket_cnt++;
-	//	//std::cout << sizeof(sendPacket) << std::endl;
+		retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+		totalPacket_cnt++;
+		Sleep(1);
+		//std::cout << sizeof(sendPacket) << std::endl;
 
-	//	sendPacket.packet_len = sizeof(sendPacket);
-	//	sendPacket.packet_type = CLIENT_AUTH_TEST4;
-	//	sendPacket.dir.x = 4;
-	//	sendPacket.dir.y = totalPacket_cnt;
+		sendPacket.packet_len = sizeof(sendPacket);
+		sendPacket.packet_type = CLIENT_AUTH_TEST4;
+		sendPacket.dir.x = 4;
+		sendPacket.dir.y = totalPacket_cnt;
 
-	//	retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
-	//	totalPacket_cnt++;
-	//	//std::cout << sizeof(sendPacket) << std::endl;
+		retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+		totalPacket_cnt++;
+		Sleep(1);
+		//std::cout << sizeof(sendPacket) << std::endl;
 
-	//	/*sendPacket.packet_len = sizeof(sendPacket);
-	//	sendPacket.packet_type = CLIENT_AUTH_TEST4 + 1;
-	//	sendPacket.dir.x = 4;
-	//	sendPacket.dir.y = 123456;
+		/*sendPacket.packet_len = sizeof(sendPacket);
+		sendPacket.packet_type = CLIENT_AUTH_TEST4 + 1;
+		sendPacket.dir.x = 4;
+		sendPacket.dir.y = 123456;
 
-	//	retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
-	//	std::cout << sizeof(sendPacket) << std::endl;*/
-	//	std::cout << "[INFO] Total Packet Count : " << totalPacket_cnt << std::endl;
-	//	//Sleep(5);
-	//}
-	
+		retval = send(socket, reinterpret_cast<const char *>(&sendPacket), sizeof(sendPacket), 0);
+		std::cout << sizeof(sendPacket) << std::endl;*/
+		
+		
+	}
+	std::cout << "[INFO] Total Packet Count : " << totalPacket_cnt << std::endl;
+	exit(1);
 	getchar();
 }
 

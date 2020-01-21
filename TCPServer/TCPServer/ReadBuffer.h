@@ -2,6 +2,7 @@
 #define __READBUFFER_H__
 
 #include <mutex>
+#include "spdlog/spdlog.h"
 
 class ReadBuffer {
 public:
@@ -15,7 +16,8 @@ public:
 	void moveReadPos(int size);
 	int	getReadAbleSize(void);
 	void checkWrite(int size);
-	void show_readWrite();
+	int getReadPos() { return readPos; }
+	int getWritePos() { return writePos; }
 
 private:
 	char* buffer;

@@ -45,11 +45,10 @@ bool ReadBuffer::moveWritePos(int size)
 
 	// totalSize보다 큰 패킷이 올리가 없다.
 	if (size > totalSize) {
+		spdlog::critical("moveWritePos size({}) > totalSize({})", size, totalSize);
 		return false;
 	}
-	//printf("[INFO] writePos : %d, ioSize : %d\n", writePos, size);
 	writePos = (writePos + size) % totalSize;
-	//printf("[INFO] writePos + size : %d, ％totalSize : %d\n", (writePos + size), (writePos + size) % totalSize);
 	return true;
 }
 
@@ -76,17 +75,10 @@ void ReadBuffer::checkWrite(int size)
 	// 순환
 	if (writePos + size >= totalSize)
 	{
-		printf("[INFO] writePos : %d, readPos : %d, size : %d\n", writePos, readPos , size);
 		memcpy_s(buffer, writePos - readPos,
 			&buffer[readPos], writePos - readPos);
 
 		readPos = 0;
 		writePos = writePos - readPos;
-		//printf("Because Packet split and buffer over ... (%d)\n", writePos);
 	}
-}
-
-void ReadBuffer::show_readWrite()
-{
-	printf("[INFO] read : %d, write : %d\n", readPos, writePos);
 }

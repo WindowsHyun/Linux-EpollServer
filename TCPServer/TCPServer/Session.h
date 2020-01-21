@@ -34,6 +34,7 @@ public:
 		m_readBuffer.init(MAX_SOCKBUF);
 		m_socketSession = INVALID_SOCKET;
 		unique_id = 0;
+		error_cnt = 0;
 	}
 	// get
 	SOCKET& get_sock() { return m_socketSession; }
@@ -41,10 +42,12 @@ public:
 	unsigned __int64 get_unique_id() { return unique_id; }
 	stOverlappedEx& get_Recv_over() { return m_stRecvOverlappedEx; }
 	stOverlappedEx& get_Send_over() { return m_stSendOverlappedEx; }
+	int get_error_cnt() { return error_cnt; }
 
 	// set
 	void set_unique_id(const unsigned __int64 id);
 	void set_init_session();
+	void set_error_cnt();
 
 private:
 	SOCKET			m_socketSession;		// Cliet와 연결되는 소켓
@@ -52,5 +55,6 @@ private:
 	stOverlappedEx	m_stRecvOverlappedEx;	// RECV Overlapped I/O작업을 위한 변수
 	stOverlappedEx	m_stSendOverlappedEx;	// SEND Overlapped I/O작업을 위한 변수
 	unsigned __int64 unique_id;				// 고유 아이디
+	int error_cnt;							// 패킷 오류 Count
 };
 #endif

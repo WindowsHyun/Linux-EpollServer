@@ -6,7 +6,7 @@ bool IOCP_Server::initServer()
 
 	int nRet = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (0 != nRet) {
-		std::cout << "[Error] WSAStartup()함수 실패 : " << WSAGetLastError() << std::endl;
+		spdlog::error("WSAStartup() 함수 실패 : {}", WSAGetLastError());
 		return false;
 	}
 
@@ -14,11 +14,11 @@ bool IOCP_Server::initServer()
 	listenSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, NULL, WSA_FLAG_OVERLAPPED);
 
 	if (INVALID_SOCKET == listenSocket) {
-		std::cout << "[Error] socket()함수 실패 : " << WSAGetLastError() << std::endl;
+		spdlog::error("socket() 함수 실패 : {}", WSAGetLastError());
 		return false;
 	}
 
-	std::cout << "Socket Init Success..!" << std::endl;
+	spdlog::info("Socket Init Success..!");
 	return true;
 }
 
@@ -36,7 +36,7 @@ bool IOCP_Server::BindandListen(const u_short port)
 	//int nRet = ::bind(listenSocket, (SOCKADDR*)&stServerAddr, sizeof(SOCKADDR_IN));
 	int nRet = ::bind(listenSocket, reinterpret_cast<sockaddr *>(&stServerAddr), sizeof(SOCKADDR_IN));
 	if (0 != nRet) {
-		std::cout << "[Error] bind()함수 실패 : " << WSAGetLastError() << std::endl;
+		spdlog::error("bind() 함수 실패 : {}", WSAGetLastError());
 		return false;
 	}
 
@@ -44,7 +44,7 @@ bool IOCP_Server::BindandListen(const u_short port)
 	// 접속 대기큐를 5개로 설정 한다.
 	nRet = ::listen(listenSocket, 5);
 	if (0 != nRet) {
-		std::cout << "[Error] listen()함수 실패 : " << WSAGetLastError() << std::endl;
+		spdlog::error("listen() 함수 실패 : {}", WSAGetLastError());
 		return false;
 	}
 
@@ -52,7 +52,8 @@ bool IOCP_Server::BindandListen(const u_short port)
 	int option = TRUE;
 	setsockopt(listenSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&option, sizeof(option));
 
-	std::cout << "Server Registration Successful..!" << std::endl;
+
+	spdlog::info("Server Registration Successful..!");
 	return true;
 }
 
@@ -61,7 +62,7 @@ bool IOCP_Server::StartServer()
 	// CompletionPort객체 생성 요청을 한다.
 	g_hiocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, MAX_WORKERTHREAD);
 	if (NULL == g_hiocp) {
-		std::cout << "[Error] CreateIoCompletionPort()함수 실패 : " << GetLastError() << std::endl;
+		spdlog::error("CreateIoCompletionPort() 함수 실패 : {}", GetLastError());
 		return false;
 	}
 
@@ -76,7 +77,7 @@ bool IOCP_Server::StartServer()
 		return false;
 	}
 
-	std::cout << "IOCP Server Start..!" << std::endl;
+	spdlog::info("IOCP Server Start..!");
 	return true;
 }
 
@@ -121,7 +122,7 @@ bool IOCP_Server::CreateWokerThread()
 		mIOWorkerThreads.emplace_back([this]() { WokerThread(); });
 	}
 
-	std::cout << "WokerThread Start..!" << std::endl;
+	spdlog::info("WokerThread Start..!");
 	return true;
 }
 
@@ -167,8 +168,8 @@ void IOCP_Server::WokerThread()
 		// client가 접속을 끊었을때..			
 		if (FALSE == bSuccess || (0 == dwIoSize && TRUE == bSuccess))
 		{
-			std::cout << "[" << (int)pPlayerSession->get_unique_id() << "] Socket 접속 끊김..." << std::endl;
-			std::cout << "[INFO] Total Packet Count : " << packet_cnt << std::endl;
+			spdlog::info("Socket 접속 끊김 / [unique_id:{}]", (int)pPlayerSession->get_unique_id());
+			spdlog::info("Total Packet Count : {}", packet_cnt);
 			ClosePlayer(pPlayerSession->get_unique_id());
 			CloseSocket(pPlayerSession);
 			continue;
@@ -186,13 +187,13 @@ void IOCP_Server::WokerThread()
 		case IOOperation::SEND:
 		{
 			// Overlapped I/O Send작업 결과 뒤 처리
-			printf("[송신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
+			spdlog::info("[SEND] bytes : {} , msg : {}", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
 		}
 		break;
 		default:
 		{
 			// 예외 상황
-			std::cout << "[Exception WokerThread(" << (int)pOverlappedEx->m_eOperation << ")] No value defined..!" << std::endl;
+			spdlog::critical("[Exception WokerThread({})] No value defined..!", (int)pOverlappedEx->m_eOperation);
 		}
 		break;
 
@@ -260,24 +261,12 @@ bool IOCP_Server::SendPacket(class PLAYER_Session * pPlayerSession, char * pMsg,
 	// socket_error이면 client socket이 끊어진걸로 처리한다.
 	if (nRet == SOCKET_ERROR && (WSAGetLastError() != ERROR_IO_PENDING))
 	{
-		std::cout << "[Error] WSASend()함수 실패..! " << WSAGetLastError() << std::endl;
+		spdlog::error("WSASend() 함수 실패 : {}", WSAGetLastError());
+		ClosePlayer(pPlayerSession->get_unique_id());
+		CloseSocket(pPlayerSession);
 		return false;
 	}
 	return true;
-}
-
-void IOCP_Server::ProcessPacket(class PLAYER_Session * pPlayerSession, const int protocolType, char * packet)
-{
-	cs_packet_dir *my_packet = reinterpret_cast<cs_packet_dir *>(packet);
-
-	my_packet->packet_type;
-	switch (protocolType) {
-	case CLIENT_INFO_TEST:
-		break;
-	default:
-		std::cout << "[Error] ProcessPacket ProtocolType(" << protocolType << ")이 없습니다..!" << std::endl;
-		break;
-	}
 }
 
 void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
@@ -285,7 +274,7 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 	// 플레이어 세션 에서 플레이어 데이터 가져오기
 	auto pTempPlayerSession = player_session.find(pOver->m_unique_id); // getPlayerSession(pOver->m_unique_id);
 	if (pTempPlayerSession == player_session.end()) {
-		std::cout << "[Error] Not Exit Session..!" << std::endl;
+		spdlog::error("No Exit Session [unique_id:{}]", pOver->m_unique_id);
 		return;
 	}
 	auto pPlayerSession = pTempPlayerSession->second;
@@ -296,14 +285,23 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 	// 쓰기를 위한 위치를 옮겨준다.
 	if (!pPlayerSession->get_buffer().moveWritePos(ioSize))
 	{
-		std::cout << "[Error] ReadBuffer Over Flow" << std::endl;
+		spdlog::error("ReadBuffer Over Flow [unique_id:{}]", pPlayerSession->get_unique_id());
 	}
 
+	PACKET_HEADER header;
 	int remainSize = 0;
 	while (pPlayerSession->get_buffer().getReadAbleSize() > 0) {
-		PACKET_HEADER header;
 
-		// ???
+		// 일정 개수 이상 Packet 오류가 나면 강제 종료 시킨다.
+		if (pPlayerSession->get_error_cnt() >= LIMIT_ERROR_CNT) {
+			spdlog::error("Limit Error Count Maximum Exceeded / ErrorCnt({}) >= LimitCnt({}) /  [unique_id:{}]", 
+				pPlayerSession->get_error_cnt(), LIMIT_ERROR_CNT, pPlayerSession->get_unique_id());
+			ClosePlayer(pPlayerSession->get_unique_id());
+			CloseSocket(pPlayerSession);
+			break;
+		}
+		
+		// 읽을 수 있는 Packet 크기가 Header Packet 보다 작을 경우 처리 한다.
 		if (pPlayerSession->get_buffer().getReadAbleSize() <= sizeof(header)) {
 			break;
 		}
@@ -311,25 +309,24 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 		// Packet_Header 를 가져온다.
 		auto PacketSize = pPlayerSession->get_buffer().getHeaderSize((char*)&header, sizeof(header));
 		if (PacketSize == -1) {
-			std::cout << "[Error] getHeaderSize" << std::endl;
+			spdlog::error("getHeaderSize [unique_id:{}]", pPlayerSession->get_unique_id());
 		}
 
-		if (pPlayerSession->get_buffer().getReadAbleSize() < header.packet_len) {
+		if (pPlayerSession->get_buffer().getReadAbleSize() < header.packet_len || header.packet_len <= PACKET_HEADER_BYTE) {
+			// 읽을 수 있는 Packet 사이즈가 전송된 Packet의 전체 사이즈보다 작을 경우 처리를 한다.
+			spdlog::critical("Packet Header Critical AbleSize({}) <= PacketSize({}) || getReadAbleSize({}) < PacketSize({}) / [unique_id:{}]", 
+				header.packet_len, PACKET_HEADER_BYTE, pPlayerSession->get_buffer().getReadAbleSize(), header.packet_len, pPlayerSession->get_unique_id());
+			// Packet 사이즈가 Header 크기보다 작을 경우 Error count를 올린다.
+			if (header.packet_len <= PACKET_HEADER_BYTE) {
+				pPlayerSession->set_error_cnt();
+			}
 			break;
 		}
 		else {
 			// 실제로 처리를 하는 위치
-			//std::cout << "Packet Type : " << header.packet_type << std::endl << "Packet Size : " << header.packet_len << std::endl;
 
 			// API 라이브러리로 해당 값을 전달 시켜 준다.
-			//pPlayerSession->get_buffer().show_readWrite();
 			ProtocolType protocolBase = (ProtocolType)((int)header.packet_type / (int)PACKET_RANG_SIZE * (int)PACKET_RANG_SIZE);
-
-			// Test Packet Error
-			if (protocolBase >= MAX_CLIENT_PROTOCOL_NO || protocolBase <= (PACKET_PROTOCOL_BASE - 1)) {
-				std::cout << "[ERROR] Packet Read Error Total Packet : " << packet_cnt << std::endl;
-				exit(1);
-			}
 
 			api.packet_Add(pPlayerSession->get_unique_id(), pPlayerSession->get_buffer().getReadBuffer(), header.packet_len);
 
@@ -366,7 +363,6 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 	//	SendPacket(pPlayerSession, pOverlappedEx->m_wsaBuf.buf, dwIoSize);
 
 	//}
-	//std::cout << "[INFO] BindRecv remainSize : " << remainSize << std::endl;
 	BindRecv(pPlayerSession, remainSize);
 }
 
@@ -374,7 +370,7 @@ bool IOCP_Server::CreateAccepterThread()
 {
 	mAccepterThread = std::thread([this]() { AccepterThread(); });
 
-	std::cout << "AccepterThread Start..!" << std::endl;
+	spdlog::info("AccepterThread Start..!");
 	return true;
 }
 
@@ -388,24 +384,26 @@ void IOCP_Server::AccepterThread()
 	{
 		// 접속 받을 유저 소켓을 생성 한다.
 		PLAYER_Session* pPlayerSession = new PLAYER_Session;
-		if (player_session.size() <= MAX_PLAYER) {
-			pPlayerSession->set_init_session();
-		}
-		else {
-			std::cout << "[Error] Client Full..!" << std::endl;
-			return;
-		}
+		pPlayerSession->set_init_session();
+
 
 		// 클라이언트 접속 요청이 들어올 때까지 기다린다.
 		pPlayerSession->get_sock() = WSAAccept(listenSocket, reinterpret_cast<sockaddr *>(&client_addr), &client_len, NULL, NULL);
 		if (INVALID_SOCKET == pPlayerSession->get_sock()) {
 			continue;
 		}
+		else if (player_session.size() >= MAX_PLAYER) {
+			spdlog::critical("Client Full..! sessionSize({}) >= MAX_PLAYER({})", player_session.size(), MAX_PLAYER);
+			CloseSocket(pPlayerSession);
+			continue;
+		}
 
 		// I/O Completion Port객체와 소켓을 연결시킨다.
 		bool bRet = BindIOCompletionPort(pPlayerSession);
 		if (false == bRet) {
-			return;
+			spdlog::error("BindIOCompletionPort() 함수 실패 : {}", GetLastError());
+			CloseSocket(pPlayerSession);
+			continue;
 		}
 
 		// session에 set 해준다.
@@ -425,12 +423,15 @@ void IOCP_Server::AccepterThread()
 
 		char clientIP[32] = { 0, };
 		inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
-		std::cout << "[접속(" << acceptPlayer->get_unique_id() << ")] Client IP : " << clientIP << " / SOCKET : " << (int)pPlayerSession->get_sock() << std::endl;
+		spdlog::info("[접속] Client IP : {} / SOCKET : {} / [unique_id:{}]", clientIP, (int)pPlayerSession->get_sock(), pPlayerSession->get_unique_id());
 
 		// Recv Overlapped I/O작업을 요청해 놓는다.
 		bRet = BindRecv(pPlayerSession, 0);
 		if (false == bRet) {
-			return;
+			spdlog::error("BindRecv() 함수 실패 [unique_id:{}]", pPlayerSession->get_unique_id());
+			ClosePlayer(pPlayerSession->get_unique_id());
+			CloseSocket(pPlayerSession);
+			continue;
 		}
 
 	}
@@ -442,7 +443,7 @@ bool IOCP_Server::BindIOCompletionPort(class PLAYER_Session * pPlayerSession)
 	auto hIOCP = CreateIoCompletionPort((HANDLE)pPlayerSession->get_sock(), g_hiocp, (ULONG_PTR)(pPlayerSession), 0);
 
 	if (NULL == hIOCP || g_hiocp != hIOCP) {
-		std::cout << "[Error] CreateIoCompletionPort()함수 실패 : " << GetLastError() << std::endl;
+		spdlog::error("CreateIoCompletionPort() 함수 실패 : {} / [unique_id:{}]", GetLastError(), pPlayerSession->get_unique_id());
 		return false;
 	}
 
@@ -476,7 +477,9 @@ bool IOCP_Server::BindRecv(class PLAYER_Session * pPlayerSession, int remainSize
 
 	//socket_error이면 client socket이 끊어진걸로 처리한다.
 	if (nRet == SOCKET_ERROR && (WSAGetLastError() != ERROR_IO_PENDING)) {
-		std::cout << "[Error] WSARecv()함수 실패 : " << WSAGetLastError() << std::endl;
+		spdlog::error("WSARecv() 함수 실패 : {} / [unique_id:{}]", WSAGetLastError(), pPlayerSession->get_unique_id());
+		ClosePlayer(pPlayerSession->get_unique_id());
+		CloseSocket(pPlayerSession);
 		return false;
 	}
 

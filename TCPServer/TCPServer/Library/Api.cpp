@@ -95,7 +95,7 @@ void Logic_API::API_Thread()
 			break;
 
 			default:
-				std::cout << "[Error] ProcessPacket ProtocolType(" << packet.packet_type << " / " << protocolBase << ")이 없습니다..!" << std::endl;
+				spdlog::error("ProcessPacket ProtocolType ({} / {})이 없습니다 / [unique_id:{}]", packet.packet_type, protocolBase, packet.unique_id);
 				break;
 
 			}

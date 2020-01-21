@@ -12,3 +12,9 @@ void PLAYER_Session::set_init_session()
 	m_socketSession = INVALID_SOCKET;
 	unique_id = 0;
 }
+
+void PLAYER_Session::set_error_cnt()
+{
+	// Call Error += 1
+	error_cnt += 1;
+}

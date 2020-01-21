@@ -25,6 +25,9 @@
 #include <queue>
 #include <mutex>
 
+// SPDLog 1.5.0 <2020.01.21> github Include Add
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/daily_file_sink.h"
 
 // 헤더 가져오기
 #include "Protocol.h"
@@ -33,7 +36,8 @@
 #include "Session.h"
 #include "Timer.h"
 #include "ReadBuffer.h"
-#include "Api.h"
+#include "Library/Api.h"
+
 
 extern class IOCP_Server iocp_server;
 extern class SERVER_Timer timer;
