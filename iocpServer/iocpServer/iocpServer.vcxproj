@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{EECE5851-849D-4AED-A66F-D0A23924A7DD}</ProjectGuid>
-    <RootNamespace>TCPServer</RootNamespace>
+    <RootNamespace>iocpServer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
