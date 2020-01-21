@@ -5,7 +5,7 @@
 
 #define SERVERPORT 9001
 #define UNIQUE_START_NO 1000	// 고유번호 시작
-#define MAX_SOCKBUF	 1024		// 최대 패킷 사이즈
+#define MAX_SOCKBUF	 4096		// 최대 패킷 사이즈
 #define MAX_PLAYER 10			// 최대 접속 인원
 #define PACKET_HEADER_BYTE 4	// Packet Header 크기
 

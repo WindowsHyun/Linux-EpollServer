@@ -3,11 +3,13 @@
 class IOCP_Server iocp_server;
 class SERVER_Timer timer;
 class Logic_API api;
+int packet_cnt;
 std::queue<Packet_Frame> recvPacketQueue;
 std::unordered_map<unsigned __int64, class PLAYER *> player;
 std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;
 
 int main() {
+	packet_cnt = 0;
 	std::cout << "Client Start Packet No : " << CLIENT_BASE << std::endl;
 	std::cout << "Max Client Packet No : " << MAX_CLIENT_PROTOCOL_NO << std::endl;
 	std::cout << "Server Start Packet No : " << SERVER_BASE << std::endl;

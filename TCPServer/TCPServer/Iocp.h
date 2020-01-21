@@ -3,8 +3,6 @@
 
 #include "Main.h"
 
-#define MAX_SOCKBUF	 1024	// 최대 패킷 사이즈
-
 class IOCP_Server {
 public:
 	HANDLE& getHandle() { return g_hiocp; }							// Handle Return

@@ -2,7 +2,6 @@
 #define __READBUFFER_H__
 
 #include <mutex>
-#define MAX_SOCKBUF	 1024		// 최대 패킷 사이즈
 
 class ReadBuffer {
 public:
@@ -11,6 +10,7 @@ public:
 	void init(int size);
 	int getHeaderSize(char* pData, int size);
 	char * getReadBuffer(void) { return &buffer[readPos]; }
+	char * getWriteBuffer(void) { return &buffer[writePos]; }
 	bool moveWritePos(int size);
 	void moveReadPos(int size);
 	int	getReadAbleSize(void);

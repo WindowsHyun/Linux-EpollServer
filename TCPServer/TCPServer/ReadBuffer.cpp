@@ -1,5 +1,7 @@
 #include "ReadBuffer.h"
 
+char first_packet{ 0 };
+
 ReadBuffer::ReadBuffer()
 {
 	totalSize = 0;
@@ -32,6 +34,7 @@ int ReadBuffer::getHeaderSize(char* pData, int size)
 	}
 	// Packet_Header Size 만큼 pData(Packet_Header)에 복사한다.
 	memcpy_s(pData, size, &buffer[readPos], size);
+
 	return size;
 }
 
@@ -44,8 +47,9 @@ bool ReadBuffer::moveWritePos(int size)
 	if (size > totalSize) {
 		return false;
 	}
-
+	//printf("[INFO] writePos : %d, ioSize : %d\n", writePos, size);
 	writePos = (writePos + size) % totalSize;
+	//printf("[INFO] writePos + size : %d, ％totalSize : %d\n", (writePos + size), (writePos + size) % totalSize);
 	return true;
 }
 
@@ -70,7 +74,7 @@ void ReadBuffer::checkWrite(int size)
 	std::lock_guard<std::mutex> guard(mLock);
 
 	// 순환
-	if (writePos + size > totalSize)
+	if (writePos + size >= totalSize)
 	{
 		printf("[INFO] writePos : %d, readPos : %d, size : %d\n", writePos, readPos , size);
 		memcpy_s(buffer, writePos - readPos,

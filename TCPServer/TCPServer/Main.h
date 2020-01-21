@@ -41,4 +41,5 @@ extern class Logic_API api;
 extern std::queue<Packet_Frame> recvPacketQueue;
 extern std::unordered_map<unsigned __int64, class PLAYER *> player;					// 플레이어 데이터
 extern std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;	// 플레이어 세션
+extern int packet_cnt;
 #endif
