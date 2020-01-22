@@ -4,9 +4,6 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS					// 윈속 오류 방지
-#define MAX_CONNECT 40									// 최대 접속 인원
-#define MAX_WORKERTHREAD 9								// 쓰레드 풀에 넣을 쓰레드 수
-#define DEBUG_MODE	TRUE								// printf 출력 여부
 
 // Header 선언
 #include <WinSock2.h>
@@ -45,5 +42,4 @@ extern class Logic_API api;
 extern std::queue<Packet_Frame> recvPacketQueue;
 extern std::unordered_map<unsigned __int64, class PLAYER *> player;					// 플레이어 데이터
 extern std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;	// 플레이어 세션
-extern int packet_cnt;
 #endif

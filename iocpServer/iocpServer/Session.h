@@ -47,7 +47,7 @@ public:
 	// set
 	void set_unique_id(const unsigned __int64 id);
 	void set_init_session();
-	void set_error_cnt();
+	void update_error_cnt();
 
 private:
 	SOCKET			m_socketSession;		// Cliet와 연결되는 소켓

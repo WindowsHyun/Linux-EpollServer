@@ -72,7 +72,7 @@ void Logic_API::API_Thread()
 			{
 				AuthRoute* auth = new AuthRoute();
 				auth->ApiProcessing(packet);
-				//delete[] auth;
+				delete auth;
 			}
 			break;
 
@@ -95,7 +95,7 @@ void Logic_API::API_Thread()
 			break;
 
 			default:
-				spdlog::error("ProcessPacket ProtocolType ({} / {})이 없습니다 / [unique_id:{}]", packet.packet_type, protocolBase, packet.unique_id);
+				spdlog::error("ProcessPacket ProtocolType ({} / {})is not found..! / [unique_id:{}]", packet.packet_type, protocolBase, packet.unique_id);
 				break;
 
 			}

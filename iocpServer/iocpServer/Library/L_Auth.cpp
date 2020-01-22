@@ -6,7 +6,6 @@ AuthRoute::AuthRoute()
 
 AuthRoute::~AuthRoute()
 {
-	std::cout << "~AuthRoute()" << std::endl;
 }
 
 void AuthRoute::ApiProcessing(Packet_Frame packet)
@@ -15,34 +14,30 @@ void AuthRoute::ApiProcessing(Packet_Frame packet)
 	case CLIENT_AUTH_TEST:
 	{
 		//std::cout << "CLIENT_AUTH_TEST" << std::endl;
-		packet_cnt++;
 	}
 	break;
 
 	case CLIENT_AUTH_TEST2:
 	{
 		//std::cout << "CLIENT_AUTH_TEST2" << std::endl;
-		packet_cnt++;
 	}
 	break;
 
 	case CLIENT_AUTH_TEST3:
 	{
 		//std::cout << "CLIENT_AUTH_TEST3" << std::endl;
-		packet_cnt++;
 	}
 	break;
 
 	case CLIENT_AUTH_TEST4:
 	{
 		//std::cout << "CLIENT_AUTH_TEST4" << std::endl;
-		packet_cnt++;
 	}
 	break;
 
 	default:
 	{
-		std::cout << "[Error] ApiProcessing ProtocolType( AuthRoute / " << packet.packet_type << " )이 없습니다..!" << std::endl;
+		spdlog::error("L_Auth->ApiProcessing ProtocolType ({})is not found..! / [unique_id:{}]", packet.packet_type, packet.unique_id);
 	}
 	break;
 	}
