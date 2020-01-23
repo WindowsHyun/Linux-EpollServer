@@ -80,5 +80,11 @@ void init_sock(SOCKET& sock)
 	ServerAddr.sin_addr.s_addr = inet_addr(ipAddres);
 
 	int Result = WSAConnect(sock, (sockaddr *)&ServerAddr, sizeof(ServerAddr), NULL, NULL, NULL, NULL);
+	if (Result == SOCKET_ERROR) {
+		std::cout << "연결 실패..!" << std::endl;
+		getchar();
+		exit(1);
+	}
+	
 
 }

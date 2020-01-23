@@ -33,15 +33,6 @@ void ConfigSetting::loadSettingData()
 	}
 	this->set_limit_err_cnt(atoi(buf));
 
-	// LIMIT_ERROR_CNT
-	GetPrivateProfileString("Common", "MAX_SOCKBUF", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
-	if (strcmp(buf, "NOT_FOUND") == 0) {
-		// 설정 ini 파일이 없을 경우 처리
-		WritePrivateProfileString("Common", "MAX_SOCKBUF", "4096", "./iocpserver.ini");
-		GetPrivateProfileString("Common", "MAX_SOCKBUF", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
-	}
-	this->set_server_port(atoi(buf));
-
 
 	// DB Default Setting
 	// REDIS_ID

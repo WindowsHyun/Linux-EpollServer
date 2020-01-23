@@ -168,7 +168,7 @@ void IOCP_Server::WokerThread()
 		// client가 접속을 끊었을때..			
 		if (FALSE == bSuccess || (0 == dwIoSize && TRUE == bSuccess))
 		{
-			spdlog::info("Socket Disconnected / [unique_id:{}]", (int)pPlayerSession->get_unique_id());
+			spdlog::info("[Disconnect] SOCKET : {} / [unique_id:{}]", (int)pPlayerSession->get_sock(), (int)pPlayerSession->get_unique_id());
 			ClosePlayer(pPlayerSession->get_unique_id());
 			CloseSocket(pPlayerSession);
 			continue;

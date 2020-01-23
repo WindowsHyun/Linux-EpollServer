@@ -24,6 +24,9 @@
 #include "Protocol.h"
 #include "Object.h"
 
+#define SERVERPORT 9001
+#define LIMIT_ERROR_CNT 5		// 최대 오류 개수
+
 const char ipAddres[MAX_SOCKBUF]{ "127.0.0.1" };
 
 void init_sock(SOCKET& sock);
