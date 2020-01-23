@@ -1,30 +1,4 @@
-<copy todir="${dstdir_global}/lxlib">
-            <fileset dir="${workdir_global}/lxlib">
-                <exclude name=".*/**" />
-                <exclude name="braves/**" />
-                <exclude name="**/build.xml" />
-            </fileset>
-        </copy>
-        <copy todir="${dstdir_global}/admin_tool">
-            <fileset dir="${workdir_global}/bounce.admin.linyworks.com">
-                <exclude name="api_monitor/**" />
-                <exclude name="console_tool/**" />
-                <exclude name=".*/**" />
-                <exclude name="**/build.xml" />
-            </fileset>
-        </copy>
-        <copy todir="${dstdir_global}/restoria">
-            <fileset dir="${workdir_global}/csm.gameapi.linyworks.com">
-                <exclude name=".*/**" />
-                <exclude name="**/build.xml" />
-            </fileset>
-        </copy>
-        <copy todir="${dstdir_global}/script">
-            <fileset dir="${workdir_global}/bounce.install/script">
-                <exclude name=".*/**" />
-                <exclude name="**/build.xml" />
-            </fileset>
-        </copy>[2020-01-22 15:16:04.635] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 15:16:04.635] [daily_logger] [info] Client Start Packet No : 1000
 [2020-01-22 15:16:04.635] [daily_logger] [info] Max Client Packet No   : 1402
 [2020-01-22 15:16:04.635] [daily_logger] [info] Server Start Packet No : 1501
 [2020-01-22 15:16:04.635] [daily_logger] [info] Max Server Packet No   : 1902
