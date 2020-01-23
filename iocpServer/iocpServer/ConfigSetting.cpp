@@ -57,7 +57,7 @@ void ConfigSetting::loadSettingData()
 	GetPrivateProfileString("DB", "SQL_ID", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
 	if (strcmp(buf, "NOT_FOUND") == 0) {
 		// 설정 ini 파일이 없을 경우 처리
-		WritePrivateProfileString("DB", "SQL_ID", "WindowsHyun", "./iocpserver.ini");
+		WritePrivateProfileString("DB", "SQL_ID", "root", "./iocpserver.ini");
 		GetPrivateProfileString("DB", "SQL_ID", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
 	}
 	this->set_sql_id(buf, strlen(buf));
@@ -66,7 +66,7 @@ void ConfigSetting::loadSettingData()
 	GetPrivateProfileString("DB", "SQL_PW", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
 	if (strcmp(buf, "NOT_FOUND") == 0) {
 		// 설정 ini 파일이 없을 경우 처리
-		WritePrivateProfileString("DB", "SQL_PW", "WindowsHyun", "./iocpserver.ini");
+		WritePrivateProfileString("DB", "SQL_PW", "windowshyun", "./iocpserver.ini");
 		GetPrivateProfileString("DB", "SQL_PW", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
 	}
 	this->set_sql_pw(buf, strlen(buf));

@@ -1,0 +1,12 @@
+- apache2 와 php 연동
+    sudo apt-get install apache2 php7.x libapache2-mod-php7.x 
+    a2query -m php7.x
+    sudo a2enmod php7.x
+    
+    sudo service apache2 restart
+
+- shortTag 지우기
+    cd /etc/php/7.0/apache2
+    sudo vi php.ini
+    short_open_tag = On
+    sudo systemctl restart apache2
