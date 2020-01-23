@@ -27,6 +27,7 @@
 #include "spdlog/sinks/daily_file_sink.h"
 
 // 헤더 가져오기
+#include "ConfigSetting.h"
 #include "Protocol.h"
 #include "Iocp.h"
 #include "Object.h"
@@ -35,10 +36,11 @@
 #include "ReadBuffer.h"
 #include "Library/Api.h"
 
-
+// Setting Value
 extern class IOCP_Server iocp_server;
 extern class SERVER_Timer timer;
 extern class Logic_API api;
+extern class ConfigSetting CS;
 extern std::queue<Packet_Frame> recvPacketQueue;
 extern std::unordered_map<unsigned __int64, class PLAYER *> player;					// 플레이어 데이터
 extern std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;	// 플레이어 세션

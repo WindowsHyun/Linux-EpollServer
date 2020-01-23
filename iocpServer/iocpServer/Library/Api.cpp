@@ -1,4 +1,4 @@
-#include "Api.h"
+ï»¿#include "Api.h"
 
 bool Logic_API::start()
 {
@@ -51,15 +51,15 @@ void Logic_API::API_Thread()
 {
 	while (threadRun) {
 		if (!recvPacketQueue.empty()) {
-			// ·ÎÁ÷ Ã³¸®¸¦ ÁøÇà
+			// ë¡œì§ ì²˜ë¦¬ë¥¼ ì§„í–‰
 			//std::cout << "[INFO] API Queue : " << recvPacketQueue.size() << std::endl;
 			std::lock_guard<std::mutex> guard(mLock);
 			auto packet = recvPacketQueue.front();
 
-			// Protocol Base°ª À» °¡Á®¿Â´Ù.
+			// Protocol Baseê°’ ì„ ê°€ì ¸ì˜¨ë‹¤.
 			ProtocolType protocolBase = (ProtocolType)((int)packet.packet_type / (int)PACKET_RANG_SIZE * (int)PACKET_RANG_SIZE);
 
-			// °¢°¢ÀÇ Library·Î Ã³¸®¸¦ º¸³½´Ù.
+			// ê°ê°ì˜ Libraryë¡œ ì²˜ë¦¬ë¥¼ ë³´ë‚¸ë‹¤.
 			switch (protocolBase) {
 
 			case CLIENT_BASE:

@@ -1,0 +1,177 @@
+<copy todir="${dstdir_global}/lxlib">
+            <fileset dir="${workdir_global}/lxlib">
+                <exclude name=".*/**" />
+                <exclude name="braves/**" />
+                <exclude name="**/build.xml" />
+            </fileset>
+        </copy>
+        <copy todir="${dstdir_global}/admin_tool">
+            <fileset dir="${workdir_global}/bounce.admin.linyworks.com">
+                <exclude name="api_monitor/**" />
+                <exclude name="console_tool/**" />
+                <exclude name=".*/**" />
+                <exclude name="**/build.xml" />
+            </fileset>
+        </copy>
+        <copy todir="${dstdir_global}/restoria">
+            <fileset dir="${workdir_global}/csm.gameapi.linyworks.com">
+                <exclude name=".*/**" />
+                <exclude name="**/build.xml" />
+            </fileset>
+        </copy>
+        <copy todir="${dstdir_global}/script">
+            <fileset dir="${workdir_global}/bounce.install/script">
+                <exclude name=".*/**" />
+                <exclude name="**/build.xml" />
+            </fileset>
+        </copy>[2020-01-22 15:16:04.635] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 15:16:04.635] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 15:16:04.635] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 15:16:04.635] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 15:16:04.635] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 15:16:04.637] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 15:16:04.637] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 15:16:04.644] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 15:16:04.644] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 15:16:04.644] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 15:17:03.229] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 15:17:03.229] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 15:17:03.229] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 15:17:03.229] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 15:17:03.230] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 15:17:03.232] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 15:17:03.232] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 15:17:03.240] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 15:17:03.241] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 15:17:03.241] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 15:17:52.999] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 15:17:52.999] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 15:17:52.999] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 15:17:52.999] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 15:23:26.010] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 15:23:26.010] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 15:23:26.010] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 15:23:26.010] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 15:23:26.011] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 15:23:26.013] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 15:23:26.013] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 15:23:26.022] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 15:23:26.023] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 15:23:26.023] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 15:23:49.962] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 15:23:49.962] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 15:23:49.962] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 15:23:49.962] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 15:23:49.963] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 15:23:49.965] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 15:23:49.965] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 15:23:49.976] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 15:23:49.976] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 15:23:49.976] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 15:23:52.914] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 15:23:52.915] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 15:23:52.915] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 15:23:52.915] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 15:23:52.915] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 15:23:52.917] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 15:23:52.917] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 15:23:52.926] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 15:23:52.926] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 15:23:52.926] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 15:26:50.598] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 15:26:50.598] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 15:26:50.599] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 15:26:50.599] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 15:26:50.600] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 15:26:50.602] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 15:26:50.602] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 15:26:50.610] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 15:26:50.611] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 15:26:50.611] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 16:29:53.685] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 16:29:53.685] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 16:29:53.685] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 16:29:53.685] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 16:30:00.382] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 16:30:00.382] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 16:30:00.382] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 16:30:00.382] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 16:30:10.440] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 16:30:10.440] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 16:30:10.441] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 16:30:10.441] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 16:31:25.800] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 16:31:25.800] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 16:31:25.800] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 16:31:25.800] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 16:33:09.321] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 16:33:09.321] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 16:33:09.321] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 16:33:09.321] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 16:33:54.796] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 16:33:54.796] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 16:33:54.797] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 16:33:54.797] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 16:38:11.777] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 16:38:11.777] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 16:38:11.777] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 16:38:11.778] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 16:38:11.781] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 16:38:11.782] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 16:38:11.782] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 16:38:11.807] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 16:38:11.807] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 16:38:11.807] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 18:40:14.439] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 18:40:14.440] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 18:40:14.440] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 18:40:14.440] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 18:40:14.449] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 18:40:14.456] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 18:40:14.456] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 18:40:14.479] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 18:40:14.481] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 18:40:14.481] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 18:41:19.414] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 18:41:19.414] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 18:41:19.414] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 18:41:19.414] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 18:41:19.416] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 18:41:19.420] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 18:41:19.420] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 18:41:19.447] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 18:41:19.448] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 18:41:19.449] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 18:41:58.266] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 18:41:58.267] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 18:41:58.267] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 18:41:58.267] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 18:41:58.271] [daily_logger] [info] Server Setting Load Complete..!
+[2020-01-22 18:41:58.273] [daily_logger] [info] Socket Init Success..!
+[2020-01-22 18:41:58.273] [daily_logger] [info] Server Registration Successful..!
+[2020-01-22 18:41:58.284] [daily_logger] [info] WokerThread Start..!
+[2020-01-22 18:41:58.285] [daily_logger] [info] AccepterThread Start..!
+[2020-01-22 18:41:58.285] [daily_logger] [info] IOCP Server Start..!
+[2020-01-22 18:48:06.385] [daily_logger] [info] Client Start Packet No : 1000
+[2020-01-22 18:48:06.385] [daily_logger] [info] Max Client Packet No   : 1402
+[2020-01-22 18:48:06.385] [daily_logger] [info] Server Start Packet No : 1501
+[2020-01-22 18:48:06.385] [daily_logger] [info] Max Server Packet No   : 1902
+
+[2020-01-22 18:48:17.901] [daily_logger] [info] Server Setting Load Complete..!

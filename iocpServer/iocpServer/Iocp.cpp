@@ -84,8 +84,8 @@ bool IOCP_Server::StartServer()
 void IOCP_Server::initClient()
 {
 	// 미리 player, player_session 공간을 할당 한다.
-	player_session.reserve(MAX_PLAYER);
-	player.reserve(MAX_PLAYER);
+	player_session.reserve(CS.get_max_player());
+	player.reserve(CS.get_max_player());
 }
 
 void IOCP_Server::destroyThread()
@@ -292,14 +292,14 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 	while (pPlayerSession->get_buffer().getReadAbleSize() > 0) {
 
 		// 일정 개수 이상 Packet 오류가 나면 강제 종료 시킨다.
-		if (pPlayerSession->get_error_cnt() >= LIMIT_ERROR_CNT) {
-			spdlog::error("Limit Error Count Maximum Exceeded / ErrorCnt({}) >= LimitCnt({}) /  [unique_id:{}]", 
-				pPlayerSession->get_error_cnt(), LIMIT_ERROR_CNT, pPlayerSession->get_unique_id());
+		if (pPlayerSession->get_error_cnt() >= CS.get_limit_err_cnt()) {
+			spdlog::error("Limit Error Count Maximum Exceeded / ErrorCnt({}) >= LimitCnt({}) /  [unique_id:{}]",
+				pPlayerSession->get_error_cnt(), CS.get_limit_err_cnt(), pPlayerSession->get_unique_id());
 			ClosePlayer(pPlayerSession->get_unique_id());
 			CloseSocket(pPlayerSession);
 			break;
 		}
-		
+
 		// 읽을 수 있는 Packet 크기가 Header Packet 보다 작을 경우 처리 한다.
 		if (pPlayerSession->get_buffer().getReadAbleSize() <= sizeof(header)) {
 			break;
@@ -313,7 +313,7 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 
 		if (pPlayerSession->get_buffer().getReadAbleSize() < header.packet_len || header.packet_len <= PACKET_HEADER_BYTE) {
 			// 읽을 수 있는 Packet 사이즈가 전송된 Packet의 전체 사이즈보다 작을 경우 처리를 한다.
-			spdlog::critical("Packet Header Critical AbleSize({}) <= PacketSize({}) || getReadAbleSize({}) < PacketSize({}) / [unique_id:{}]", 
+			spdlog::critical("Packet Header Critical AbleSize({}) <= PacketSize({}) || getReadAbleSize({}) < PacketSize({}) / [unique_id:{}]",
 				header.packet_len, PACKET_HEADER_BYTE, pPlayerSession->get_buffer().getReadAbleSize(), header.packet_len, pPlayerSession->get_unique_id());
 			// Packet 사이즈가 Header 크기보다 작을 경우 Error count를 올린다.
 			if (header.packet_len <= PACKET_HEADER_BYTE) {
@@ -391,8 +391,8 @@ void IOCP_Server::AccepterThread()
 		if (INVALID_SOCKET == pPlayerSession->get_sock()) {
 			continue;
 		}
-		else if (player_session.size() >= MAX_PLAYER) {
-			spdlog::critical("Client Full..! sessionSize({}) >= MAX_PLAYER({})", player_session.size(), MAX_PLAYER);
+		else if (player_session.size() >= CS.get_max_player()) {
+			spdlog::critical("Client Full..! sessionSize({}) >= MAX_PLAYER({})", player_session.size(), CS.get_max_player());
 			CloseSocket(pPlayerSession);
 			continue;
 		}

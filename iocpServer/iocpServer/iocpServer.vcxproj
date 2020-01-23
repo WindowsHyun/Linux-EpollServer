@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ConfigSetting.cpp" />
     <ClCompile Include="Iocp.cpp" />
     <ClCompile Include="Library\Api.cpp" />
     <ClCompile Include="Library\L_Auth.cpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="Iocp.h" />
     <ClInclude Include="ReadBuffer.h" />
     <ClInclude Include="Session.h" />
+    <ClInclude Include="ConfigSetting.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
