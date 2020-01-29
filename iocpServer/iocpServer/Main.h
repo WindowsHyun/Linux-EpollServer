@@ -26,8 +26,14 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/daily_file_sink.h"
 
+// RedisConnect <2020.01.29> | github source : https://github.com/genxun/RedisConnect
+#include <stdarg.h>
+#include <algorithm>
+#include "Setting/RedisConnect.h"
+
+
 // 헤더 가져오기
-#include "ConfigSetting.h"
+#include "Setting/ConfigSetting.h"
 #include "Protocol.h"
 #include "Iocp.h"
 #include "Object.h"
@@ -35,6 +41,7 @@
 #include "Timer.h"
 #include "ReadBuffer.h"
 #include "Library/Api.h"
+
 
 // Setting Value
 extern class IOCP_Server iocp_server;

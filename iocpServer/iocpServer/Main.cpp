@@ -17,6 +17,16 @@ int main() {
 	spdlog::set_default_logger(daily_logger);
 #endif
 
+	RedisConnect *redis = new RedisConnect;
+	redis->Setup("192.168.56.43", 6380, "3235e85a87a00eed432ee7512950abccd085c805d5825c4c17cdc65ad3835867");
+	redis->connect("192.168.56.43", 6380, 3);
+	redis->auth("3235e85a87a00eed432ee7512950abccd085c805d5825c4c17cdc65ad3835867");
+	//shared_ptr<RedisConnect> redis = RedisConnect::Instance();
+	redis->ping();
+	redis->set("1993", "06");
+	//redis->set("key", "val");
+
+
 	// Server Packet Info
 	spdlog::info("Client Start Packet No : {}", CLIENT_BASE);
 	spdlog::info("Max Client Packet No   : {}", MAX_CLIENT_PROTOCOL_NO);

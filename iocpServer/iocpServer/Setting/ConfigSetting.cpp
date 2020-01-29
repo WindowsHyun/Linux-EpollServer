@@ -35,12 +35,21 @@ void ConfigSetting::loadSettingData()
 
 
 	// DB Default Setting
-	// REDIS_ID
-	GetPrivateProfileString("DB", "REDIS_ID", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
+	// REDIS_IP
+	GetPrivateProfileString("DB", "REDIS_IP", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
 	if (strcmp(buf, "NOT_FOUND") == 0) {
 		// 설정 ini 파일이 없을 경우 처리
-		WritePrivateProfileString("DB", "REDIS_ID", "WindowsHyun", "./iocpserver.ini");
-		GetPrivateProfileString("DB", "REDIS_ID", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
+		WritePrivateProfileString("DB", "REDIS_IP", "192.168.56.43", "./iocpserver.ini");
+		GetPrivateProfileString("DB", "REDIS_IP", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
+	}
+	this->set_redis_id(buf, strlen(buf));
+
+	// REDIS_PORT
+	GetPrivateProfileString("DB", "REDIS_IP", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
+	if (strcmp(buf, "NOT_FOUND") == 0) {
+		// 설정 ini 파일이 없을 경우 처리
+		WritePrivateProfileString("DB", "REDIS_IP", "192.168.56.43", "./iocpserver.ini");
+		GetPrivateProfileString("DB", "REDIS_IP", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
 	}
 	this->set_redis_id(buf, strlen(buf));
 
@@ -48,7 +57,8 @@ void ConfigSetting::loadSettingData()
 	GetPrivateProfileString("DB", "REDIS_PW", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
 	if (strcmp(buf, "NOT_FOUND") == 0) {
 		// 설정 ini 파일이 없을 경우 처리
-		WritePrivateProfileString("DB", "REDIS_PW", "WindowsHyun", "./iocpserver.ini");
+		// echo "windowshyun" | sha256sum
+		WritePrivateProfileString("DB", "REDIS_PW", "3235e85a87a00eed432ee7512950abccd085c805d5825c4c17cdc65ad3835867", "./iocpserver.ini");
 		GetPrivateProfileString("DB", "REDIS_PW", "NOT_FOUND", buf, MAX_SOCKBUF, "./iocpserver.ini");
 	}
 	this->set_redis_pw(buf, strlen(buf));

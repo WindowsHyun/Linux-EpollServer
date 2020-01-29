@@ -13,12 +13,12 @@ echo "*****************************************"
 #sudo yum -y update
 #sudo ln -sf /usr/share/zoneinfo/America/Los_Angeles \/etc/localtime
 #sudo yum -y install gcc gcc-c++ make 
-apt-get update
-apt-get -y install make
-apt-get -y install make-guile
-apt-get -y install linux-kernel-headers kernel-package
-apt-get -y install libjemalloc-dev
-apt-get -y install gcc
+sudo apt-get update
+sudo apt-get -y install make
+sudo apt-get -y install make-guile
+sudo apt-get -y install linux-kernel-headers kernel-package
+sudo apt-get -y install libjemalloc-dev
+sudo apt-get -y install gcc
 echo "*****************************************"
 echo " 2. Download, Untar and Make Redis 5.0.7"
 echo "*****************************************"
@@ -26,7 +26,7 @@ cd /usr/local/src
 sudo wget http://download.redis.io/releases/redis-5.0.7.tar.gz
 sudo tar xzf redis-5.0.7.tar.gz
 sudo rm redis-5.0.7.tar.gz
-cd redis-2.6.14
+cd redis-5.0.7
 sudo make
 echo "*****************************************"
 echo " 3. Create Directories and Copy Redis Files"

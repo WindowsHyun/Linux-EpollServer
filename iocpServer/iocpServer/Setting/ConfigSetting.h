@@ -1,7 +1,7 @@
 ﻿#ifndef __CONFIGSETTING_H__
 #define __CONFIGSETTING_H__
 
-#include "Main.h"
+#include "../Main.h"
 
 class ConfigSetting {
 public:
