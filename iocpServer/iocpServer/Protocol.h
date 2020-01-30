@@ -3,11 +3,23 @@
 
 #include "Object.h"
 
-#define UNIQUE_START_NO 1000	// 고유번호 시작
+#define TEMP_UNIQUE_NO 0		// 임시 고유번호
+#define UNIQUE_START_NO 10000	// 고유번호 시작
 #define MAX_SOCKBUF	 4096		// 최대 패킷 사이즈
+#define MIN_SOCKBUF 128			// 최소 패킷 사이즈
 #define MAX_WORKERTHREAD 9		// 쓰레드 풀에 넣을 쓰레드 수
 #define PACKET_HEADER_BYTE 4	// Packet Header 크기
 
+// Redis DB
+#define REDIS_MAIN_PORT 6380
+
+const enum REDISDB {
+	REDIS_OPERATING_TABLE_DB,	// 기획 테이블
+	REDIS_USER_AUTH_DB,			// 유저 정보
+	REDIS_USER_RANKING_DB,		// 유저 랭킹 정보
+
+	MAX_REDIS_DB_NUM
+};
 
 // 프로토콜 타입
 const enum ProtocolType {
@@ -93,9 +105,14 @@ struct Packet_Frame {
 // 타이머 타입
 enum TimerType {
 	T_NormalTime,
+	T_TestTime
 };
 
 // ↓ 클라 -> 서버 패킷
+struct cs_packet_auth : public PACKET_HEADER {
+	char sha256sum[MIN_SOCKBUF]{ 0, };
+};
+
 struct cs_packet_dir : public PACKET_HEADER {
 	Location dir;
 };

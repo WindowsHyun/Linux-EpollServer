@@ -7,7 +7,7 @@
 enum class IOOperation {
 	RECV,
 	SEND,
-	IO_EVENT,
+	IO_EVENT
 };
 
 // WSAOVERLAPPED구조체를 확장 시켜서 필요한 정보를 더 넣었다.

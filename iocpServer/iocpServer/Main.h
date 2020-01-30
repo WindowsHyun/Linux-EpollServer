@@ -29,11 +29,10 @@
 // RedisConnect <2020.01.29> | github source : https://github.com/genxun/RedisConnect
 #include <stdarg.h>
 #include <algorithm>
-#include "Setting/RedisConnect.h"
-
+#include "Global/RedisConnect.h"
 
 // 헤더 가져오기
-#include "Setting/ConfigSetting.h"
+#include "Global/ConfigSetting.h"
 #include "Protocol.h"
 #include "Iocp.h"
 #include "Object.h"
@@ -48,7 +47,10 @@ extern class IOCP_Server iocp_server;
 extern class SERVER_Timer timer;
 extern class Logic_API api;
 extern class ConfigSetting CS;
+extern std::vector<class RedisConnect *> RDC;
 extern std::queue<Packet_Frame> recvPacketQueue;
 extern std::unordered_map<unsigned __int64, class PLAYER *> player;					// 플레이어 데이터
 extern std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;	// 플레이어 세션
+
+void initRDC();
 #endif

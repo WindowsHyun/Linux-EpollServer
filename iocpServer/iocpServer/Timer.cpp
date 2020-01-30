@@ -8,14 +8,27 @@ void SERVER_Timer::Timer_Thread()
 			std::lock_guard<std::mutex> guard(mLock);
 			Timer_Event t = timer_queue.top();
 			if (t.exec_time > high_resolution_clock::now()) {
-				break; // 현재시간보다 크다면, 기다려줌
+				continue; // 현재시간보다 크다면, 기다려줌
 			}
 			timer_queue.pop();
 
 			stOverlappedEx *over = new stOverlappedEx;
-			if (T_NormalTime == t.event) {
+			switch (t.event) {
+			case T_NormalTime:
+			{
 				over->m_eOperation = IOOperation::IO_EVENT;
 				over->m_unique_id = t.object_id;
+			}
+			break;
+
+			default:
+			{
+				// 예외 상황
+				spdlog::critical("[Exception TimerThread({})] No value defined..! / [unique_id:{}]",
+					(int)t.event, t.object_id);
+				continue;
+			}
+			break;
 			}
 			PostQueuedCompletionStatus(g_hiocp, 1, t.object_id, &over->m_wsaOverlapped);
 		}

@@ -177,17 +177,30 @@ void IOCP_Server::WokerThread()
 		stOverlappedEx* pOverlappedEx = (stOverlappedEx*)lpOverlapped;
 		// Overlapped I/O Recv작업 결과 뒤 처리
 		switch (pOverlappedEx->m_eOperation) {
+
 		case IOOperation::RECV:
 		{
 			OnRecv(pOverlappedEx, dwIoSize);
 		}
 		break;
+
 		case IOOperation::SEND:
 		{
 			// Overlapped I/O Send작업 결과 뒤 처리
 			spdlog::info("[SEND] bytes : {} , msg : {}", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
 		}
 		break;
+
+		case IOOperation::IO_EVENT:
+		{
+			Timer_Event* t = new Timer_Event;
+			t->object_id = 0;
+			t->exec_time = high_resolution_clock::now() + 1024ms;
+			t->event = T_NormalTime;
+			timer.setTimerEvent(*t);
+		}
+		break;
+
 		default:
 		{
 			// 예외 상황
@@ -336,32 +349,11 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 
 	}
 
-
-	//pOverlappedEx->m_szBuf[dwIoSize] = NULL;
-
-	//PACKET_HEADER *my_packet = reinterpret_cast<PACKET_HEADER *>(pOverlappedEx->m_wsaBuf.buf);
-	//my_packet->packet_type;
-	//ProcessPacket(pPlayerSession, pOverlappedEx->m_wsaBuf.buf[0], pOverlappedEx->m_wsaBuf.buf);
-	//printf("[수신] bytes : %d , msg : %s\n", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
-	//////----------------------------------------------------
-	////// 타이머 테스트
-	////Timer_Event* t = new Timer_Event;
-	////t->object_id = 0;
-	////t->exec_time = high_resolution_clock::now() + 2048ms;
-	////t->event = T_NormalTime;
-	////timer.setTimerEvent(*t);
-	//////----------------------------------------------------
-	////클라이언트에 메세지를 에코한다. 'kch'일 경우에만 리턴을 하도록 하였다.
-	//if (!strcmp(pOverlappedEx->m_wsaBuf.buf, "kch")) {
-	//	//sc_packet_clientno packet;
-	//	//packet.packet_len = sizeof(packet);
-	//	//packet.packet_type = SERVER_CLIENT_NO;
-	//	//packet.no = 0;
-
-
-	//	SendPacket(pPlayerSession, pOverlappedEx->m_wsaBuf.buf, dwIoSize);
-
-	//}
+	//sc_packet_clientno packet;
+	//packet.packet_len = sizeof(packet);
+	//packet.packet_type = SERVER_CLIENT_NO;
+	//packet.no = 0;
+	//SendPacket(pPlayerSession, pOverlappedEx->m_wsaBuf.buf, dwIoSize);
 	BindRecv(pPlayerSession, remainSize);
 }
 
@@ -406,19 +398,19 @@ void IOCP_Server::AccepterThread()
 		}
 
 		// session에 set 해준다.
-		pPlayerSession->set_unique_id(uniqueId);
+		pPlayerSession->set_unique_id(tempUniqueId);
 
 		// player_session에 추가 한다.
-		player_session.insert(std::unordered_map<unsigned __int64, class PLAYER_Session *>::value_type(uniqueId, pPlayerSession));
+		player_session.insert(std::unordered_map<unsigned __int64, class PLAYER_Session *>::value_type(tempUniqueId, pPlayerSession));
 
 		// 플레이어를 set 해준다.
 		class PLAYER * acceptPlayer = new class PLAYER;
 		acceptPlayer->set_sock(pPlayerSession->get_sock());
-		acceptPlayer->set_unique_id(uniqueId);
-		player.insert(std::unordered_map<unsigned __int64, class PLAYER *>::value_type(uniqueId, acceptPlayer));
+		acceptPlayer->set_unique_id(tempUniqueId);
+		player.insert(std::unordered_map<unsigned __int64, class PLAYER *>::value_type(tempUniqueId, acceptPlayer));
 
 		//클라이언트 갯수 증가
-		++uniqueId;
+		++tempUniqueId;
 
 		char clientIP[32] = { 0, };
 		inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
@@ -491,6 +483,7 @@ IOCP_Server::IOCP_Server()
 	g_hiocp = INVALID_HANDLE_VALUE;
 	listenSocket = INVALID_SOCKET;
 	uniqueId = UNIQUE_START_NO;
+	tempUniqueId = tempUniqueId;
 	mIsWorkerRun = true;
 	mIsAccepterRun = true;
 }

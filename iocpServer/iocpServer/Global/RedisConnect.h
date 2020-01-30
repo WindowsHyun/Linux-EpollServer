@@ -131,7 +131,7 @@ public:
 			SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 
 			if (IsSocketClosed(sock)) return INVALID_SOCKET;
-			
+
 			long ms = (long)(timeout * 1000 + 0.5);
 
 			tv.tv_sec = ms / 1000;
@@ -157,35 +157,35 @@ public:
 			if (handle < 0)
 			{
 				SocketClose(sock);
-			
+
 				return INVALID_SOCKET;
 			}
-			
+
 			memset(&ev, 0, sizeof(ev));
-			
+
 			ev.events = EPOLLOUT | EPOLLERR | EPOLLHUP;
-			
+
 			epoll_ctl(handle, EPOLL_CTL_ADD, sock, &ev);
-			
+
 			if (epoll_wait(handle, &evs, 1, ms) > 0)
 			{
 				if (evs.events & EPOLLOUT)
 				{
 					int res = FAIL;
 					socklen_t len = sizeof(res);
-			
+
 					getsockopt(sock, SOL_SOCKET, SO_ERROR, (char*)(&res), &len);
 					ioctlsocket(sock, FIONBIO, &mode);
-			
+
 					if (res == 0)
 					{
 						::close(handle);
-			
+
 						return sock;
 					}
 				}
 			}
-			
+
 			::close(handle);
 #else
 			fd_set ws;
@@ -196,16 +196,16 @@ public:
 			{
 				int res = ERROR;
 				int len = sizeof(res);
-			
+
 				getsockopt(sock, SOL_SOCKET, SO_ERROR, (char*)(&res), &len);
 				ioctlsocket(sock, FIONBIO, &mode);
-			
+
 				if (res == 0) return sock;
 			}
 #endif
 
 			SocketClose(sock);
-			
+
 			return INVALID_SOCKET;
 		}
 
@@ -550,6 +550,7 @@ public:
 protected:
 	int code = 0;
 	int port = 0;
+	int db = 0;
 	int memsz = 0;
 	int status = 0;
 	int timeout = 0;
@@ -559,6 +560,7 @@ protected:
 	string msg;
 	string host;
 	Socket sock;
+	std::mutex mLock;
 
 public:
 	~RedisConnect()
@@ -575,7 +577,7 @@ public:
 	{
 		return code;
 	}
-	string getErrorString() const
+	string getResultString() const
 	{
 		return msg;
 	}
@@ -613,6 +615,7 @@ public:
 	template<class DATA_TYPE, class ...ARGS>
 	int execute(vector<string>& vec, DATA_TYPE val, ARGS ...args)
 	{
+
 		Command cmd;
 
 		cmd.add(val, args...);
@@ -644,6 +647,29 @@ public:
 		return buffer ? true : false;
 	}
 
+	bool init(const string& host, const int& port, const string& pwd, const int& db)
+	{
+		bool val = 0;
+		Setup(host, port, pwd);
+		val = connect(host, port, 3);
+		if (val == false) {
+			spdlog::error("Redis Connect Fail : {}:{} / {}", host, port, pwd);
+			exit(1);
+			return val;
+		}
+		auth(pwd);
+		selectDB(db);
+		ping();
+		if (getResultString() != "PONG") {
+			spdlog::error("Redis({}) Ping Fail : {}:{} / {}", db, host, port, pwd);
+			exit(1);
+			return false;
+		}
+
+		spdlog::info("Redis({}) init Success..!", db);
+		return true;
+	}
+
 public:
 	int ping()
 	{
@@ -651,14 +677,20 @@ public:
 	}
 	int del(const string& key)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("del", key);
 	}
 	int ttl(const string& key)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("ttl", key) == OK ? status : code;
 	}
 	int hlen(const string& key)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("hlen", key) == OK ? status : code;
 	}
 	int auth(const string& pwd)
@@ -669,8 +701,23 @@ public:
 
 		return execute("auth", pwd);
 	}
+	int selectDB(const int& db)
+	{
+		if (this->db == db) {
+			// 동일한 DB일 경우 pass
+			return true;
+		}
+		else {
+			// 동일한 DB가 아닐 경우 변경처리 한다.
+			this->db = db;
+			return execute("select", db);
+		}
+	}
 	int get(const string& key, string& val)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
+
 		vector<string> vec;
 
 		if (execute(vec, "get", key) <= 0) return code;
@@ -681,40 +728,79 @@ public:
 	}
 	int decr(const string& key, int val = 1)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("decrby", key, val);
 	}
 	int incr(const string& key, int val = 1)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("incrby", key, val);
 	}
 	int expire(const string& key, int timeout)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("expire", key, timeout);
 	}
 	int keys(vector<string>& vec, const string& key)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute(vec, "keys", key);
 	}
 	int hdel(const string& key, const string& filed)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("hdel", key, filed);
 	}
-	int hget(const string& key, const string& filed, string& val)
+	int hget(const string& key, map<std::string, std::string>& val)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		vector<string> vec;
 
-		if (execute(vec, "hget", key, filed) <= 0) return code;
+		if (execute(vec, "hgetall", key) <= 0) return code;
 
-		val = vec[0];
+		for (int i = 0; i < vec.size(); ) {
+			val.insert(pair<std::string, std::string>(vec[i], vec[i + 1]));
+			i += 2;
+		}
+
+		return code;
+	}
+	int smembers(const string& key, vector<std::string>& val)
+	{
+		std::lock_guard<std::mutex> guard(mLock);
+
+		vector<string> vec;
+
+		if (execute(vec, "smembers", key) <= 0) return code;
+
+		for (auto data : vec) {
+			val.emplace_back(data);
+		}
 
 		return code;
 	}
 	int set(const string& key, const string& val, int timeout = 0)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return timeout > 0 ? execute("setex", key, timeout, val) : execute("set", key, val);
+	}
+	int sadd(const string& key, const string& val, int timeout = 0)
+	{
+		std::lock_guard<std::mutex> guard(mLock);
+
+		return timeout > 0 ? execute("sadd", key, timeout, val) : execute("sadd", key, val);
 	}
 	int hset(const string& key, const string& filed, const string& val)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("hset", key, filed, val);
 	}
 
@@ -725,6 +811,8 @@ public:
 	}
 	int lpop(const string& key, string& val)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		vector<string> vec;
 
 		if (execute(vec, "lpop", key) <= 0) return code;
@@ -735,6 +823,8 @@ public:
 	}
 	int rpop(const string& key, string& val)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		vector<string> vec;
 
 		if (execute(vec, "rpop", key) <= 0) return code;
@@ -749,32 +839,46 @@ public:
 	}
 	int lpush(const string& key, const string& val)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("lpush", key, val);
 	}
 	int rpush(const string& key, const string& val)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("rpush", key, val);
 	}
 	int range(vector<string>& vec, const string& key, int start, int end)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute(vec, "lrange", key, start, end);
 	}
 	int lrange(vector<string>& vec, const string& key, int start, int end)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute(vec, "lrange", key, start, end);
 	}
 
 public:
 	int zrem(const string& key, const string& filed)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("zrem", key, filed);
 	}
 	int zadd(const string& key, const string& filed, int score)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return execute("zadd", key, score, filed);
 	}
 	int zrange(vector<string>& vec, const string& key, int start, int end, bool withscore = false)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
+		
 		return withscore ? execute(vec, "zrange", key, start, end, "withscores") : execute(vec, "zrange", key, start, end);
 	}
 
@@ -831,7 +935,7 @@ public:
 			}
 		}
 
-		auto get = [&](){
+		auto get = [&]() {
 			if (redis)
 			{
 				if (redis->ping() > 0 || redis->reconnect()) return true;

@@ -5,6 +5,7 @@
 
 #define UNIQUE_START_NO 1000	// 고유번호 시작
 #define MAX_SOCKBUF	 4096		// 최대 패킷 사이즈
+#define MIN_SOCKBUF 128			// 최소 패킷 사이즈
 #define MAX_WORKERTHREAD 9		// 쓰레드 풀에 넣을 쓰레드 수
 #define PACKET_HEADER_BYTE 4	// Packet Header 크기
 
@@ -96,6 +97,10 @@ enum TimerType {
 };
 
 // ↓ 클라 -> 서버 패킷
+struct cs_packet_auth : public PACKET_HEADER {
+	char sha256sum[MIN_SOCKBUF]{ 0, };
+};
+
 struct cs_packet_dir : public PACKET_HEADER {
 	Location dir;
 };

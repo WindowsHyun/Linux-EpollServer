@@ -21,6 +21,7 @@ private:
 	std::vector<std::thread> mIOWorkerThreads;							// IO Worker 스레드
 	std::thread	mAccepterThread;										// Accept 스레드
 	unsigned __int64 uniqueId;											// 접속 UniqueID
+	unsigned __int64 tempUniqueId;										// 임시 UniqueID
 	bool mIsWorkerRun;													// 작업 Thread 동작 플래그
 
 	bool CreateWokerThread();											// WorkThread init

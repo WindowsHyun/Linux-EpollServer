@@ -22,13 +22,13 @@
     <Filter Include="소스 파일\Module">
       <UniqueIdentifier>{48ec26b7-0f32-49ad-9e60-18664ef91de8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\Setting">
-      <UniqueIdentifier>{cf99245d-d580-413e-a7ce-bd6340917b71}</UniqueIdentifier>
-    </Filter>
     <Filter Include="헤더 파일\Module">
       <UniqueIdentifier>{22662083-b4e5-47ec-be71-01a25910704b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Setting">
+    <Filter Include="헤더 파일\Global">
+      <UniqueIdentifier>{cf99245d-d580-413e-a7ce-bd6340917b71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Global">
       <UniqueIdentifier>{2f7591aa-eda3-4510-b153-6f00a2267664}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -57,8 +57,17 @@
     <ClCompile Include="Library\L_Auth.cpp">
       <Filter>소스 파일\Library</Filter>
     </ClCompile>
-    <ClCompile Include="Setting\ConfigSetting.cpp">
-      <Filter>소스 파일\Setting</Filter>
+    <ClCompile Include="Global\ConfigSetting.cpp">
+      <Filter>소스 파일\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Global\ini.c">
+      <Filter>소스 파일\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Global\INIReader.cpp">
+      <Filter>소스 파일\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Module\M_Auth.cpp">
+      <Filter>소스 파일\Module</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -89,11 +98,20 @@
     <ClInclude Include="Library\L_Auth.h">
       <Filter>헤더 파일\Library</Filter>
     </ClInclude>
-    <ClInclude Include="Setting\ConfigSetting.h">
-      <Filter>헤더 파일\Setting</Filter>
+    <ClInclude Include="Global\ConfigSetting.h">
+      <Filter>헤더 파일\Global</Filter>
     </ClInclude>
-    <ClInclude Include="Setting\RedisConnect.h">
-      <Filter>헤더 파일\Setting</Filter>
+    <ClInclude Include="Global\RedisConnect.h">
+      <Filter>헤더 파일\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\ini.h">
+      <Filter>헤더 파일\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\INIReader.h">
+      <Filter>헤더 파일\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Module\M_Auth.h">
+      <Filter>헤더 파일\Module</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
