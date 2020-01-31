@@ -95,7 +95,7 @@ void Logic_API::API_Thread()
 			break;
 
 			default:
-				spdlog::error("ProcessPacket ProtocolType ({} / {})is not found..! / [unique_id:{}]", packet.packet_type, protocolBase, packet.unique_id);
+				spdlog::error("ProcessPacket ProtocolType ({} / {})is not found..! || [unique_id:{}]", packet.packet_type, protocolBase, packet.unique_id);
 				break;
 
 			}

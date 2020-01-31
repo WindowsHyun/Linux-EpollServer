@@ -6,6 +6,8 @@
 class AuthModule {
 public:
 	bool get_uniqueID(const char * value, unsigned __int64& uniqueID);
+	bool set_uniqueID(const char * value, unsigned __int64& uniqueID);
+
 
 private:
 

@@ -2,7 +2,6 @@
 #define __L_AUTH_H__
 
 #include "Api.h"
-#include "../Module/M_Auth.h"
 
 class AuthRoute {
 public:

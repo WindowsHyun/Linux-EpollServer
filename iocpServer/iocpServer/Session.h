@@ -35,6 +35,7 @@ public:
 		m_socketSession = INVALID_SOCKET;
 		unique_id = 0;
 		error_cnt = 0;
+		remainSize = 0;
 	}
 	// get
 	SOCKET& get_sock() { return m_socketSession; }
@@ -43,11 +44,14 @@ public:
 	stOverlappedEx& get_Recv_over() { return m_stRecvOverlappedEx; }
 	stOverlappedEx& get_Send_over() { return m_stSendOverlappedEx; }
 	int get_error_cnt() { return error_cnt; }
+	int get_remainSize() { return remainSize; }
 
 	// set
 	void set_unique_id(const unsigned __int64 id);
 	void set_init_session();
 	void update_error_cnt();
+	void set_remainSize(const int value){ remainSize = value;}
+	void incr_remainSize(const int value) { remainSize += value; }
 
 private:
 	SOCKET			m_socketSession;		// Cliet와 연결되는 소켓
@@ -56,5 +60,6 @@ private:
 	stOverlappedEx	m_stSendOverlappedEx;	// SEND Overlapped I/O작업을 위한 변수
 	unsigned __int64 unique_id;				// 고유 아이디
 	int error_cnt;							// 패킷 오류 Count
+	int remainSize;							// Auth Login을 위하여
 };
 #endif

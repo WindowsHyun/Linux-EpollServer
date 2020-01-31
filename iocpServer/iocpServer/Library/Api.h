@@ -4,6 +4,7 @@
 #include "../Main.h"
 // Route Header
 #include "L_Auth.h"
+#include "../Module/M_Auth.h"
 
 class Logic_API {
 public:

@@ -24,7 +24,7 @@ void SERVER_Timer::Timer_Thread()
 			default:
 			{
 				// 예외 상황
-				spdlog::critical("[Exception TimerThread({})] No value defined..! / [unique_id:{}]",
+				spdlog::critical("[Exception TimerThread({})] No value defined..! || [unique_id:{}]",
 					(int)t.event, t.object_id);
 				continue;
 			}

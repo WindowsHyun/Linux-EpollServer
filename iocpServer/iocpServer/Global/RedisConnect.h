@@ -732,11 +732,14 @@ public:
 		
 		return execute("decrby", key, val);
 	}
-	int incr(const string& key, int val = 1)
+	int incr(const string& key, string& val, int incrCnt = 1)
 	{
 		std::lock_guard<std::mutex> guard(mLock);
-		
-		return execute("incrby", key, val);
+
+		if (execute("incrby", key, incrCnt) <= 0) return code;
+		val = this->msg;
+
+		return code;
 	}
 	int expire(const string& key, int timeout)
 	{
