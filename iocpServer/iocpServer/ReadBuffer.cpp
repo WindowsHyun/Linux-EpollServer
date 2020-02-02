@@ -24,7 +24,7 @@ void ReadBuffer::init(int size)
 	writePos = 0;
 }
 
-int ReadBuffer::getHeaderSize(char* pData, int size)
+int ReadBuffer::getHeaderSize(char* pMsg, int size)
 {
 	std::lock_guard<std::mutex> guard(mLock);
 
@@ -32,9 +32,26 @@ int ReadBuffer::getHeaderSize(char* pData, int size)
 	if (totalSize - readPos < size) {
 		return -1;
 	}
-	// Packet_Header Size 만큼 pData(Packet_Header)에 복사한다.
-	memcpy_s(pData, size, &buffer[readPos], size);
+	// Packet_Header Size 만큼 pMsg(Packet_Header)에 복사한다.
+	memcpy_s(pMsg, size, &buffer[readPos], size);
 
+	return size;
+}
+
+int ReadBuffer::setWriteBuffer(char * pMsg, int size)
+{
+	std::lock_guard<std::mutex> guard(mLock);
+
+	// 쓰기 가능한 공간이, size보다 크면 초기화를 해준다.
+	if (size > getWriteAbleSize()) {
+		memcpy_s(&buffer[0], size, pMsg, size);
+		readPos = 0;
+		writePos = size;
+	}
+	else {
+		memcpy_s(&buffer[writePos], size, pMsg, size);
+		writePos += size;
+	}
 	return size;
 }
 
@@ -65,6 +82,18 @@ int ReadBuffer::getReadAbleSize(void)
 	}
 	else {
 		return (totalSize - readPos) + writePos;
+	}
+}
+
+int ReadBuffer::getWriteAbleSize(void)
+{
+	if (readPos > writePos)
+	{
+		return readPos - writePos;
+	}
+	else
+	{
+		return totalSize - writePos;
 	}
 }
 

@@ -17,11 +17,11 @@ bool Logic_API::stop()
 	return true;
 }
 
-void Logic_API::packet_Add(unsigned __int64 unique_id, char * pData, unsigned short packetLen)
+void Logic_API::packet_Add(unsigned __int64 unique_no, char * pMsg, unsigned short packetLen)
 {
 	// Packet Header Read
 	char *packetHeader = new char[packetLen];
-	memcpy(packetHeader, pData, packetLen);
+	memcpy(packetHeader, pMsg, packetLen);
 	auto pHeader = (PACKET_HEADER*)packetHeader;
 	PACKET_HEADER packet_header;
 	packet_header.packet_type = pHeader->packet_type;
@@ -31,8 +31,8 @@ void Logic_API::packet_Add(unsigned __int64 unique_id, char * pData, unsigned sh
 	Packet_Frame packet_frame;
 	packet_frame.packet_type = packet_header.packet_type;
 	packet_frame.size = packet_header.packet_len;
-	packet_frame.pData = packetHeader;
-	packet_frame.unique_id = unique_id;
+	packet_frame.pMsg = packetHeader;
+	packet_frame.unique_no = unique_no;
 	std::lock_guard<std::mutex> guard(mLock);
 	api.get_PacketFrame().push(packet_frame);
 }
@@ -52,9 +52,10 @@ void Logic_API::API_Thread()
 	while (threadRun) {
 		if (!recvPacketQueue.empty()) {
 			// 로직 처리를 진행
-			//std::cout << "[INFO] API Queue : " << recvPacketQueue.size() << std::endl;
 			std::lock_guard<std::mutex> guard(mLock);
+			sc_packet_result result;
 			auto packet = recvPacketQueue.front();
+			result.packet_no = packet.packet_type;
 
 			// Protocol Base값 을 가져온다.
 			ProtocolType protocolBase = (ProtocolType)((int)packet.packet_type / (int)PACKET_RANG_SIZE * (int)PACKET_RANG_SIZE);
@@ -71,7 +72,7 @@ void Logic_API::API_Thread()
 			case CLIENT_AUTH_BASE:
 			{
 				AuthRoute* auth = new AuthRoute();
-				auth->ApiProcessing(packet);
+				auth->ApiProcessing(packet, result);
 				delete auth;
 			}
 			break;
@@ -95,15 +96,22 @@ void Logic_API::API_Thread()
 			break;
 
 			default:
-				spdlog::error("ProcessPacket ProtocolType ({} / {})is not found..! || [unique_id:{}]", packet.packet_type, protocolBase, packet.unique_id);
+				spdlog::error("ProcessPacket ProtocolType ({} / {})is not found..! || [unique_no:{}]", packet.packet_type, protocolBase, packet.unique_no);
 				break;
 
 			}
 
+			// Result Packet 보내기.
+			if (result.result != (int)ResultCode::PASS) {
+				// PASS처리가 아닌 경우에는 무조건 Client에게 결과를 전송한다.
+				result.packet_len = sizeof(result);
+				result.packet_type = SERVER_RESULT_PACKET;
+
+				iocp_server.SendPacket(result.unique_no,
+					reinterpret_cast<char *>(&result), sizeof(result));
+			}
 			recvPacketQueue.pop();
-			delete[] packet.pData;
-
-
+			delete[] packet.pMsg;
 		}
 		else {
 			std::this_thread::sleep_for(std::chrono::milliseconds(2));

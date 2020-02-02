@@ -33,6 +33,7 @@
 
 // 헤더 가져오기
 #include "Global/ConfigSetting.h"
+#include "Global/ResultCode.h"
 #include "Protocol.h"
 #include "Iocp.h"
 #include "Object.h"

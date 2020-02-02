@@ -30,4 +30,5 @@
 const char ipAddres[MAX_SOCKBUF]{ "127.0.0.1" };
 
 void init_sock(SOCKET& sock);
+int recvn(SOCKET s, char *buf, int len, int flags);
 #endif

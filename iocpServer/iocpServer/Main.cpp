@@ -54,10 +54,10 @@ void initRDC()
 	if (value == "") {
 		// UNIQUE_NO가 없을 경우 서버 초기 시작 값 부터 진행을 한다.
 		RDC[REDISDB::REDIS_USER_AUTH_DB]->set("UNIQUE_NO", to_string(UNIQUE_START_NO));
-		CS.set_unique_id_no(atoi(to_string(UNIQUE_START_NO).c_str()));
+		CS.set_unique_no(atoi(to_string(UNIQUE_START_NO).c_str()));
 	}
 	else {
-		CS.set_unique_id_no(atoi(value.c_str()));
+		CS.set_unique_no(atoi(value.c_str()));
 	}
-	spdlog::info("User Unique Start No   : {}", CS.get_unique_id_no());
+	spdlog::info("User Unique Start No   : {}", CS.get_unique_no());
 }

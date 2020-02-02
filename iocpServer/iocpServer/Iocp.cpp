@@ -18,6 +18,12 @@ bool IOCP_Server::initServer()
 		return false;
 	}
 
+	Timer_Event* t = new Timer_Event;
+	t->object_id = 0;
+	t->exec_time = high_resolution_clock::now() + 5120ms;
+	t->event = T_DisconnectRemove;
+	timer.setTimerEvent(*t);
+
 	spdlog::info("Socket Init Success..!");
 	return true;
 }
@@ -112,9 +118,9 @@ void IOCP_Server::destroyThread()
 	timer.stop();
 }
 
-void IOCP_Server::add_tempUniqueID(unsigned __int64 uniqueID)
+void IOCP_Server::add_tempUniqueNo(unsigned __int64 uniqueNo)
 {
-	tempUniqueID.push(uniqueID);
+	tempUniqueNo.push(uniqueNo);
 }
 
 bool IOCP_Server::CreateWokerThread()
@@ -173,8 +179,8 @@ void IOCP_Server::WokerThread()
 		// client가 접속을 끊었을때..			
 		if (FALSE == bSuccess || (0 == dwIoSize && TRUE == bSuccess))
 		{
-			spdlog::info("[Disconnect] SOCKET : {} || [unique_id:{}]", (int)pPlayerSession->get_sock(), (int)pPlayerSession->get_unique_id());
-			ClosePlayer(pPlayerSession->get_unique_id());
+			spdlog::info("[Disconnect] SOCKET : {} || [unique_no:{}]", (int)pPlayerSession->get_sock(), (int)pPlayerSession->get_unique_no());
+			ClosePlayer(pPlayerSession->get_unique_no());
 			CloseSocket(pPlayerSession);
 			continue;
 		}
@@ -192,16 +198,19 @@ void IOCP_Server::WokerThread()
 		case IOOperation::SEND:
 		{
 			// Overlapped I/O Send작업 결과 뒤 처리
-			spdlog::info("[SEND] bytes : {} , msg : {}", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
+			OnSend(pPlayerSession, dwIoSize);
+			//spdlog::info("[SEND] bytes : {} , msg : {}", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
 		}
 		break;
 
-		case IOOperation::IO_EVENT:
+		case IOOperation::DisconnectRemove:
 		{
+			// 종료된 리스트를 비워준다.
+			disconnectUniqueNo.clear();
 			Timer_Event* t = new Timer_Event;
 			t->object_id = 0;
-			t->exec_time = high_resolution_clock::now() + 1024ms;
-			t->event = T_NormalTime;
+			t->exec_time = high_resolution_clock::now() + 5120ms;
+			t->event = T_DisconnectRemove;
 			timer.setTimerEvent(*t);
 		}
 		break;
@@ -209,8 +218,8 @@ void IOCP_Server::WokerThread()
 		default:
 		{
 			// 예외 상황
-			spdlog::critical("[Exception WokerThread({})] No value defined..! || [unique_id:{}]",
-				(int)pOverlappedEx->m_eOperation, pPlayerSession->get_unique_id());
+			spdlog::critical("[Exception WokerThread({})] No value defined..! || [unique_no:{}]",
+				(int)pOverlappedEx->m_eOperation, pPlayerSession->get_unique_no());
 		}
 		break;
 
@@ -239,101 +248,84 @@ void IOCP_Server::CloseSocket(class PLAYER_Session * pPlayerSession, bool bIsFor
 	pPlayerSession->get_sock() = INVALID_SOCKET;
 }
 
-void IOCP_Server::ClosePlayer(unsigned __int64 uniqueId)
+void IOCP_Server::ClosePlayer(unsigned __int64 uniqueNo)
 {
-	player.erase(uniqueId);
-	player_session.erase(uniqueId);
+	player.erase(uniqueNo);
+	player_session.erase(uniqueNo);
 }
 
-bool IOCP_Server::SendPacket(class PLAYER_Session * pPlayerSession, char * pMsg, int nLen)
+bool IOCP_Server::SendPacket(unsigned __int64 uniqueNo, char * pMsg, int nLen)
 {
-	DWORD dwRecvNumBytes = 0;
-
-	//PACKET_HEADER packetHader;
-	//packetHader.packet_len = sizeof(pMsg);
-	//packetHader.packet_type = CLIENT_BASE;
-	//std::cout << packetHader.packet_len << std::endl;
-
-	//reinterpret_cast<const char *>(&packetHader)
-
-	//char sendMSG[MAX_SOCKBUF]{ 0 };
-
-	// 전송될 메세지를 복사
-	CopyMemory(pPlayerSession->get_Send_over().m_wsaBuf.buf, pMsg, nLen);
-
-
-	// Overlapped I/O을 위해 각 정보를 셋팅해 준다.
-	pPlayerSession->get_Send_over().m_wsaBuf.len = nLen;
-	pPlayerSession->get_Send_over().m_wsaBuf.buf = pPlayerSession->get_Send_over().m_wsaBuf.buf;
-	pPlayerSession->get_Send_over().m_eOperation = IOOperation::SEND;
-
-	int nRet = WSASend(pPlayerSession->get_sock(),
-		&(pPlayerSession->get_Send_over().m_wsaBuf),
-		1,
-		&dwRecvNumBytes,
-		0,
-		(LPWSAOVERLAPPED) & (pPlayerSession->get_Send_over()),
-		NULL);
-
-	// socket_error이면 client socket이 끊어진걸로 처리한다.
-	if (nRet == SOCKET_ERROR && (WSAGetLastError() != ERROR_IO_PENDING))
-	{
-		spdlog::error("WSASend() Function failure : {} || [unique_id:{}]", WSAGetLastError(), pPlayerSession->get_unique_id());
-		ClosePlayer(pPlayerSession->get_unique_id());
-		CloseSocket(pPlayerSession);
+	auto pPlayerSession = getSessionByNo(uniqueNo);
+	if (pPlayerSession != nullptr) {
+		// send_Buffer에 pMsg를 넣어준다.
+		pPlayerSession->sendReady(pMsg, nLen);
+		// Send처리를 한다.
+		return pPlayerSession->sendIo();
+	}
+	else {
 		return false;
 	}
-	return true;
+}
+
+PLAYER_Session * IOCP_Server::getSessionByNo(unsigned __int64 uniqueNo)
+{
+	auto pTempPlayerSession = player_session.find(uniqueNo);
+	if (pTempPlayerSession == player_session.end()) {
+		if (disconnectUniqueNo.find(uniqueNo) == disconnectUniqueNo.end()) {
+			spdlog::error("[getSessionByNo] No Exit Session || [unique_no:{}]", uniqueNo);
+			disconnectUniqueNo.insert(pair<unsigned __int64, bool>(uniqueNo, true));
+		}
+		return nullptr;
+	}
+	auto pPlayerSession = pTempPlayerSession->second;
+
+	return pPlayerSession;
 }
 
 void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 {
 	// 플레이어 세션 에서 플레이어 데이터 가져오기
-	auto pTempPlayerSession = player_session.find(pOver->m_unique_id); // getPlayerSession(pOver->m_unique_id);
-	if (pTempPlayerSession == player_session.end()) {
-		spdlog::error("[OnRecv] No Exit Session || [unique_id:{}]", pOver->m_unique_id);
-		return;
-	}
-	auto pPlayerSession = pTempPlayerSession->second;
+	auto pPlayerSession = getSessionByNo(pOver->m_unique_no);
 
-	//std::cout << "User No : " << pPlayerSession->get_unique_id() << " | OnRecv..!" << std::endl;
+	//std::cout << "User No : " << pPlayerSession->get_unique_no() << " | OnRecv..!" << std::endl;
 	//std::cout << "[INFO] ioSize : " << ioSize << std::endl;
 
 	// 쓰기를 위한 위치를 옮겨준다.
-	if (!pPlayerSession->get_buffer().moveWritePos(ioSize))
+	if (!pPlayerSession->read_buffer().moveWritePos(ioSize))
 	{
-		spdlog::error("ReadBuffer Over Flow || [unique_id:{}]", pPlayerSession->get_unique_id());
+		spdlog::error("ReadBuffer Over Flow || [unique_no:{}]", pPlayerSession->get_unique_no());
 	}
 
 	PACKET_HEADER header;
 	//int remainSize = 0;
 	pPlayerSession->set_remainSize(0);
-	while (pPlayerSession->get_buffer().getReadAbleSize() > 0) {
+	while (pPlayerSession->read_buffer().getReadAbleSize() > 0) {
 
 		// 일정 개수 이상 Packet 오류가 나면 강제 종료 시킨다.
 		if (pPlayerSession->get_error_cnt() >= CS.get_limit_err_cnt()) {
-			spdlog::error("Limit Error Count Maximum Exceeded / ErrorCnt({}) >= LimitCnt({}) || [unique_id:{}]",
-				pPlayerSession->get_error_cnt(), CS.get_limit_err_cnt(), pPlayerSession->get_unique_id());
-			ClosePlayer(pPlayerSession->get_unique_id());
+			spdlog::error("Limit Error Count Maximum Exceeded / ErrorCnt({}) >= LimitCnt({}) || [unique_no:{}]",
+				pPlayerSession->get_error_cnt(), CS.get_limit_err_cnt(), pPlayerSession->get_unique_no());
+			ClosePlayer(pPlayerSession->get_unique_no());
 			CloseSocket(pPlayerSession);
 			break;
 		}
 
 		// 읽을 수 있는 Packet 크기가 Header Packet 보다 작을 경우 처리 한다.
-		if (pPlayerSession->get_buffer().getReadAbleSize() <= sizeof(header)) {
+		if (pPlayerSession->read_buffer().getReadAbleSize() <= sizeof(header)) {
 			break;
 		}
 
 		// Packet_Header 를 가져온다.
-		auto PacketSize = pPlayerSession->get_buffer().getHeaderSize((char*)&header, sizeof(header));
+		auto PacketSize = pPlayerSession->read_buffer().getHeaderSize((char*)&header, sizeof(header));
 		if (PacketSize == -1) {
-			spdlog::error("getHeaderSize || [unique_id:{}]", pPlayerSession->get_unique_id());
+			spdlog::error("getHeaderSize || [unique_no:{}]", pPlayerSession->get_unique_no());
 		}
 
-		if (pPlayerSession->get_buffer().getReadAbleSize() < header.packet_len || header.packet_len <= PACKET_HEADER_BYTE) {
+		if (pPlayerSession->read_buffer().getReadAbleSize() < header.packet_len || header.packet_len <= PACKET_HEADER_BYTE) {
 			// 읽을 수 있는 Packet 사이즈가 전송된 Packet의 전체 사이즈보다 작을 경우 처리를 한다.
-			spdlog::critical("Packet Header Critical AbleSize({}) <= PacketSize({}) OR getReadAbleSize({}) < PacketSize({}) || [unique_id:{}]",
-				header.packet_len, PACKET_HEADER_BYTE, pPlayerSession->get_buffer().getReadAbleSize(), header.packet_len, pPlayerSession->get_unique_id());
+			spdlog::critical("Packet Header Critical AbleSize({}) <= PacketSize({}) OR getReadAbleSize({}) < PacketSize({}) || [unique_no:{}]",
+				header.packet_len, PACKET_HEADER_BYTE, pPlayerSession->read_buffer().getReadAbleSize(), header.packet_len, pPlayerSession->get_unique_no());
 			// Packet 사이즈가 Header 크기보다 작을 경우 Error count를 올린다.
 			if (header.packet_len <= PACKET_HEADER_BYTE) {
 				pPlayerSession->update_error_cnt();
@@ -346,10 +338,10 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 			// API 라이브러리로 해당 값을 전달 시켜 준다.
 			ProtocolType protocolBase = (ProtocolType)((int)header.packet_type / (int)PACKET_RANG_SIZE * (int)PACKET_RANG_SIZE);
 
-			api.packet_Add(pPlayerSession->get_unique_id(), pPlayerSession->get_buffer().getReadBuffer(), header.packet_len);
+			api.packet_Add(pPlayerSession->get_unique_no(), pPlayerSession->read_buffer().getReadBuffer(), header.packet_len);
 
 			// 읽기 완료 처리
-			pPlayerSession->get_buffer().moveReadPos(header.packet_len);
+			pPlayerSession->read_buffer().moveReadPos(header.packet_len);
 			pPlayerSession->incr_remainSize((ioSize - header.packet_len));
 			//remainSize += (ioSize - header.packet_len);
 		}
@@ -358,9 +350,15 @@ void IOCP_Server::OnRecv(struct stOverlappedEx* pOver, int ioSize)
 
 	// 임시 번호의 경우 일시적으로 BindRecv를 하지 않는다.
 	// L_Auth_Login에서 처리하면서 BindRecv를 해준다.
-	if (pPlayerSession->get_unique_id() >= UNIQUE_START_NO) {
+	if (pPlayerSession->get_unique_no() >= UNIQUE_START_NO) {
 		BindRecv(pPlayerSession, pPlayerSession->get_remainSize());
 	}
+}
+
+void IOCP_Server::OnSend(PLAYER_Session * pSession, int size)
+{
+	// send 완료 처리
+	pSession->sendFinish(size);
 }
 
 bool IOCP_Server::CreateAccepterThread()
@@ -403,37 +401,37 @@ void IOCP_Server::AccepterThread()
 			continue;
 		}
 
-		// 임시 UniqueID가 없을 경우 강제로 연결을 끊는다.
-		if (tempUniqueID.size() == 0) {
-			spdlog::critical("tempUniqueID Full..!");
+		// 임시 uniqueNo가 없을 경우 강제로 연결을 끊는다.
+		if (tempUniqueNo.size() == 0) {
+			spdlog::critical("tempUniqueNo Full..!");
 			CloseSocket(pPlayerSession);
 			continue;
 		}
 
 		// session에 set 해준다.
-		pPlayerSession->set_unique_id(tempUniqueID.front());
+		pPlayerSession->set_unique_no(tempUniqueNo.front());
 
 		// player_session에 추가 한다.
-		player_session.insert(std::unordered_map<unsigned __int64, class PLAYER_Session *>::value_type(tempUniqueID.front(), pPlayerSession));
+		player_session.insert(std::unordered_map<unsigned __int64, class PLAYER_Session *>::value_type(tempUniqueNo.front(), pPlayerSession));
 
 		// 플레이어를 set 해준다.
 		class PLAYER * acceptPlayer = new class PLAYER;
 		acceptPlayer->set_sock(pPlayerSession->get_sock());
-		acceptPlayer->set_unique_id(tempUniqueID.front());
-		player.insert(std::unordered_map<unsigned __int64, class PLAYER *>::value_type(tempUniqueID.front(), acceptPlayer));
+		acceptPlayer->set_unique_no(tempUniqueNo.front());
+		player.insert(std::unordered_map<unsigned __int64, class PLAYER *>::value_type(tempUniqueNo.front(), acceptPlayer));
 
 		//클라이언트 갯수 증가
-		tempUniqueID.pop();
+		tempUniqueNo.pop();
 
 		char clientIP[32] = { 0, };
 		inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
-		spdlog::info("[Connect] Client IP : {} / SOCKET : {} || [unique_id:{}]", clientIP, (int)pPlayerSession->get_sock(), pPlayerSession->get_unique_id());
+		spdlog::info("[Connect] Client IP : {} / SOCKET : {} || [unique_no:{}]", clientIP, (int)pPlayerSession->get_sock(), pPlayerSession->get_unique_no());
 
 		// Recv Overlapped I/O작업을 요청해 놓는다.
 		bRet = BindRecv(pPlayerSession, 0);
 		if (false == bRet) {
-			spdlog::error("BindRecv() Function failure || [unique_id:{}]", pPlayerSession->get_unique_id());
-			ClosePlayer(pPlayerSession->get_unique_id());
+			spdlog::error("BindRecv() Function failure || [unique_no:{}]", pPlayerSession->get_unique_no());
+			ClosePlayer(pPlayerSession->get_unique_no());
 			CloseSocket(pPlayerSession);
 			continue;
 		}
@@ -447,7 +445,7 @@ bool IOCP_Server::BindIOCompletionPort(class PLAYER_Session * pPlayerSession)
 	auto hIOCP = CreateIoCompletionPort((HANDLE)pPlayerSession->get_sock(), g_hiocp, (ULONG_PTR)(pPlayerSession), 0);
 
 	if (NULL == hIOCP || g_hiocp != hIOCP) {
-		spdlog::error("CreateIoCompletionPort() Function failure : {} || [unique_id:{}]", GetLastError(), pPlayerSession->get_unique_id());
+		spdlog::error("CreateIoCompletionPort() Function failure : {} || [unique_no:{}]", GetLastError(), pPlayerSession->get_unique_no());
 		return false;
 	}
 
@@ -461,14 +459,14 @@ bool IOCP_Server::BindRecv(class PLAYER_Session * pPlayerSession, int remainSize
 	WSABUF wBuf;
 
 	if (remainSize > 0) {
-		pPlayerSession->get_buffer().checkWrite(remainSize);
+		pPlayerSession->read_buffer().checkWrite(remainSize);
 	}
 
 	// Overlapped I/O을 위해 각 정보를 셋팅해 준다.
 	wBuf.len = MAX_SOCKBUF;
-	wBuf.buf = pPlayerSession->get_buffer().getWriteBuffer();
+	wBuf.buf = pPlayerSession->read_buffer().getWriteBuffer();
 	pPlayerSession->get_Recv_over().m_eOperation = IOOperation::RECV;
-	pPlayerSession->get_Recv_over().m_unique_id = pPlayerSession->get_unique_id();
+	pPlayerSession->get_Recv_over().m_unique_no = pPlayerSession->get_unique_no();
 	pPlayerSession->get_Recv_over().m_socketSession = pPlayerSession->get_sock();
 
 	int nRet = WSARecv(pPlayerSession->get_sock(),
@@ -481,8 +479,8 @@ bool IOCP_Server::BindRecv(class PLAYER_Session * pPlayerSession, int remainSize
 
 	// socket_error이면 client socket이 끊어진걸로 처리한다.
 	if (nRet == SOCKET_ERROR && (WSAGetLastError() != ERROR_IO_PENDING)) {
-		spdlog::error("WSARecv() Function failure : {} || [unique_id:{}]", WSAGetLastError(), pPlayerSession->get_unique_id());
-		ClosePlayer(pPlayerSession->get_unique_id());
+		spdlog::error("WSARecv() Function failure : {} || [unique_no:{}]", WSAGetLastError(), pPlayerSession->get_unique_no());
+		ClosePlayer(pPlayerSession->get_unique_no());
 		CloseSocket(pPlayerSession);
 		return false;
 	}
@@ -495,10 +493,10 @@ IOCP_Server::IOCP_Server()
 	std::wcout.imbue(std::locale("korean"));	// Locale Korean
 	g_hiocp = INVALID_HANDLE_VALUE;
 	listenSocket = INVALID_SOCKET;
-	uniqueId = UNIQUE_START_NO;
-	// 임시 UniqueID 추가
+	uniqueNo = UNIQUE_START_NO;
+	// 임시 uniqueNo 추가
 	for (int i = 0; i < UNIQUE_START_NO; ++i) {
-		tempUniqueID.push(i);
+		tempUniqueNo.push(i);
 	}
 	mIsWorkerRun = true;
 	mIsAccepterRun = true;

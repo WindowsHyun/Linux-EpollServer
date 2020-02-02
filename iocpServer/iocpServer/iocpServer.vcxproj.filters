@@ -113,6 +113,9 @@
     <ClInclude Include="Module\M_Auth.h">
       <Filter>헤더 파일\Module</Filter>
     </ClInclude>
+    <ClInclude Include="Global\ResultCode.h">
+      <Filter>헤더 파일\Global</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

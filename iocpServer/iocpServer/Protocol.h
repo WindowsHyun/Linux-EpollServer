@@ -68,6 +68,7 @@ const enum ProtocolType {
 	SERVER_FRONT_BASE = SERVER_AUTH_BASE + PACKET_RANG_SIZE,
 	SERVER_GOODS_BASE = SERVER_FRONT_BASE + PACKET_RANG_SIZE,
 	SERVER_INFO_BASE = SERVER_GOODS_BASE + PACKET_RANG_SIZE,
+	SERVER_RESULT_BASE = SERVER_INFO_BASE + PACKET_RANG_SIZE,
 
 	// Auth
 	SERVER_AUTH = SERVER_AUTH_BASE,
@@ -85,6 +86,10 @@ const enum ProtocolType {
 	SERVER_INFO = SERVER_INFO_BASE,
 	SERVER_INFO_TEST,
 
+	// Packet Result
+	SERVER_RESULT = SERVER_RESULT_BASE,
+	SERVER_RESULT_PACKET,
+
 	// Max Protocol No (Server)
 	MAX_SERVER_PROTOCOL_NO,
 };
@@ -98,14 +103,14 @@ struct PACKET_HEADER {
 struct Packet_Frame {
 	unsigned short packet_type = -1; // NONE
 	unsigned short size = 0;
-	unsigned __int64 unique_id = 0;
-	char* pData = nullptr;
+	unsigned __int64 unique_no = 0;
+	char* pMsg = nullptr;
 };
 
 // 타이머 타입
 enum TimerType {
 	T_NormalTime,
-	T_TestTime
+	T_DisconnectRemove
 };
 
 // ↓ 클라 -> 서버 패킷
@@ -126,7 +131,13 @@ struct cs_packet_test : public PACKET_HEADER {
 
 // ↓ 서버 -> 클라 패킷
 struct sc_packet_clientno : public PACKET_HEADER {
-	unsigned __int64 no;
+	unsigned __int64 unique_no;
+};
+
+struct sc_packet_result : public PACKET_HEADER {
+	unsigned __int64 unique_no;
+	int packet_no;
+	int result;
 };
 
 struct sc_packet_dir : public PACKET_HEADER {

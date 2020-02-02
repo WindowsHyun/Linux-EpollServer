@@ -7,7 +7,7 @@ class AuthRoute {
 public:
 	AuthRoute();
 	~AuthRoute();
-	void ApiProcessing(Packet_Frame packet);	// API 처리
+	void ApiProcessing(Packet_Frame packet, sc_packet_result& resultCode);	// API 처리
 
 private:
 	class AuthModule *auth;

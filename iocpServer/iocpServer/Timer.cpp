@@ -17,14 +17,21 @@ void SERVER_Timer::Timer_Thread()
 			case T_NormalTime:
 			{
 				over->m_eOperation = IOOperation::IO_EVENT;
-				over->m_unique_id = t.object_id;
+				over->m_unique_no = t.object_id;
+			}
+			break;
+
+			case T_DisconnectRemove:
+			{
+				over->m_eOperation = IOOperation::DisconnectRemove;
+				over->m_unique_no = t.object_id;
 			}
 			break;
 
 			default:
 			{
 				// 예외 상황
-				spdlog::critical("[Exception TimerThread({})] No value defined..! || [unique_id:{}]",
+				spdlog::critical("[Exception TimerThread({})] No value defined..! || [unique_no:{}]",
 					(int)t.event, t.object_id);
 				continue;
 			}

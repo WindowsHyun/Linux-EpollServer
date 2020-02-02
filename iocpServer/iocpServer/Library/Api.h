@@ -10,7 +10,7 @@ class Logic_API {
 public:
 	bool start();
 	bool stop();
-	void packet_Add(unsigned __int64 unique_id, char* pData, unsigned short packetLen);
+	void packet_Add(unsigned __int64 unique_no, char* pMsg, unsigned short packetLen);
 	std::mutex& get_mutex() { return mLock; }
 	std::queue<Packet_Frame>& get_PacketFrame() { return recvPacketQueue; }
 	Logic_API();

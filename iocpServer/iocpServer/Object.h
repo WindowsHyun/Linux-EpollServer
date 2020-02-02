@@ -25,23 +25,23 @@ public:
 	PLAYER() {
 		ZeroMemory(&nickName, sizeof(char));
 		sock = INVALID_SOCKET;
-		unique_id = 0;
+		unique_no = 0;
 		connect = false;
 		live = false;
 		game_play = false;
 	}
 	// get
 	SOCKET get_sock() { return sock; }
-	unsigned __int64 get_unique_id() { return unique_id; }
+	unsigned __int64 get_unique_no() { return unique_no; }
 
 	// set
 	void set_sock(const SOCKET g_sock);
-	void set_unique_id(const unsigned __int64 id);
+	void set_unique_no(const unsigned __int64 id);
 	void set_init_player();
 
 private:
 	SOCKET sock;
-	unsigned __int64 unique_id;	// 클라이언트 고유 번호
+	unsigned __int64 unique_no;	// 클라이언트 고유 번호
 	bool connect;				// 클라이언트 연결 여부
 	int hp;						// 클라이언트 체력
 	bool live;					// 클라이언트 생존 여부
