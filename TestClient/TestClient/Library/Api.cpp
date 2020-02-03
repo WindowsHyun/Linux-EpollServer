@@ -53,63 +53,45 @@ void Logic_API::API_Thread()
 		if (!recvPacketQueue.empty()) {
 			// 로직 처리를 진행
 			std::lock_guard<std::mutex> guard(mLock);
-			sc_packet_result result;
 			auto packet = recvPacketQueue.front();
-			result.packet_no = packet.packet_type;
 
 			// Protocol Base값 을 가져온다.
 			ProtocolType protocolBase = (ProtocolType)((int)packet.packet_type / (int)PACKET_RANG_SIZE * (int)PACKET_RANG_SIZE);
 
-			// 각각의 Library로 처리를 보낸다.
-			switch (protocolBase) {
-
-			case CLIENT_BASE:
+			switch (protocolBase)
 			{
-
+			case SERVER_AUTH_BASE:
+			{
+				spdlog::info("SERVER_AUTH_BASE");
 			}
 			break;
-
-			case CLIENT_AUTH_BASE:
+			case SERVER_FRONT_BASE:
 			{
-				AuthRoute* auth = new AuthRoute();
-				auth->ApiProcessing(packet, result);
-				delete auth;
+				spdlog::info("SERVER_FRONT_BASE");
 			}
 			break;
-
-			case CLIENT_FRONT_BASE:
+			case SERVER_GOODS_BASE:
 			{
-
+				spdlog::info("SERVER_GOODS_BASE");
 			}
 			break;
-
-			case CLIENT_GOODS_BASE:
+			case SERVER_INFO_BASE:
 			{
-
+				spdlog::info("SERVER_INFO_BASE");
 			}
 			break;
-
-			case CLIENT_INFO_BASE:
+			case SERVER_RESULT_BASE:
 			{
-
+				spdlog::info("SERVER_RESULT_BASE");
 			}
 			break;
-
 			default:
+			{
 				spdlog::error("ProcessPacket ProtocolType ({} / {})is not found..! || [unique_no:{}]", packet.packet_type, protocolBase, packet.unique_no);
-				break;
-
+			}
+			break;
 			}
 
-			// Result Packet 보내기.
-			if (result.result != (int)ResultCode::NONE) {
-				// Error의 경우에만 Msg발송 처리를 한다.
-				result.packet_len = sizeof(result);
-				result.packet_type = SERVER_RESULT_PACKET;
-
-				iocp_server.SendPacket(result.unique_no,
-					reinterpret_cast<char *>(&result), sizeof(result));
-			}
 			recvPacketQueue.pop();
 			delete[] packet.pMsg;
 		}

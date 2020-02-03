@@ -53,6 +53,15 @@ void AuthRoute::ApiProcessing(Packet_Frame packet, sc_packet_result& resultCode)
 		// 다시 Recv할 수 있게 변경을 해준다.
 		iocp_server.BindRecv(pPlayerSession, pPlayerSession->get_remainSize());
 
+		// 클라이언트에게 자신의 고유번호를 전송해 준다.
+		sc_packet_unique_no packet;
+		packet.packet_type = SERVER_AUTH_UNIQUENO;
+		packet.packet_len = sizeof(packet);
+		packet.unique_no = uniqueNo;
+		for (int i = 0; i < 50; ++i) {
+			iocp_server.SendPacket(uniqueNo, reinterpret_cast<char *>(&packet), sizeof(packet));
+		}
+
 		resultCode.result = (int)ResultCode::NONE;
 		resultCode.unique_no = uniqueNo;
 		spdlog::info("[CLIENT_AUTH_LOGIN] Old uniqueNo : {} / Changed uniqueNo : {} || [unique_no:{}]", olduniqueNo, uniqueNo, pPlayerSession->get_unique_no());

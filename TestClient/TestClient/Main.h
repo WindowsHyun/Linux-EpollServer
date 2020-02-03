@@ -21,14 +21,21 @@
 #include <queue>
 #include <mutex>
 
+// SPDLog 1.5.0 <2020.01.21> github Include Add
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/daily_file_sink.h"
+
+// header 불러오기
+#include "ReadBuffer.h"
+#include "iocpClient.h"
 #include "Protocol.h"
 #include "Object.h"
+#include "Library/Api.h"
 
 #define SERVERPORT 9001
-#define LIMIT_ERROR_CNT 5		// 최대 오류 개수
 
 const char ipAddres[MAX_SOCKBUF]{ "127.0.0.1" };
 
-void init_sock(SOCKET& sock);
-int recvn(SOCKET s, char *buf, int len, int flags);
+extern class IOCP_Client iocp_client;
+extern class Logic_API api;
 #endif

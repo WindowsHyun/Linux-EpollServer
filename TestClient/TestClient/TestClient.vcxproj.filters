@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="소스 파일\Library">
+      <UniqueIdentifier>{81f6f8b5-eb85-47f3-a0a6-2bac964eb3bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Library">
+      <UniqueIdentifier>{f170c5e5-320e-4d40-8ad7-ef5897bffed4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Object.cpp">
@@ -20,6 +26,15 @@
     </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="iocpClient.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadBuffer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Api.cpp">
+      <Filter>소스 파일\Library</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -32,5 +47,17 @@
     <ClInclude Include="Main.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="iocpClient.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadBuffer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Api.h">
+      <Filter>헤더 파일\Library</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

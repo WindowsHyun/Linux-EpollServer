@@ -72,7 +72,7 @@ const enum ProtocolType {
 
 	// Auth
 	SERVER_AUTH = SERVER_AUTH_BASE,
-	SERVER_CLIENT_NO,
+	SERVER_AUTH_UNIQUENO,
 
 	// Front
 	SERVER_FRONT = SERVER_FRONT_BASE,
@@ -130,7 +130,7 @@ struct cs_packet_test : public PACKET_HEADER {
 
 
 // ↓ 서버 -> 클라 패킷
-struct sc_packet_clientno : public PACKET_HEADER {
+struct sc_packet_unique_no : public PACKET_HEADER {
 	unsigned __int64 unique_no;
 };
 
