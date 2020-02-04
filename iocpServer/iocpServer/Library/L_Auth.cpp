@@ -31,7 +31,7 @@ void AuthRoute::ApiProcessing(Packet_Frame packet, sc_packet_result& resultCode)
 		}
 
 		// 유저 세션을 찾아온다.
-		auto pPlayerSession = iocp_server.getSessionByNo(packet.unique_no); 
+		auto pPlayerSession = iocp_server.getSessionByNo(packet.unique_no);
 		// 세션이 없을 경우 break 처리
 		if (pPlayerSession == nullptr) break;
 		pPlayerSession->set_unique_no(uniqueNo);
@@ -58,9 +58,7 @@ void AuthRoute::ApiProcessing(Packet_Frame packet, sc_packet_result& resultCode)
 		packet.packet_type = SERVER_AUTH_UNIQUENO;
 		packet.packet_len = sizeof(packet);
 		packet.unique_no = uniqueNo;
-		for (int i = 0; i < 50; ++i) {
-			iocp_server.SendPacket(uniqueNo, reinterpret_cast<char *>(&packet), sizeof(packet));
-		}
+		iocp_server.SendPacket(uniqueNo, reinterpret_cast<char *>(&packet), sizeof(packet));
 
 		resultCode.result = (int)ResultCode::NONE;
 		resultCode.unique_no = uniqueNo;

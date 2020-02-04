@@ -2,6 +2,7 @@
 
 class IOCP_Client iocp_client;
 class Logic_API api;
+class PLAYER *Player;
 
 int main() {
 	bool result;

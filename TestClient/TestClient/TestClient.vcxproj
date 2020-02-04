@@ -125,6 +125,8 @@
   <ItemGroup>
     <ClCompile Include="iocpClient.cpp" />
     <ClCompile Include="Library\Api.cpp" />
+    <ClCompile Include="Library\L_Auth.cpp" />
+    <ClCompile Include="Module\M_Auth.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ReadBuffer.cpp" />
@@ -132,7 +134,9 @@
   <ItemGroup>
     <ClInclude Include="iocpClient.h" />
     <ClInclude Include="Library\Api.h" />
+    <ClInclude Include="Library\L_Auth.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="Module\M_Auth.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Protocol.h" />
     <ClInclude Include="ReadBuffer.h" />

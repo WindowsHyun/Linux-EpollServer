@@ -8,6 +8,7 @@
 #define MIN_SOCKBUF 128			// 최소 패킷 사이즈
 #define MAX_WORKERTHREAD 9		// 쓰레드 풀에 넣을 쓰레드 수
 #define PACKET_HEADER_BYTE 4	// Packet Header 크기
+#define LIMIT_ERROR_COUNT 5		// Error 최대 개수
 
 
 // 프로토콜 타입

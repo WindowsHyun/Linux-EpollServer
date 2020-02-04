@@ -49,6 +49,7 @@ Logic_API::~Logic_API()
 
 void Logic_API::API_Thread()
 {
+	int cnt = 0;
 	while (threadRun) {
 		if (!recvPacketQueue.empty()) {
 			// 로직 처리를 진행
@@ -62,7 +63,9 @@ void Logic_API::API_Thread()
 			{
 			case SERVER_AUTH_BASE:
 			{
-				spdlog::info("SERVER_AUTH_BASE");
+				AuthRoute* auth = new AuthRoute();
+				auth->ApiProcessing(packet);
+				delete auth;
 			}
 			break;
 			case SERVER_FRONT_BASE:
@@ -92,6 +95,7 @@ void Logic_API::API_Thread()
 			break;
 			}
 
+			iocp_client.BindRecv(Player);
 			recvPacketQueue.pop();
 			delete[] packet.pMsg;
 		}

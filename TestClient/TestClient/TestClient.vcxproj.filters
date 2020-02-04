@@ -19,6 +19,12 @@
     <Filter Include="헤더 파일\Library">
       <UniqueIdentifier>{f170c5e5-320e-4d40-8ad7-ef5897bffed4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Module">
+      <UniqueIdentifier>{01710ac1-6593-4ee0-baf9-478ef265270e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Module">
+      <UniqueIdentifier>{cc771a3e-c641-4b54-8ce0-322d55a84fa2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Object.cpp">
@@ -35,6 +41,12 @@
     </ClCompile>
     <ClCompile Include="Library\Api.cpp">
       <Filter>소스 파일\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\L_Auth.cpp">
+      <Filter>소스 파일\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Module\M_Auth.cpp">
+      <Filter>소스 파일\Module</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +67,12 @@
     </ClInclude>
     <ClInclude Include="Library\Api.h">
       <Filter>헤더 파일\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\L_Auth.h">
+      <Filter>헤더 파일\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Module\M_Auth.h">
+      <Filter>헤더 파일\Module</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

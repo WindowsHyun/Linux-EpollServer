@@ -38,4 +38,5 @@ const char ipAddres[MAX_SOCKBUF]{ "127.0.0.1" };
 
 extern class IOCP_Client iocp_client;
 extern class Logic_API api;
+extern class PLAYER *Player;
 #endif
