@@ -3,7 +3,7 @@
 
 #include <mutex>
 #include <string.h>
-//#include <spdlog/spdlog.h>
+#include "includes/spdlog/spdlog.h"
 
 class ReadBuffer {
 public:

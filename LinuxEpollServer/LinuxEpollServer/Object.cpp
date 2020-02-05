@@ -1,6 +1,6 @@
 ﻿#include "Main.h"
 
-void PLAYER::set_sock(const SOCKET g_sock)
+void PLAYER::set_sock(const int g_sock)
 {
 	sock = g_sock;
 }
@@ -12,7 +12,7 @@ void PLAYER::set_unique_no(const unsigned_int64 id)
 
 void PLAYER::set_init_player()
 {
-	ZeroMemory(&nickName, sizeof(char));
+	memset(nickName, 0, sizeof(char));
 	sock = INVALID_SOCKET;
 	unique_no = 0;
 	connect = false;

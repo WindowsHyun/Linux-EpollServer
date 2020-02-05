@@ -75,13 +75,25 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);@(DataFilesToCopyRemotely);</SourcesToCopyRemotelyOverride>
+    <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);@(DataFilesToCopyRemotely);$(ProjectDir)iocpserver.ini</SourcesToCopyRemotelyOverride>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="EpollServer.cpp" />
+    <ClCompile Include="Global\ConfigSetting.cpp" />
+    <ClCompile Include="Global\ini.c" />
+    <ClCompile Include="Global\INIReader.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="ReadBuffer.cpp" />
+    <ClCompile Include="Session.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EpollServer.h" />
+    <ClInclude Include="Global\ConfigSetting.h" />
+    <ClInclude Include="Global\ini.h" />
+    <ClInclude Include="Global\INIReader.h" />
+    <ClInclude Include="Global\RedisConnect.h" />
+    <ClInclude Include="Global\ResultCode.h" />
     <ClInclude Include="includes\spdlog\async.h" />
     <ClInclude Include="includes\spdlog\async_logger-inl.h" />
     <ClInclude Include="includes\spdlog\async_logger.h" />
@@ -162,8 +174,11 @@
     <ClInclude Include="includes\spdlog\spdlog.h" />
     <ClInclude Include="includes\spdlog\tweakme.h" />
     <ClInclude Include="includes\spdlog\version.h" />
-    <ClInclude Include="main.h" />
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="Protocol.h" />
     <ClInclude Include="ReadBuffer.h" />
+    <ClInclude Include="Session.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="includes\spdlog\fmt\bundled\LICENSE.rst" />
@@ -171,12 +186,17 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
     <PreBuildEvent />
     <PreBuildEvent>
       <Command>
       </Command>
     </PreBuildEvent>
+    <Link />
+    <Link>
+      <AdditionalOptions>-pthread -Wconversion -Wunused-but-set-variable -Wsign-compare %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

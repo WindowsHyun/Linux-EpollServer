@@ -34,7 +34,7 @@
 
 #define SERVERPORT 9001
 
-const char ipAddres[MAX_SOCKBUF]{ "127.0.0.1" };
+const char ipAddres[MAX_SOCKBUF]{ "192.168.56.43" };
 
 extern class IOCP_Client iocp_client;
 extern class Logic_API api;

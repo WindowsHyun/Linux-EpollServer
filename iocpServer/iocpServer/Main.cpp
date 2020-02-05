@@ -6,8 +6,8 @@ class Logic_API api;
 class ConfigSetting CS;
 std::vector<class RedisConnect *> RDC;
 std::queue<Packet_Frame> recvPacketQueue;
-std::unordered_map<unsigned __int64, class PLAYER *> player;
-std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;
+std::unordered_map<unsigned_int64, class PLAYER *> player;
+std::unordered_map<unsigned_int64, class PLAYER_Session *> player_session;
 
 int main() {
 #if DEBUG

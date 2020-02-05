@@ -15,7 +15,7 @@ typedef unsigned long long int	unsigned_int64;	// 8Byte, 64bit
 // Redis DB
 #define REDIS_MAIN_PORT 6380
 
-const enum REDISDB {
+enum REDISDB {
 	REDIS_OPERATING_TABLE_DB,	// 기획 테이블
 	REDIS_USER_AUTH_DB,			// 유저 정보
 	REDIS_USER_RANKING_DB,		// 유저 랭킹 정보
@@ -24,7 +24,7 @@ const enum REDISDB {
 };
 
 // 프로토콜 타입
-const enum ProtocolType {
+enum ProtocolType {
 	None = 0,
 
 	PACKET_PROTOCOL_BASE = 1000,

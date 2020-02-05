@@ -5,8 +5,8 @@
 
 class AuthModule {
 public:
-	bool get_uniqueNo(const char * value, unsigned __int64& uniqueNo);
-	bool set_uniqueNo(const char * value, unsigned __int64& uniqueNo);
+	bool get_uniqueNo(const char * value, unsigned_int64& uniqueNo);
+	bool set_uniqueNo(const char * value, unsigned_int64& uniqueNo);
 
 
 private:

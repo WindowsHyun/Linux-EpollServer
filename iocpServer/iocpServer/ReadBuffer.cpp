@@ -33,7 +33,11 @@ int ReadBuffer::getHeaderSize(char* pMsg, int size)
 		return -1;
 	}
 	// Packet_Header Size 만큼 pMsg(Packet_Header)에 복사한다.
+#ifdef _MSC_VER
 	memcpy_s(pMsg, size, &buffer[readPos], size);
+#else
+	memcpy(pMsg, &buffer[readPos], size);
+#endif
 
 	return size;
 }
@@ -44,12 +48,20 @@ int ReadBuffer::setWriteBuffer(char * pMsg, int size)
 
 	// 쓰기 가능한 공간이, size보다 크면 초기화를 해준다.
 	if (size > getWriteAbleSize()) {
+#ifdef _MSC_VER
 		memcpy_s(&buffer[0], size, pMsg, size);
+#else
+		memcpy(&buffer[0], pMsg, size);
+#endif
 		readPos = 0;
 		writePos = size;
 	}
 	else {
+#ifdef _MSC_VER
 		memcpy_s(&buffer[writePos], size, pMsg, size);
+#else
+		memcpy(&buffer[writePos], pMsg, size);
+#endif
 		writePos += size;
 	}
 	return size;
@@ -104,8 +116,12 @@ void ReadBuffer::checkWrite(int size)
 	// 순환
 	if (writePos + size >= totalSize)
 	{
+#ifdef _MSC_VER
 		memcpy_s(buffer, writePos - readPos,
 			&buffer[readPos], writePos - readPos);
+#else
+		memcpy(buffer, &buffer[readPos], writePos - readPos);
+#endif
 
 		readPos = 0;
 		writePos = writePos - readPos;

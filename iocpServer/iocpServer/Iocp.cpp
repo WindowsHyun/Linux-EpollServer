@@ -118,7 +118,7 @@ void IOCP_Server::destroyThread()
 	timer.stop();
 }
 
-void IOCP_Server::add_tempUniqueNo(unsigned __int64 uniqueNo)
+void IOCP_Server::add_tempUniqueNo(unsigned_int64 uniqueNo)
 {
 	tempUniqueNo.push(uniqueNo);
 }
@@ -248,13 +248,13 @@ void IOCP_Server::CloseSocket(class PLAYER_Session * pPlayerSession, bool bIsFor
 	pPlayerSession->get_sock() = INVALID_SOCKET;
 }
 
-void IOCP_Server::ClosePlayer(unsigned __int64 uniqueNo)
+void IOCP_Server::ClosePlayer(unsigned_int64 uniqueNo)
 {
 	player.erase(uniqueNo);
 	player_session.erase(uniqueNo);
 }
 
-bool IOCP_Server::SendPacket(unsigned __int64 uniqueNo, char * pMsg, int nLen)
+bool IOCP_Server::SendPacket(unsigned_int64 uniqueNo, char * pMsg, int nLen)
 {
 	auto pPlayerSession = getSessionByNo(uniqueNo);
 	if (pPlayerSession != nullptr) {
@@ -268,13 +268,13 @@ bool IOCP_Server::SendPacket(unsigned __int64 uniqueNo, char * pMsg, int nLen)
 	}
 }
 
-PLAYER_Session * IOCP_Server::getSessionByNo(unsigned __int64 uniqueNo)
+PLAYER_Session * IOCP_Server::getSessionByNo(unsigned_int64 uniqueNo)
 {
 	auto pTempPlayerSession = player_session.find(uniqueNo);
 	if (pTempPlayerSession == player_session.end()) {
 		if (disconnectUniqueNo.find(uniqueNo) == disconnectUniqueNo.end()) {
 			spdlog::error("[getSessionByNo] No Exit Session || [unique_no:{}]", uniqueNo);
-			disconnectUniqueNo.insert(pair<unsigned __int64, bool>(uniqueNo, true));
+			disconnectUniqueNo.insert(pair<unsigned_int64, bool>(uniqueNo, true));
 		}
 		return nullptr;
 	}
@@ -412,13 +412,13 @@ void IOCP_Server::AccepterThread()
 		pPlayerSession->set_unique_no(tempUniqueNo.front());
 
 		// player_session에 추가 한다.
-		player_session.insert(std::unordered_map<unsigned __int64, class PLAYER_Session *>::value_type(tempUniqueNo.front(), pPlayerSession));
+		player_session.insert(std::unordered_map<unsigned_int64, class PLAYER_Session *>::value_type(tempUniqueNo.front(), pPlayerSession));
 
 		// 플레이어를 set 해준다.
 		class PLAYER * acceptPlayer = new class PLAYER;
 		acceptPlayer->set_sock(pPlayerSession->get_sock());
 		acceptPlayer->set_unique_no(tempUniqueNo.front());
-		player.insert(std::unordered_map<unsigned __int64, class PLAYER *>::value_type(tempUniqueNo.front(), acceptPlayer));
+		player.insert(std::unordered_map<unsigned_int64, class PLAYER *>::value_type(tempUniqueNo.front(), acceptPlayer));
 
 		//클라이언트 갯수 증가
 		tempUniqueNo.pop();

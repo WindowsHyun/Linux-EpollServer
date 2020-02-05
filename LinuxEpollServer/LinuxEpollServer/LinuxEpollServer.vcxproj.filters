@@ -22,19 +22,40 @@
     <Filter Include="SPDLog\sinks">
       <UniqueIdentifier>{fd1aebe0-8429-4354-94e9-7fb8c32bbcf7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source File\Global">
+      <UniqueIdentifier>{b9e0a391-a339-4bf7-976f-96a028dccfdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header File\Global">
+      <UniqueIdentifier>{a0712fbd-754b-46cf-9ecc-8198edc85f8e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source File</Filter>
-    </ClCompile>
     <ClCompile Include="ReadBuffer.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="Global\ConfigSetting.cpp">
+      <Filter>Header File\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Global\ini.c">
+      <Filter>Header File\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Global\INIReader.cpp">
+      <Filter>Header File\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="EpollServer.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h">
-      <Filter>Header File</Filter>
-    </ClInclude>
     <ClInclude Include="ReadBuffer.h">
       <Filter>Header File</Filter>
     </ClInclude>
@@ -277,6 +298,36 @@
     </ClInclude>
     <ClInclude Include="includes\spdlog\sinks\wincolor_sink-inl.h">
       <Filter>SPDLog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\ConfigSetting.h">
+      <Filter>Source File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\ini.h">
+      <Filter>Source File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\INIReader.h">
+      <Filter>Source File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\RedisConnect.h">
+      <Filter>Source File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\ResultCode.h">
+      <Filter>Source File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="EpollServer.h">
+      <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>Header File</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿#include "Session.h"
 
-void PLAYER_Session::set_unique_no(const unsigned __int64 id)
+void PLAYER_Session::set_unique_no(const unsigned_int64 id)
 {
 	unique_no = id;
 }

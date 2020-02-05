@@ -17,7 +17,7 @@ bool Logic_API::stop()
 	return true;
 }
 
-void Logic_API::packet_Add(unsigned __int64 unique_no, char * pMsg, unsigned short packetLen)
+void Logic_API::packet_Add(unsigned_int64 unique_no, char * pMsg, unsigned short packetLen)
 {
 	// Packet Header Read
 	char *packetHeader = new char[packetLen];

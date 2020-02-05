@@ -16,8 +16,8 @@ void AuthRoute::ApiProcessing(Packet_Frame packet, sc_packet_result& resultCode)
 	{
 		cs_packet_auth *my_packet = reinterpret_cast<cs_packet_auth *>(packet.pMsg);
 		bool result = false;
-		unsigned __int64 uniqueNo;
-		unsigned __int64 olduniqueNo = packet.unique_no;
+		unsigned_int64 uniqueNo;
+		unsigned_int64 olduniqueNo = packet.unique_no;
 
 		// Redis 에서 유저 고유 번호를 가져온다.
 		result = auth->get_uniqueNo(my_packet->sha256sum, uniqueNo);
@@ -40,12 +40,12 @@ void AuthRoute::ApiProcessing(Packet_Frame packet, sc_packet_result& resultCode)
 		class PLAYER * acceptPlayer = new class PLAYER;
 		acceptPlayer->set_sock(pPlayerSession->get_sock());
 		acceptPlayer->set_unique_no(uniqueNo);
-		player.insert(std::unordered_map<unsigned __int64, class PLAYER *>::value_type(uniqueNo, acceptPlayer));
+		player.insert(std::unordered_map<unsigned_int64, class PLAYER *>::value_type(uniqueNo, acceptPlayer));
 		// 기존 플레이어 del 해준다.
 		player.erase(olduniqueNo);
 
 		// 세션도 변경 처리 한다.
-		player_session.insert(std::unordered_map<unsigned __int64, class PLAYER_Session *>::value_type(uniqueNo, pPlayerSession));
+		player_session.insert(std::unordered_map<unsigned_int64, class PLAYER_Session *>::value_type(uniqueNo, pPlayerSession));
 		player_session.erase(olduniqueNo);
 
 		// 사용한 tempUniqueNo는 다시 등록을 해준다.

@@ -74,7 +74,7 @@ bool ReadBuffer::moveWritePos(int size)
 
 	// totalSize보다 큰 패킷이 올리가 없다.
 	if (size > totalSize) {
-		//spdlog::critical("moveWritePos size({}) > totalSize({})", size, totalSize);
+		spdlog::critical("moveWritePos size({}) > totalSize({})", size, totalSize);
 		return false;
 	}
 	writePos = (writePos + size) % totalSize;

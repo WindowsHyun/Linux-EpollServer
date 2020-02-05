@@ -5,6 +5,8 @@
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS					// 윈속 오류 방지
 
+typedef unsigned long long int	unsigned_int64;	// 8Byte, 64bit
+
 // Header 선언
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
@@ -50,8 +52,8 @@ extern class Logic_API api;
 extern class ConfigSetting CS;
 extern std::vector<class RedisConnect *> RDC;
 extern std::queue<Packet_Frame> recvPacketQueue;
-extern std::unordered_map<unsigned __int64, class PLAYER *> player;					// 플레이어 데이터
-extern std::unordered_map<unsigned __int64, class PLAYER_Session *> player_session;	// 플레이어 세션
+extern std::unordered_map<unsigned_int64, class PLAYER *> player;					// 플레이어 데이터
+extern std::unordered_map<unsigned_int64, class PLAYER_Session *> player_session;	// 플레이어 세션
 
 void initRDC();
 #endif

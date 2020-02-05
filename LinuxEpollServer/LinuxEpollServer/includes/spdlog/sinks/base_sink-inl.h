@@ -7,8 +7,8 @@
 #include <spdlog/sinks/base_sink.h>
 #endif
 
-#include <spdlog/common.h>
-#include <spdlog/details/pattern_formatter.h>
+#include "../common.h"
+#include "../details/pattern_formatter.h"
 
 #include <memory>
 

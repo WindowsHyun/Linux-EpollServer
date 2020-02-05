@@ -1,6 +1,6 @@
 #include "M_Auth.h"
 
-bool AuthModule::get_uniqueNo(const char * value, unsigned __int64& uniqueNo)
+bool AuthModule::get_uniqueNo(const char * value, unsigned_int64& uniqueNo)
 {
 	std::string result;
 	std::string RDCKey = "Data:";
@@ -18,7 +18,7 @@ bool AuthModule::get_uniqueNo(const char * value, unsigned __int64& uniqueNo)
 
 }
 
-bool AuthModule::set_uniqueNo(const char * value, unsigned __int64& uniqueNo)
+bool AuthModule::set_uniqueNo(const char * value, unsigned_int64& uniqueNo)
 {
 	bool result;
 	std::string stValue;

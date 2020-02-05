@@ -1,8 +1,6 @@
 ﻿#ifndef __OBJECT_H__
 #define __OBJECT_H__
 
-#include "Iocp.h"
-
 struct Location {
 	int x;
 	int y;
@@ -23,24 +21,24 @@ struct BULLET {
 class PLAYER {
 public:
 	PLAYER() {
-		ZeroMemory(&nickName, sizeof(char));
-		sock = INVALID_SOCKET;
+		memset(nickName, 0, sizeof(char));
+		//sock = INVALID_SOCKET;
 		unique_no = 0;
 		connect = false;
 		live = false;
 		game_play = false;
 	}
 	// get
-	SOCKET get_sock() { return sock; }
+	int get_sock() { return sock; }
 	unsigned_int64 get_unique_no() { return unique_no; }
 
 	// set
-	void set_sock(const SOCKET g_sock);
+	void set_sock(const int g_sock);
 	void set_unique_no(const unsigned_int64 id);
 	void set_init_player();
 
 private:
-	SOCKET sock;
+	int sock;
 	unsigned_int64 unique_no;	// 클라이언트 고유 번호
 	bool connect;				// 클라이언트 연결 여부
 	int hp;						// 클라이언트 체력
