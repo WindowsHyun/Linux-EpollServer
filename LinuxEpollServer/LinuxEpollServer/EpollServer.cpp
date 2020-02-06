@@ -4,6 +4,7 @@ Epoll_Server::Epoll_Server()
 {
 	memset(&ev, 0, sizeof ev);
 	mIsEventThreadRun = false;
+	mIsWorkerThreadRun = false;
 	disconnectUniqueNo.clear();
 	// 임시 uniqueNo 추가
 	for (int i = 0; i < UNIQUE_START_NO; ++i) {
@@ -50,20 +51,26 @@ void Epoll_Server::BindandListen(int port)
 
 	mIsEventThreadRun = true;
 	mEventThread = std::thread([this]() { EventThread(); });
-	spdlog::info("EventThread Start..!");
+	
+	mIsWorkerThreadRun = true;
+	mWorkerThreads.reserve(MAX_WORKERTHREAD + 1);
+	for (int i = 0; i < 1; i++) {
+		mWorkerThreads.emplace_back([this]() { WorkerThread(); });
+	}
 
+	spdlog::info("Epoll Server Thread Start..!");
 	ev.events = EPOLLIN;
 	ev.data.fd = sock;
 	epoll_ctl(epfd, EPOLL_CTL_ADD, sock, &ev);
 }
 
-PLAYER_Session * Epoll_Server::getSessionByNo(unsigned_int64 uniqueNo)
+PLAYER_Session * Epoll_Server::getSessionByNo(int socketNo)
 {
-	auto pTempPlayerSession = player_session.find(uniqueNo);
+	auto pTempPlayerSession = player_session.find(socketNo);
 	if (pTempPlayerSession == player_session.end()) {
-		if (disconnectUniqueNo.find(uniqueNo) == disconnectUniqueNo.end()) {
-			spdlog::error("[getSessionByNo] No Exit Session || [unique_no:{}]", uniqueNo);
-			disconnectUniqueNo.insert(pair<unsigned_int64, bool>(uniqueNo, true));
+		if (disconnectUniqueNo.find(socketNo) == disconnectUniqueNo.end()) {
+			spdlog::error("[getSessionByNo] No Exit Session || [socketNo:{}]", socketNo);
+			disconnectUniqueNo.insert(pair<unsigned_int64, bool>(socketNo, true));
 		}
 		return nullptr;
 	}
@@ -78,13 +85,14 @@ void Epoll_Server::SetNonBlocking(int sock)
 	fcntl(sock, F_SETFL, flag | O_NONBLOCK);
 
 	memset(&ev, 0, sizeof ev);
-	ev.events = EPOLLIN | EPOLLET;
+	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLET;
 	ev.data.fd = sock;
 	epoll_ctl(epfd, EPOLL_CTL_ADD, sock, &ev);
 }
 
 void Epoll_Server::EventThread()
 {
+	int ci = 0;
 	int nfds;
 	while (mIsEventThreadRun)
 	{
@@ -104,7 +112,28 @@ void Epoll_Server::EventThread()
 		}
 
 		for (int i = 0; i < nfds; i++) {
-			if (events[i].data.fd == sock) {
+			std::lock_guard<std::mutex> guard(mLock);
+			// 해당 이벤트를 event_Queue에 넣어준다.
+			struct epoll_event eev;
+			memcpy(&eev, &events[i], sizeof(events[i]));
+			event_Queue.push(eev);
+			++ci;
+			spdlog::info("ci : {}, nfds : {}", ci, nfds);
+		}
+
+	}
+}
+
+void Epoll_Server::WorkerThread()
+{
+	int cnt = 0;
+	while (mIsWorkerThreadRun)
+	{
+		std::lock_guard<std::mutex> guard(mLock);
+		if (!event_Queue.empty()) {
+			auto event = event_Queue.front();
+			event_Queue.pop();
+			if (event.data.fd == sock) {
 				// 신규 유저 접속 처리
 				PLAYER_Session* pPlayerSession = new PLAYER_Session;
 				pPlayerSession->set_init_session();
@@ -134,13 +163,13 @@ void Epoll_Server::EventThread()
 				pPlayerSession->set_unique_no(tempUniqueNo.front());
 
 				// player_session에 추가 한다.
-				player_session.insert(std::unordered_map<unsigned_int64, class PLAYER_Session *>::value_type(tempUniqueNo.front(), pPlayerSession));
+				player_session.insert(std::unordered_map<int, class PLAYER_Session *>::value_type(pPlayerSession->get_sock(), pPlayerSession));
 
 				// 플레이어를 set 해준다.
 				class PLAYER * acceptPlayer = new class PLAYER;
 				acceptPlayer->set_sock(pPlayerSession->get_sock());
 				acceptPlayer->set_unique_no(tempUniqueNo.front());
-				player.insert(std::unordered_map<unsigned_int64, class PLAYER *>::value_type(tempUniqueNo.front(), acceptPlayer));
+				player.insert(std::unordered_map<int, class PLAYER *>::value_type(pPlayerSession->get_sock(), acceptPlayer));
 
 				//클라이언트 갯수 증가
 				tempUniqueNo.pop();
@@ -148,16 +177,36 @@ void Epoll_Server::EventThread()
 				char clientIP[32] = { 0, };
 				inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
 				spdlog::info("[Connect] Client IP : {} / SOCKET : {} || [unique_no:{}]", clientIP, (int)pPlayerSession->get_sock(), pPlayerSession->get_unique_no());
-				
+
 				// fd에 통신 준비 처리
 				SetNonBlocking(pPlayerSession->get_sock());
 			}
 			else {
-				// 기존 접속 유저 처리
+				// 기존 접속자
+				++cnt;
+				auto pPlayerSession = getSessionByNo(event.data.fd);
+				int ioSize = read(event.data.fd, pPlayerSession->read_buffer().getReadBuffer(), sizeof(pPlayerSession->read_buffer().getReadBuffer()));
+
+				if (ioSize == 0) {
+					spdlog::info("[Disconnect] SOCKET : {} || [unique_no:{}]", (int)pPlayerSession->get_sock(), (int)pPlayerSession->get_unique_no());
+					ClosePlayer(pPlayerSession->get_sock());
+				}
+				else if (ioSize < 0) {
+					// read
+					spdlog::info("ioSize : {}", ioSize);
+				}
+				else {
+					// 계속 읽기.
+					pPlayerSession->read_buffer().moveReadPos(ioSize);
+				}
+
+				spdlog::info("{}", cnt);
 			}
-
+			
 		}
-
+		else {
+			std::this_thread::sleep_for(std::chrono::milliseconds(2));
+		}
 	}
 }
 

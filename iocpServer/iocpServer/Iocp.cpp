@@ -73,7 +73,7 @@ bool IOCP_Server::StartServer()
 	}
 
 	// 접속된 클라이언트 주소 정보를 저장할 구조체
-	bool bRet = CreateWokerThread();
+	bool bRet = CreateWorkerThread();
 	if (false == bRet) {
 		return false;
 	}
@@ -123,21 +123,21 @@ void IOCP_Server::add_tempUniqueNo(unsigned_int64 uniqueNo)
 	tempUniqueNo.push(uniqueNo);
 }
 
-bool IOCP_Server::CreateWokerThread()
+bool IOCP_Server::CreateWorkerThread()
 {
 	// Vector 공간 미리 할당
 	mIOWorkerThreads.reserve(MAX_WORKERTHREAD + 1);
 
 	// WaingThread Queue에 대기 상태로 넣을 쓰레드들 생성 권장되는 개수 : (cpu개수 * 2) + 1 
 	for (int i = 0; i < MAX_WORKERTHREAD; i++) {
-		mIOWorkerThreads.emplace_back([this]() { WokerThread(); });
+		mIOWorkerThreads.emplace_back([this]() { WorkerThread(); });
 	}
 
-	spdlog::info("WokerThread Start..!");
+	spdlog::info("WorkerThread Start..!");
 	return true;
 }
 
-void IOCP_Server::WokerThread()
+void IOCP_Server::WorkerThread()
 {
 	//CompletionKey를 받을 포인터 변수
 	PLAYER_Session* pPlayerSession = NULL;
@@ -218,7 +218,7 @@ void IOCP_Server::WokerThread()
 		default:
 		{
 			// 예외 상황
-			spdlog::critical("[Exception WokerThread({})] No value defined..! || [unique_no:{}]",
+			spdlog::critical("[Exception WorkerThread({})] No value defined..! || [unique_no:{}]",
 				(int)pOverlappedEx->m_eOperation, pPlayerSession->get_unique_no());
 		}
 		break;

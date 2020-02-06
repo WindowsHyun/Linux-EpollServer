@@ -30,8 +30,8 @@ extern class ConfigSetting CS;
 extern std::vector<class RedisConnect *> RDC;
 extern class Epoll_Server epoll_server;
 //extern class SERVER_Timer timer;
-extern std::unordered_map<unsigned_int64, class PLAYER *> player;					// 플레이어 데이터
-extern std::unordered_map<unsigned_int64, class PLAYER_Session *> player_session;	// 플레이어 세션
+extern std::unordered_map<int, class PLAYER *> player;					// 플레이어 데이터
+extern std::unordered_map<int, class PLAYER_Session *> player_session;	// 플레이어 세션
 
 void initRDC();
 #endif

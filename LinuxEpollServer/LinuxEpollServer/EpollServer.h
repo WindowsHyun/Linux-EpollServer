@@ -18,7 +18,7 @@ public:
 	~Epoll_Server();
 	void init_server();
 	void BindandListen(int port);
-	class PLAYER_Session * getSessionByNo(unsigned_int64 uniqueNo);
+	class PLAYER_Session * getSessionByNo(int socketNo);
 
 private:
 	int sock;
@@ -26,12 +26,18 @@ private:
 	struct sockaddr_in sin;
 	struct epoll_event ev;
 	struct epoll_event events[MAX_EVENTS];
+	std::mutex	mLock;
+	std::queue<struct epoll_event> event_Queue;
+
 	std::unordered_map<unsigned_int64, bool> disconnectUniqueNo;		// 종료된 UniqueNo
 	std::queue<unsigned_int64> tempUniqueNo;							// 임시 uniqueNo
-	bool mIsEventThreadRun;												// Event 
+	bool mIsEventThreadRun;												// Event
 	std::thread	mEventThread;											// Event Thread
+	bool mIsWorkerThreadRun;											// Worker
+	std::vector<std::thread> mWorkerThreads;							// Worker Thread
 	void SetNonBlocking(int sock);
 	void EventThread();													// EventThread Function
+	void WorkerThread();												// WorkerThread Function
 	void ClosePlayer(const int sock);									// User Close
 };
 
