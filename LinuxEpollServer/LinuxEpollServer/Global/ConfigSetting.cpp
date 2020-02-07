@@ -3,7 +3,7 @@
 void ConfigSetting::loadSettingData()
 {
 
-	INIReader reader("./iocpserver.ini");
+	INIReader reader("iocpserver.ini");
 
 	if (reader.ParseError() < 0) {
 		spdlog::error("Not Found 'iocpserver.ini' File..!");

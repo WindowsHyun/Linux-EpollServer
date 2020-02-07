@@ -29,8 +29,8 @@ private:
 	std::queue<unsigned_int64> tempUniqueNo;							// 임시 uniqueNo
 	std::unordered_map<unsigned_int64, bool> disconnectUniqueNo;		// 종료된 UniqueNo
 
-	bool CreateWokerThread();											// WorkThread init
-	void WokerThread();													// WorkThread
+	bool CreateWorkerThread();											// WorkThread init
+	void WorkerThread();													// WorkThread
 	bool mIsAccepterRun;												// Accept 
 	bool CreateAccepterThread();										// AcceptThread init
 	void AccepterThread();												// AcceptThread

@@ -21,7 +21,8 @@ int main() {
 	sendPacket.packet_len = sizeof(sendPacket);
 	sendPacket.packet_type = CLIENT_AUTH_LOGIN;
 	strcpy(sendPacket.sha256sum, "0998deee89b70c6b4e68a15a731bfc86bb1707d32d9825035819d8a338172bcf");
-	for (int i = 0; i < 50; ++i) {
+	for (int i = 0; i < 3; ++i) {
+		spdlog::info("{}", sizeof(sendPacket));
 		iocp_client.SendPacket(reinterpret_cast<char *>(&sendPacket), sizeof(sendPacket));
 	}
 

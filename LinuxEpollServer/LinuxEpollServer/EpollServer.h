@@ -9,7 +9,7 @@
 #include <sys/epoll.h>
 #include <netinet/in.h>
 #define MAX_EVENTS 256		// 예상되는 최대 동시접속 수
-#define BACKLOG 10
+#define BACKLOG 10			// 접속 대기 큐
 
 
 class Epoll_Server {
@@ -38,7 +38,9 @@ private:
 	void SetNonBlocking(int sock);
 	void EventThread();													// EventThread Function
 	void WorkerThread();												// WorkerThread Function
-	void ClosePlayer(const int sock);									// User Close
+	void ClosePlayer(const int sock, struct epoll_event *ev);			// User Close
+	bool AcceptProcessing(struct epoll_event &ev);						// Accept Processing
+	void OnRecv(const int sock, const int ioSize);						// Recv 처리를 진행 한다.
 };
 
 

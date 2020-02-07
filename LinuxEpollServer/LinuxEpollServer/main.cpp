@@ -3,8 +3,8 @@
 class ConfigSetting CS;
 class Epoll_Server epoll_server;
 std::vector<class RedisConnect *> RDC;
-std::unordered_map<unsigned_int64, class PLAYER *> player;
-std::unordered_map<unsigned_int64, class PLAYER_Session *> player_session;
+std::unordered_map<int, class PLAYER *> player;
+std::unordered_map<int, class PLAYER_Session *> player_session;
 
 int main()
 {

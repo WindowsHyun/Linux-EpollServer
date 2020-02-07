@@ -147,6 +147,8 @@ bool IOCP_Client::SendPacket(char * pMsg, int nLen)
 		spdlog::error("WSASend() Function failure : {} || [unique_no:{}]", WSAGetLastError(), unique_no);
 		return false;
 	}
+	send_buffer.moveReadPos(nLen);
+	
 	return true;
 }
 
@@ -211,6 +213,7 @@ void IOCP_Client::WokerThread()
 			// Overlapped I/O Send작업 결과 뒤 처리
 			//OnSend(pPlayerSession, dwIoSize);
 			spdlog::info("[SEND] bytes : {} , msg : {}", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
+			send_buffer.moveReadPos(dwIoSize);
 		}
 		break;
 
