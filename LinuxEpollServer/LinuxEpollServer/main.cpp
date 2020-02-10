@@ -1,6 +1,7 @@
 #include "Main.h"
 
 class ConfigSetting CS;
+class Logic_API api;
 class Epoll_Server epoll_server;
 std::vector<class RedisConnect *> RDC;
 std::unordered_map<int, class PLAYER *> player;
@@ -26,6 +27,7 @@ int main()
 	initRDC();															// RedisClinet »ý¼º
 	epoll_server.init_server();											// Server init
 	epoll_server.BindandListen(CS.get_server_port());					// Server BindListen
+	api.start();														// API Thread init
 
 	getchar();
     return 0;

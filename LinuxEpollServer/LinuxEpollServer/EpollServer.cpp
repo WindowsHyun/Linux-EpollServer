@@ -64,13 +64,33 @@ void Epoll_Server::BindandListen(int port)
 	epoll_ctl(epfd, EPOLL_CTL_ADD, sock, &ev);
 }
 
-PLAYER_Session * Epoll_Server::getSessionByNo(int socketNo)
+void Epoll_Server::add_tempUniqueNo(unsigned_int64 uniqueNo)
 {
-	auto pTempPlayerSession = player_session.find(socketNo);
+	tempUniqueNo.push(uniqueNo);
+}
+
+bool Epoll_Server::SendPacket(int sock, char* pMsg, int nLen)
+{
+	auto pPlayerSession = getSessionByNo(sock);
+	if (pPlayerSession != nullptr) {
+		// send_Buffer에 pMsg를 넣어준다.
+		pPlayerSession->sendReady(pMsg, nLen);
+		// Send처리를 한다.
+		return pPlayerSession->sendIo();
+	}
+	else {
+		return false;
+	}
+	return false;
+}
+
+PLAYER_Session * Epoll_Server::getSessionByNo(int sock)
+{
+	auto pTempPlayerSession = player_session.find(sock);
 	if (pTempPlayerSession == player_session.end()) {
-		if (disconnectUniqueNo.find(socketNo) == disconnectUniqueNo.end()) {
-			spdlog::error("[getSessionByNo] No Exit Session || [socketNo:{}]", socketNo);
-			disconnectUniqueNo.insert(pair<unsigned_int64, bool>(socketNo, true));
+		if (disconnectUniqueNo.find(sock) == disconnectUniqueNo.end()) {
+			spdlog::error("[getSessionByNo] No Exit Session || [socketNo:{}]", sock);
+			disconnectUniqueNo.insert(pair<int, bool>(sock, true));
 		}
 		return nullptr;
 	}
@@ -102,7 +122,7 @@ void Epoll_Server::EventThread()
 
 		if (nfds < 0) {
 			// critical error
-			spdlog::error("epoll_wait() Function failure : {}", strerror(errno));
+			//spdlog::error("epoll_wait() Function failure : {}", strerror(errno));
 			continue;
 			//exit(-1);
 		}
@@ -137,37 +157,42 @@ void Epoll_Server::WorkerThread()
 		if (!event_Queue.empty()) {
 			auto event = event_Queue.front();
 			event_Queue.pop();
-			spdlog::info("eventQueue Size : {}", event_Queue.size());
-			mLock.unlock();
 			// 기존 접속자
 			auto pPlayerSession = getSessionByNo(event.data.fd);
 			if (pPlayerSession == nullptr) continue;
-
 			if (event.events & EPOLLIN) {
 				int ioSize = 0;
-
+				errno = 0;	// Errno Clear
 				if (pPlayerSession->get_remainSize() > 0) {
 					pPlayerSession->read_buffer().checkWrite(pPlayerSession->get_remainSize());
 				}
-				ioSize = read(pPlayerSession->get_sock(), pPlayerSession->read_buffer().getWriteBuffer(), pPlayerSession->read_buffer().getWriteAbleSize());
 
-				if (ioSize == 0) {
-					spdlog::info("[Disconnect] EPOLLIN SOCKET : {} || [unique_no:{}]", (int)pPlayerSession->get_sock(), (int)pPlayerSession->get_unique_no());
+				/*spdlog::info("readPos : {}, writePos : {}, ReadAbleSize : {}",
+					pPlayerSession->read_buffer().getReadPos(), pPlayerSession->read_buffer().getWritePos(),
+					pPlayerSession->read_buffer().getReadAbleSize());*/
+
+				ioSize = read(pPlayerSession->get_sock(), pPlayerSession->read_buffer().getWriteBuffer(), pPlayerSession->read_buffer().getWriteAbleSize());
+				if (errno == CONNECTION_RESET) {
+					spdlog::info("[Disconnect] EPOLLIN SOCKET : {}, errno : {} || [unique_no:{}]", (int)pPlayerSession->get_sock(), errno, (int)pPlayerSession->get_unique_no());
+					ClosePlayer(pPlayerSession->get_sock(), &event);
+					continue;
+				}else if (ioSize == 0) {
+					spdlog::info("[Disconnect] EPOLLIN SOCKET : {}, ioSize : {} || [unique_no:{}]", (int)pPlayerSession->get_sock(), ioSize, (int)pPlayerSession->get_unique_no());
 					ClosePlayer(pPlayerSession->get_sock(), &event);
 				}
 				else if (ioSize < 0) {
 					// Read Error
-					spdlog::error("[Exception WorkerThread()] Read Error ioSize : {} || [unique_no:{}]",
-						ioSize, pPlayerSession->get_unique_no());
+					if (errno != EAGAIN) {
+						// Try again
+						spdlog::error("[Exception WorkerThread()] Read Error ioSize : {}, Error : {}, events : {} || [unique_no:{}]",
+							ioSize, errno, event.events, pPlayerSession->get_unique_no());
+					}
 				}
 				else {
-					// 계속 읽기.
-					spdlog::info("ioSize : {}", ioSize);
+					// Recv 처리
+					//spdlog::info("ioSize : {}", ioSize);
 					OnRecv(event.data.fd, ioSize);
-					//pPlayerSession->read_buffer().moveReadPos(ioSize);
-					
 				}
-
 			}
 			else if (event.events & EPOLLERR) {
 				spdlog::info("[Disconnect] EPOLLERR SOCKET : {} || [unique_no:{}]", (int)pPlayerSession->get_sock(), (int)pPlayerSession->get_unique_no());
@@ -180,8 +205,8 @@ void Epoll_Server::WorkerThread()
 				spdlog::info("[Disconnect] EPOLLRDHUP SOCKET : {} || [unique_no:{}]", (int)pPlayerSession->get_sock(), (int)pPlayerSession->get_unique_no());
 				ClosePlayer(pPlayerSession->get_sock(), &event);
 			}else {
-				spdlog::error("[Exception WorkerThread()] No Event ({}) || [unique_no:{}]",
-					ev.events, pPlayerSession->get_unique_no());
+				spdlog::error("[Exception WorkerThread()] No Event ({}), Error : {} || [unique_no:{}]",
+					ev.events, errno, pPlayerSession->get_unique_no());
 			}
 		}
 		else {
@@ -193,6 +218,8 @@ void Epoll_Server::WorkerThread()
 void Epoll_Server::ClosePlayer(const int sock, struct epoll_event *ev)
 {
 	epoll_ctl(epfd, EPOLL_CTL_DEL, sock, ev);
+	player_session.erase(sock);
+	player.erase(sock);
 	close(sock);
 }
 
@@ -259,9 +286,7 @@ void Epoll_Server::OnRecv(const int sock, const int ioSize)
 	PACKET_HEADER header;
 	pPlayerSession->set_remainSize(0);
 	while (pPlayerSession->read_buffer().getReadAbleSize() > 0) {
-		spdlog::info("readPos : {}, writePos : {}, ReadAbleSize : {}", 
-			pPlayerSession->read_buffer().getReadPos(), pPlayerSession->read_buffer().getWritePos(), 
-			pPlayerSession->read_buffer().getReadAbleSize());
+
 		// 읽을 수 있는 Packet 크기가 Header Packet 보다 작을 경우 처리 한다.
 		if (pPlayerSession->read_buffer().getReadAbleSize() <= sizeof(header)) {
 			break;
@@ -289,10 +314,9 @@ void Epoll_Server::OnRecv(const int sock, const int ioSize)
 			// API 라이브러리로 해당 값을 전달 시켜 준다.
 			ProtocolType protocolBase = (ProtocolType)((int)header.packet_type / (int)PACKET_RANG_SIZE * (int)PACKET_RANG_SIZE);
 
-			spdlog::info("uniqueNo : {}, packet Size : {}, protocolBase : {}, protocolType : {}", 
-				pPlayerSession->get_unique_no(), header.packet_len, protocolBase, header.packet_type);
-
-			//api.packet_Add(pPlayerSession->get_unique_no(), pPlayerSession->read_buffer().getReadBuffer(), header.packet_len);
+			/*spdlog::info("uniqueNo : {}, packet Size : {}, protocolBase : {}, protocolType : {}", 
+				pPlayerSession->get_unique_no(), header.packet_len, protocolBase, header.packet_type);*/
+			api.packet_Add(sock, pPlayerSession->get_unique_no(), pPlayerSession->read_buffer().getReadBuffer(), header.packet_len);
 
 			// 읽기 완료 처리
 			pPlayerSession->read_buffer().moveReadPos(header.packet_len);

@@ -28,6 +28,18 @@
     <Filter Include="Header File\Global">
       <UniqueIdentifier>{a0712fbd-754b-46cf-9ecc-8198edc85f8e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header File\Library">
+      <UniqueIdentifier>{96231d44-3282-421a-a8d8-170a49c30674}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source File\Library">
+      <UniqueIdentifier>{b9c26a65-9c64-4242-8ef3-a0561250f28a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header File\Module">
+      <UniqueIdentifier>{2a091aed-95ee-4e7f-b290-100963d30a05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source File\Module">
+      <UniqueIdentifier>{0752e794-270e-4278-b70c-92c5eb50addb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReadBuffer.cpp">
@@ -39,20 +51,29 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
-    <ClCompile Include="Global\ConfigSetting.cpp">
-      <Filter>Header File\Global</Filter>
-    </ClCompile>
-    <ClCompile Include="Global\ini.c">
-      <Filter>Header File\Global</Filter>
-    </ClCompile>
-    <ClCompile Include="Global\INIReader.cpp">
-      <Filter>Header File\Global</Filter>
-    </ClCompile>
     <ClCompile Include="EpollServer.cpp">
       <Filter>Source File</Filter>
     </ClCompile>
     <ClCompile Include="Session.cpp">
       <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="Global\ConfigSetting.cpp">
+      <Filter>Source File\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Global\ini.c">
+      <Filter>Source File\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Global\INIReader.cpp">
+      <Filter>Source File\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Api.cpp">
+      <Filter>Source File\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\L_Auth.cpp">
+      <Filter>Source File\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Module\M_Auth.cpp">
+      <Filter>Source File\Module</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -308,26 +329,35 @@
     <ClInclude Include="Main.h">
       <Filter>Header File</Filter>
     </ClInclude>
-    <ClInclude Include="Global\ConfigSetting.h">
-      <Filter>Source File\Global</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\ini.h">
-      <Filter>Source File\Global</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\INIReader.h">
-      <Filter>Source File\Global</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\RedisConnect.h">
-      <Filter>Source File\Global</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\ResultCode.h">
-      <Filter>Source File\Global</Filter>
-    </ClInclude>
     <ClInclude Include="EpollServer.h">
       <Filter>Header File</Filter>
     </ClInclude>
     <ClInclude Include="Session.h">
       <Filter>Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\ConfigSetting.h">
+      <Filter>Header File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\ini.h">
+      <Filter>Header File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\INIReader.h">
+      <Filter>Header File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\RedisConnect.h">
+      <Filter>Header File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\ResultCode.h">
+      <Filter>Header File\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Api.h">
+      <Filter>Header File\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\L_Auth.h">
+      <Filter>Header File\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Module\M_Auth.h">
+      <Filter>Header File\Module</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

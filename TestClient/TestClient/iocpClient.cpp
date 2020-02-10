@@ -213,7 +213,6 @@ void IOCP_Client::WokerThread()
 			// Overlapped I/O Send작업 결과 뒤 처리
 			//OnSend(pPlayerSession, dwIoSize);
 			spdlog::info("[SEND] bytes : {} , msg : {}", dwIoSize, pOverlappedEx->m_wsaBuf.buf);
-			send_buffer.moveReadPos(dwIoSize);
 		}
 		break;
 

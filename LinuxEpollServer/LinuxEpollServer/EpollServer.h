@@ -8,8 +8,10 @@
 #include <sys/types.h>
 #include <sys/epoll.h>
 #include <netinet/in.h>
-#define MAX_EVENTS 256		// 예상되는 최대 동시접속 수
-#define BACKLOG 10			// 접속 대기 큐
+#include <errno.h>
+#define MAX_EVENTS 256			// 예상되는 최대 동시접속 수
+#define BACKLOG 10				// 접속 대기 큐
+#define CONNECTION_RESET 104	// 클라이언트 접속 리셋 되었다.
 
 
 class Epoll_Server {
@@ -18,7 +20,9 @@ public:
 	~Epoll_Server();
 	void init_server();
 	void BindandListen(int port);
-	class PLAYER_Session * getSessionByNo(int socketNo);
+	void add_tempUniqueNo(unsigned_int64 uniqueNo);								// 사용된 uniqueNo 다시 등록
+	bool SendPacket(int sock, char* pMsg, int nLen);							// Packet Send 처리를 한다.
+	class PLAYER_Session * getSessionByNo(int socketNo);						// PlayerSession 가져오기
 
 private:
 	int sock;
@@ -29,7 +33,7 @@ private:
 	std::mutex	mLock;
 	std::queue<struct epoll_event> event_Queue;
 
-	std::unordered_map<unsigned_int64, bool> disconnectUniqueNo;		// 종료된 UniqueNo
+	std::unordered_map<int, bool> disconnectUniqueNo;					// 종료된 UniqueNo
 	std::queue<unsigned_int64> tempUniqueNo;							// 임시 uniqueNo
 	bool mIsEventThreadRun;												// Event
 	std::thread	mEventThread;											// Event Thread

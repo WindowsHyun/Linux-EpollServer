@@ -20,6 +20,7 @@
 #include "Global/ConfigSetting.h"
 #include "Global/ResultCode.h"
 #include "Global/RedisConnect.h"
+#include "Library/Api.h"
 #include "ReadBuffer.h"
 #include "Object.h"
 #include "Session.h"
@@ -29,6 +30,7 @@
 extern class ConfigSetting CS;
 extern std::vector<class RedisConnect *> RDC;
 extern class Epoll_Server epoll_server;
+extern class Logic_API api;
 //extern class SERVER_Timer timer;
 extern std::unordered_map<int, class PLAYER *> player;					// 플레이어 데이터
 extern std::unordered_map<int, class PLAYER_Session *> player_session;	// 플레이어 세션

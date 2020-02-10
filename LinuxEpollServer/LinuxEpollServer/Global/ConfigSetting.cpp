@@ -6,8 +6,8 @@ void ConfigSetting::loadSettingData()
 	INIReader reader("iocpserver.ini");
 
 	if (reader.ParseError() < 0) {
-		spdlog::error("Not Found 'iocpserver.ini' File..!");
-		exit(1);
+		spdlog::error("Not Found 'iocpserver.ini' File Default Load..!");
+		//exit(1);
 	}
 
 	// SERVER_PORT
@@ -26,13 +26,14 @@ void ConfigSetting::loadSettingData()
 
 	// REDIS_PW
 	// echo "windowshyun" | sha256sum | 3235e85a87a00eed432ee7512950abccd085c805d5825c4c17cdc65ad3835867
-	this->set_redis_pw(reader.Get("DB", "REDIS_PW", "").c_str(), strlen(reader.Get("DB", "REDIS_PW", "").c_str()));
+	const string db_pw = "3235e85a87a00eed432ee7512950abccd085c805d5825c4c17cdc65ad3835867";
+	this->set_redis_pw(reader.Get("DB", "REDIS_PW", db_pw).c_str(), strlen(reader.Get("DB", "REDIS_PW", db_pw).c_str()));
 
 	// SQL_ID
 	this->set_sql_id(reader.Get("DB", "SQL_ID", "root").c_str(), strlen(reader.Get("DB", "SQL_ID", "root").c_str()));
 
 	// SQL_PW
-	this->set_sql_pw(reader.Get("DB", "SQL_PW", "root").c_str(), strlen(reader.Get("DB", "SQL_PW", "root").c_str()));
+	this->set_sql_pw(reader.Get("DB", "SQL_PW", "01041470566").c_str(), strlen(reader.Get("DB", "SQL_PW", "01041470566").c_str()));
 
 	spdlog::info("Server Setting Load Complete..!");
 }

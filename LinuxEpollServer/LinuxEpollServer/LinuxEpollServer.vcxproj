@@ -82,7 +82,10 @@
     <ClCompile Include="Global\ConfigSetting.cpp" />
     <ClCompile Include="Global\ini.c" />
     <ClCompile Include="Global\INIReader.cpp" />
+    <ClCompile Include="Library\Api.cpp" />
+    <ClCompile Include="Library\L_Auth.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Module\M_Auth.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ReadBuffer.cpp" />
     <ClCompile Include="Session.cpp" />
@@ -174,7 +177,10 @@
     <ClInclude Include="includes\spdlog\spdlog.h" />
     <ClInclude Include="includes\spdlog\tweakme.h" />
     <ClInclude Include="includes\spdlog\version.h" />
+    <ClInclude Include="Library\Api.h" />
+    <ClInclude Include="Library\L_Auth.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="Module\M_Auth.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Protocol.h" />
     <ClInclude Include="ReadBuffer.h" />

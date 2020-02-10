@@ -105,6 +105,7 @@ struct PACKET_HEADER {
 struct Packet_Frame {
 	unsigned short packet_type = -1; // NONE
 	unsigned short size = 0;
+	int sock = 0;
 	unsigned_int64 unique_no = 0;
 	char* pMsg = nullptr;
 };

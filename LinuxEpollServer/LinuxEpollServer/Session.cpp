@@ -25,7 +25,7 @@ bool PLAYER_Session::sendReady(char * pMsg, int size)
 
 bool PLAYER_Session::sendIo()
 {
-
+	return write(m_socketSession, m_sendBuffer.getReadBuffer(), m_sendBuffer.getReadAbleSize());
 }
 
 bool PLAYER_Session::sendFinish(int size)
