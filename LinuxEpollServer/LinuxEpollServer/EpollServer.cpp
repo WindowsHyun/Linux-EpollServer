@@ -271,6 +271,7 @@ bool Epoll_Server::AcceptProcessing(struct epoll_event &ev)
 	char clientIP[32] = { 0, };
 	inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, 32 - 1);
 	spdlog::info("[Connect] Client IP : {} / SOCKET : {} || [unique_no:{}]", clientIP, (int)pPlayerSession->get_sock(), pPlayerSession->get_unique_no());
+	return true;
 }
 
 void Epoll_Server::OnRecv(const int sock, const int ioSize)
