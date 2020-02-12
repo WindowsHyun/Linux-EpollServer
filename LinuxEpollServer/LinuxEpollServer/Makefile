@@ -32,8 +32,6 @@ ARFLAGS=cr
 
 GEN_DEP_FLAG ?= -MP -MMD
 
-THREAD_OPTION=-pthread -Wreturn-type
-
 # do not use ./bin
 BUILD_ROOT?=bin
 
@@ -43,6 +41,15 @@ CC?=cc
 CXX?=c++
 AR?=ar
 
+CPP_OPTION=-std=c++11 
+THREAD_OPTION=-pthread -Wreturn-type
+#default = release
+CPPFLAGS=-D _RELEASE -DNDEBUG -g
+
+####################################
+# get makefile command line argument
+####################################
+
 # ENTRY_LIST
 # VPATH=
 
@@ -51,8 +58,7 @@ IS_TEST?=$(filter %_test.$(CEXT) %_test.$(CXXEXT),$(1))
 #  clears out the suffix list with implicit rules
 .SUFFIXES:
 
-################################################################
-
+########################################################
 ##
 # $(call Em_src2obj,$(CSRC) $(CXXSRC),$(BUILD_ROOT))
 Em_src2obj=$(foreach _src,$(1),$(2)/$(basename $(_src)).o)
@@ -108,7 +114,7 @@ all:
 # as entry.
 $(BUILD_ROOT)/%.o: %.$(CXXEXT)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(GEN_DEP_FLAG) -c -o $@ $< $(THREAD_OPTION)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(GEN_DEP_FLAG) -c -o $@ $< $(CPPFLAGS) $(CPP_OPTION) $(THREAD_OPTION)
 	@if [ $$(nm -g --format="posix" $@ | grep -c "^main T") -eq 1 ]; then 		\
 		echo "$(patsubst $(BUILD_ROOT)/%.o,%.$(CXXEXT),$@)" >> $(em_f_entries);	\
 		sort -u $(em_f_entries) -o $(em_f_entries); 							\
@@ -116,7 +122,7 @@ $(BUILD_ROOT)/%.o: %.$(CXXEXT)
 
 $(BUILD_ROOT)/%.o: %.$(CEXT)
 	@mkdir -p $(dir $@)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(GEN_DEP_FLAG)  -c -o $@ $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(GEN_DEP_FLAG)  -c -o $@ $< $(CPPFLAGS) $(THREAD_OPTION)
 	@if [ $$(nm -g --format="posix" $@ | grep -c "^main T") -eq 1 ]; then		\
 		echo "$(patsubst $(BUILD_ROOT)/%.o,%.$(CEXT),$@)" >> $(em_f_entries);	\
 		sort -u $(em_f_entries) -o $(em_f_entries); 							\
@@ -141,7 +147,7 @@ $(BUILD_ROOT)/em_targets.mk: $(em_all_objects)
 	@$(foreach f,$(em_entry_list),										\
 		echo 'all: $(call Em_src2target,$f)' >> $@;						\
 		echo '$(call Em_src2target,$f): $(call Em_objects,$f)' >> $@;	\
-		echo '	$(em_linker) $$^ $(LDFLAGS) -o $$@ $(LOADLIBES) $(LDLIBS) $(THREAD_OPTION)'	>> $@;	\
+		echo '	$(em_linker) $$^ $(LDFLAGS) -o $$@ $(LOADLIBES) $(LDLIBS) $(CPPFLAGS) $(CPP_OPTION) $(THREAD_OPTION)'	>> $@;	\
 	)
 
 # This recipe to handle rule "all: foo.so" or command "make foo.so"

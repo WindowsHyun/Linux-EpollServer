@@ -9,7 +9,7 @@ std::unordered_map<int, class PLAYER_Session *> player_session;
 
 int main()
 {
-#if DEBUG
+#ifdef _RELEASE
 	// daily Logger Start 
 	// Debug 모드에서는 콘솔에 출력만, 저장은 하지 않는다.
 	auto daily_logger = spdlog::daily_logger_mt("daily_logger", "logs/iocpServer.txt", 0, 0);	// 00:00 new log
