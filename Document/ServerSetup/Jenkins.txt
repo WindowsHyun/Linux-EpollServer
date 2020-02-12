@@ -1,0 +1,9 @@
+cd ${WORKSPACE}/LinuxEpollServer/LinuxEpollServer
+if [($BUILD_MODE) == 'Debug']; then
+	wget -O Makefile 'https://raw.githubusercontent.com/WindowsHyun/easymake/master/Debug_Makefile'
+else
+	wget -O Makefile 'https://raw.githubusercontent.com/WindowsHyun/easymake/master/Release_Makefile'
+fi
+make -j4
+cd bin
+cp Main /etc/epollServer/epollServer

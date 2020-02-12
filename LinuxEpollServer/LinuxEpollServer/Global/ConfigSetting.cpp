@@ -3,10 +3,10 @@
 void ConfigSetting::loadSettingData()
 {
 
-	INIReader reader("iocpserver.ini");
+	INIReader reader("SettingConfig.ini");
 
 	if (reader.ParseError() < 0) {
-		spdlog::error("Not Found 'iocpserver.ini' File Default Load..!");
+		spdlog::error("Not Found 'SettingConfig.ini' File Default Load..!");
 		//exit(1);
 	}
 
@@ -22,7 +22,7 @@ void ConfigSetting::loadSettingData()
 
 	// DB Default Setting
 	// REDIS_IP
-	this->set_redis_ip(reader.Get("DB", "REDIS_IP", "192.168.56.43").c_str(), strlen(reader.Get("DB", "REDIS_IP", "192.168.56.43").c_str()));
+	this->set_redis_ip(reader.Get("DB", "REDIS_IP", "127.0.0.1").c_str(), strlen(reader.Get("DB", "REDIS_IP", "127.0.0.1").c_str()));
 
 	// REDIS_PW
 	// echo "windowshyun" | sha256sum | 3235e85a87a00eed432ee7512950abccd085c805d5825c4c17cdc65ad3835867

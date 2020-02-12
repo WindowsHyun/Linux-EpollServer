@@ -12,7 +12,7 @@ int main()
 #ifdef _RELEASE
 	// daily Logger Start 
 	// Debug 모드에서는 콘솔에 출력만, 저장은 하지 않는다.
-	auto daily_logger = spdlog::daily_logger_mt("daily_logger", "logs/iocpServer.txt", 0, 0);	// 00:00 new log
+	auto daily_logger = spdlog::daily_logger_mt("daily_logger", "logs/epollServer.txt", 0, 0);	// 00:00 new log
 	daily_logger->flush_on(spdlog::level::debug);
 	spdlog::set_default_logger(daily_logger);
 #endif
