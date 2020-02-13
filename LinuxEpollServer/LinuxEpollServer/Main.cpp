@@ -29,7 +29,10 @@ int main()
 	epoll_server.BindandListen(CS.get_server_port());					// Server BindListen
 	api.start();														// API Thread init
 
-	getchar();
+	// Shutdown protection
+	while (true) {
+		getchar();
+	}
     return 0;
 }
 
