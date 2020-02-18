@@ -20,6 +20,7 @@
 #include "Global/ConfigSetting.h"
 #include "Global/ResultCode.h"
 #include "Global/RedisConnect.h"
+#include "Global/MySQLConnect.h"
 #include "Library/Api.h"
 #include "ReadBuffer.h"
 #include "Object.h"
@@ -29,6 +30,7 @@
 // Setting Value
 extern class ConfigSetting CS;
 extern std::vector<class RedisConnect *> RDC;
+extern class MySQLConnect sql;
 extern class Epoll_Server epoll_server;
 extern class Logic_API api;
 //extern class SERVER_Timer timer;

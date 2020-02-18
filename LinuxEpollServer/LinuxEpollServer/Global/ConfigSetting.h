@@ -13,8 +13,10 @@ public:
 		UNIQUE_NO = -1;
 		REDIS_IP = NULL;
 		REDIS_PW = NULL;
+		SQL_HOST = NULL;
 		SQL_ID = NULL;
 		SQL_PW = NULL;
+		SQL_DB = NULL;
 	}
 	void loadSettingData();
 
@@ -25,8 +27,10 @@ public:
 	const int get_limit_err_cnt() { return LIMIT_ERROR_CNT; }
 	const char* get_redis_ip() { return REDIS_IP; }
 	const char* get_redis_pw() { return REDIS_PW; }
+	const char* get_sql_host() { return SQL_HOST; }
 	const char* get_sql_id() { return SQL_ID; }
 	const char* get_sql_pw() { return SQL_PW; }
+	const char* get_sql_db() { return SQL_DB; }
 
 	// public set
 	void set_unique_no(const unsigned_int64 value) { UNIQUE_NO = value; }
@@ -39,8 +43,10 @@ private:
 	unsigned_int64 UNIQUE_NO;	// 고유 아이디 시작 번호
 	char* REDIS_IP;					// 레디스 접속 아이피
 	char* REDIS_PW;					// 레디스 접속 비밀번호
+	char* SQL_HOST;					// SQL 접속 주소
 	char* SQL_ID;					// SQL 접속 아이디
 	char* SQL_PW;					// SQL 접속 비밀번호
+	char* SQL_DB;					// SQL 접속 DB
 
 	// private set
 	void set_server_port(const int value) { SERVER_PORT = value; }
@@ -66,6 +72,16 @@ private:
 #endif
 		REDIS_PW[size] = '\0';
 	}
+	void set_sql_host(const char* value, const unsigned_int64 size) {
+		SQL_HOST = new char[size];
+		memset(SQL_HOST, 0, size);
+#ifdef _MSC_VER
+		memcpy_s(SQL_HOST, size, value, size);
+#else
+		memcpy(SQL_HOST, value, size);
+#endif
+		SQL_HOST[size] = '\0';
+	}
 	void set_sql_id(const char* value, const unsigned_int64 size) {
 		SQL_ID = new char[size];
 		memset(SQL_ID, 0, size);
@@ -85,6 +101,16 @@ private:
 		memcpy(SQL_PW, value, size);
 #endif
 		SQL_PW[size] = '\0';
+	}
+	void set_sql_db(const char* value, const unsigned_int64 size) {
+		SQL_DB = new char[size];
+		memset(SQL_DB, 0, size);
+#ifdef _MSC_VER
+		memcpy_s(SQL_DB, size, value, size);
+#else
+		memcpy(SQL_DB, value, size);
+#endif
+		SQL_DB[size] = '\0';
 	}
 };
 #endif

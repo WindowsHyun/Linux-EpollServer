@@ -82,6 +82,7 @@
     <ClCompile Include="Global\ConfigSetting.cpp" />
     <ClCompile Include="Global\ini.c" />
     <ClCompile Include="Global\INIReader.cpp" />
+    <ClCompile Include="Global\MySQLConnect.cpp" />
     <ClCompile Include="Library\Api.cpp" />
     <ClCompile Include="Library\L_Auth.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -95,6 +96,7 @@
     <ClInclude Include="Global\ConfigSetting.h" />
     <ClInclude Include="Global\ini.h" />
     <ClInclude Include="Global\INIReader.h" />
+    <ClInclude Include="Global\MySQLConnect.h" />
     <ClInclude Include="Global\RedisConnect.h" />
     <ClInclude Include="Global\ResultCode.h" />
     <ClInclude Include="includes\spdlog\async.h" />
@@ -191,7 +193,7 @@
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)usr;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
     <PreBuildEvent />
@@ -200,8 +202,9 @@
       </Command>
     </PreBuildEvent>
     <Link />
+    <Link />
     <Link>
-      <AdditionalOptions>-pthread -Wconversion -Wunused-but-set-variable -Wsign-compare %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-pthread -L/usr/lib/mysql -I/usr/include/mysql -lmysqlclient %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

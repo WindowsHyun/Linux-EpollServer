@@ -1,7 +1,8 @@
 #include "Main.h"
 
-class ConfigSetting CS;
 class Logic_API api;
+class MySQLConnect sql;
+class ConfigSetting CS;
 class Epoll_Server epoll_server;
 std::vector<class RedisConnect *> RDC;
 std::unordered_map<int, class PLAYER *> player;
@@ -16,6 +17,7 @@ int main()
 	daily_logger->flush_on(spdlog::level::debug);
 	spdlog::set_default_logger(daily_logger);
 #endif
+
 	// Server Packet Info
 	spdlog::info("Client Start Packet No : {}", CLIENT_BASE);
 	spdlog::info("Max Client Packet No   : {}", MAX_CLIENT_PROTOCOL_NO);
@@ -23,11 +25,12 @@ int main()
 	spdlog::info("Max Server Packet No   : {}\n", MAX_SERVER_PROTOCOL_NO);
 
 	// Start Server
-	CS.loadSettingData();												// Load Server Config
-	initRDC();															// RedisClinet 持失
-	epoll_server.init_server();											// Server init
-	epoll_server.BindandListen(CS.get_server_port());					// Server BindListen
-	api.start();														// API Thread init
+	CS.loadSettingData();																// Load Server Config
+	initRDC();																			// RedisClinet 持失
+	sql.init(CS.get_sql_host(), CS.get_sql_id(), CS.get_sql_pw(), CS.get_sql_db());		// DB init
+	epoll_server.init_server();															// Server init
+	epoll_server.BindandListen(CS.get_server_port());									// Server BindListen
+	api.start();																		// API Thread init
 
 	// Shutdown protection
 	while (true) {

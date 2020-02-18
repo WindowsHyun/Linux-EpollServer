@@ -1,3 +1,7 @@
+개발용 mysql-dev 설치
+sudo apt-get install mysql
+sudo apt install libmysqlclient-dev
+
 - Mysql 외부 접속 허용 처리
     cd /etc/mysql/mysql.conf.d
     sudo vi mysqld.cnf

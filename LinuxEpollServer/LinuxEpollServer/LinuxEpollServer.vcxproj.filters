@@ -75,6 +75,9 @@
     <ClCompile Include="Module\M_Auth.cpp">
       <Filter>Source File\Module</Filter>
     </ClCompile>
+    <ClCompile Include="Global\MySQLConnect.cpp">
+      <Filter>Source File\Global</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReadBuffer.h">
@@ -358,6 +361,9 @@
     </ClInclude>
     <ClInclude Include="Module\M_Auth.h">
       <Filter>Header File\Module</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\MySQLConnect.h">
+      <Filter>Header File\Global</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
