@@ -30,7 +30,7 @@ void ConfigSetting::loadSettingData()
 	this->set_redis_pw(reader.Get("REDIS_DB", "REDIS_PW", db_pw).c_str(), strlen(reader.Get("REDIS_DB", "REDIS_PW", db_pw).c_str()));
 
 	// SQL_HOST
-	this->set_sql_id(reader.Get("MYSQL_DB", "SQL_HOST", "127.0.0.1").c_str(), strlen(reader.Get("MYSQL_DB", "SQL_HOST", "127.0.0.1").c_str()));
+	this->set_sql_host(reader.Get("MYSQL_DB", "SQL_HOST", "127.0.0.1").c_str(), strlen(reader.Get("MYSQL_DB", "SQL_HOST", "127.0.0.1").c_str()));
 
 	// SQL_ID
 	this->set_sql_id(reader.Get("MYSQL_DB", "SQL_ID", "root").c_str(), strlen(reader.Get("MYSQL_DB", "SQL_ID", "root").c_str()));
@@ -39,7 +39,7 @@ void ConfigSetting::loadSettingData()
 	this->set_sql_pw(reader.Get("MYSQL_DB", "SQL_PW", "windowshyun").c_str(), strlen(reader.Get("MYSQL_DB", "SQL_PW", "windowshyun").c_str()));
 
 	// SQL_DB
-	this->set_sql_pw(reader.Get("MYSQL_DB", "SQL_DB", "GameServer").c_str(), strlen(reader.Get("MYSQL_DB", "SQL_DB", "GameServer").c_str()));
+	this->set_sql_db(reader.Get("MYSQL_DB", "SQL_DB", "GameServer").c_str(), strlen(reader.Get("MYSQL_DB", "SQL_DB", "GameServer").c_str()));
 
 	spdlog::info("Server Setting Load Complete..!");
 }
