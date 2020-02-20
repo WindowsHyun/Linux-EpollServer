@@ -23,3 +23,9 @@ sudo apt install libmysqlclient-dev
     CREATE USER 'root'@'%' IDENTIFIED BY 'windowshyun' PASSWORD EXPIRE NEVER;
     GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
     flush privileges;
+
+- Visual Studio MySQL --libs 설정 방법
+    - 프로젝트 속성 -> 링커 -> 입력
+    - 추가 종속성
+    - `mysql_config --cflags --libs`
+    - 해당 값을 입력하면 된다.

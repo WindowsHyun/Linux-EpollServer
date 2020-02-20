@@ -115,7 +115,7 @@ void Logic_API::API_Thread()
 			delete[] packet.pMsg;
 		}
 		else {
-			std::this_thread::sleep_for(std::chrono::milliseconds(2));
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 	}
 }
