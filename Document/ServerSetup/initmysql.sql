@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- 호스트:                          192.168.56.43
--- 서버 버전:                        5.7.28-0ubuntu0.16.04.2 - (Ubuntu)
+-- 서버 버전:                        5.7.29-0ubuntu0.16.04.1 - (Ubuntu)
 -- 서버 OS:                        Linux
--- HeidiSQL 버전:                  10.2.0.5599
+-- HeidiSQL 버전:                  10.3.0.5771
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -15,6 +15,24 @@
 -- GameServer 데이터베이스 구조 내보내기
 CREATE DATABASE IF NOT EXISTS `GameServer` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */;
 USE `GameServer`;
+
+-- 테이블 GameServer.admin_table 구조 내보내기
+CREATE TABLE IF NOT EXISTS `admin_table` (
+  `no` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `id` text COLLATE utf8_unicode_ci NOT NULL,
+  `pwd` text COLLATE utf8_unicode_ci NOT NULL,
+  `permission` int(11) DEFAULT NULL,
+  `lastLogin` datetime DEFAULT NULL,
+  PRIMARY KEY (`no`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 테이블 데이터 GameServer.admin_table:~0 rows (대략적) 내보내기
+DELETE FROM `admin_table`;
+/*!40000 ALTER TABLE `admin_table` DISABLE KEYS */;
+INSERT INTO `admin_table` (`no`, `name`, `id`, `pwd`, `permission`, `lastLogin`) VALUES
+	(1, 'windowshyun', 'windowshyun', 'BNtpyDrQItq7J/dloqmpjA', NULL, '2020-02-20 15:57:45');
+/*!40000 ALTER TABLE `admin_table` ENABLE KEYS */;
 
 -- 테이블 GameServer.menu 구조 내보내기
 CREATE TABLE IF NOT EXISTS `menu` (
@@ -59,11 +77,13 @@ CREATE TABLE IF NOT EXISTS `user_table` (
   `regtime` datetime NOT NULL,
   `lastLogin` datetime DEFAULT NULL,
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
--- 테이블 데이터 GameServer.user_table:~0 rows (대략적) 내보내기
+-- 테이블 데이터 GameServer.user_table:~1 rows (대략적) 내보내기
 DELETE FROM `user_table`;
 /*!40000 ALTER TABLE `user_table` DISABLE KEYS */;
+INSERT INTO `user_table` (`no`, `name`, `mail`, `pwd`, `level`, `code`, `token`, `regtime`, `lastLogin`) VALUES
+	(1, 'WindowsHyun', 'kwon616@gmail.com', 'BNtpyDrQItq7J/dloqmpjA', 10, 'ADMIN', 'BNtpyDrQItq7J/dloqmpjA', '2020-02-20 14:29:30', NULL);
 /*!40000 ALTER TABLE `user_table` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

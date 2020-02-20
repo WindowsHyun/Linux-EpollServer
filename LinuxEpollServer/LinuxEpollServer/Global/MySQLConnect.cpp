@@ -3,7 +3,7 @@
 void MySQLConnect::init(const char * host, const char * id, const char * pwd, const char * db)
 {
 	// mysql init
-	if (!(conn = mysql_init((MYSQL*)NULL))) {
+	if (!(conn = mysql_init(conn))) {
 		spdlog::error("MySQL init Fail..!");
 		exit(1);
 	}
@@ -21,20 +21,39 @@ void MySQLConnect::init(const char * host, const char * id, const char * pwd, co
 		exit(1);
 	}
 	spdlog::info("MySQL init Success..!");
-	//// 쿼리
-	//if (mysql_query(conn, "select * from 테이블명")) {  // 테이블명을 테이블에 맞게 변경
-	//	printf("query fail\n");
-	//	exit(1);
-	//}
-	//res = mysql_store_result(conn);                 //쿼리에 대한 결과를 row에 저장
-	//// 쿼리 결과
-	//while ((row = mysql_fetch_row(res)) != NULL) {
-	//	printf("%s %s %s %s %s %s\n", row[0], row[1], row[2], row[3], row[4], row[5]);       //이전과 같이 디비테이블을 만들었다면 id와 패스워드값이 나온다.
-	//}
+
+}
+
+bool MySQLConnect::query(const char * query, vector<std::string>& result)
+{
+	std::lock_guard<std::mutex> guard(mLock);
+	// 쿼리
+	if (mysql_query(conn, query)) {  // 테이블명을 테이블에 맞게 변경
+		spdlog::error("MySQL Query({}) Fail..!", query);
+		return false;
+	}
+	MYSQL_RES *res = mysql_store_result(conn);                 // 쿼리에 대한 결과를 row에 저장
+	int fields = mysql_num_fields(res);				// 필드 갯수 구함
+	MYSQL_ROW row;
+	// 쿼리 결과
+	while (row = mysql_fetch_row(res)) {
+		for (int i = 0; i < fields; ++i) {
+			// DB에 NULL 값이 있을 경우 처리
+			if (row[i] != NULL) {
+				result.push_back(row[i]);
+			}
+			else {
+				result.push_back("");
+			}
+		}
+	}
+	mysql_free_result(res);
+	return true;
 }
 
 MySQLConnect::MySQLConnect()
 {
+	conn = new MYSQL;
 }
 
 MySQLConnect::~MySQLConnect()

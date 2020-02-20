@@ -32,11 +32,21 @@ int main()
 	epoll_server.BindandListen(CS.get_server_port());									// Server BindListen
 	api.start();																		// API Thread init
 
+	// MySQL Query Ã³¸®
+	/*vector<std::string> result;
+	char query[100];
+	int no = 1;
+	sprintf(query, "select * from user_table where no=%d;", no);
+	sql.query(query, result);
+	for (auto var : result) {
+		spdlog::info("{}", var);
+	}*/
+
 	// Shutdown protection
 	while (true) {
 		getchar();
 	}
-    return 0;
+	return 0;
 }
 
 void initRDC()
