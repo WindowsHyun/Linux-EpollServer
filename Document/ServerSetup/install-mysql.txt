@@ -29,3 +29,7 @@ sudo apt install libmysqlclient-dev
     - 추가 종속성
     - `mysql_config --cflags --libs`
     - 해당 값을 입력하면 된다.
+
+
+- PHP mysqli 설치
+    - sudo apt-get install php-mysql

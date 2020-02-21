@@ -8,3 +8,5 @@
 .vs/
 Debug/
 .vagrant/
+.history/
+.vscode/

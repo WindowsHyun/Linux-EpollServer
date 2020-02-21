@@ -1,0 +1,24 @@
+sudo apt-get install php-fpm
+sudo apt-get install php-xdebug
+
+cd /etc/php/7.0/apache2
+
+[첨부파일 크기 수정]
+upload_max_filesize
+post_max_size
+max_execution_time
+max_input_time = -1
+memory_limit
+
+[xDebug]
+xdebug.remote_enable = 1
+xdebug.remote_autostart = 1
+xdebug.remote_port = 9000
+xdebug.remote_connect_back = on
+
+sudo service apache2 restart
+
+
+apt-get install php-curl
+
+php -m | grep curl

@@ -1,0 +1,13 @@
+cd /etc/apache2
+sudo vi apache2.conf
+
+---
+<Directory /var/www/>
+        Options FollowSymLinks MultiViews
+        AddType application/x-httpd-php .php .jsp
+        Require all granted
+        AllowOverride None
+</Directory>
+---
+
+/etc/init.d/apache2 restart

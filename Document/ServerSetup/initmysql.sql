@@ -20,18 +20,19 @@ USE `GameServer`;
 CREATE TABLE IF NOT EXISTS `admin_table` (
   `no` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
-  `id` text COLLATE utf8_unicode_ci NOT NULL,
+  `mail` text COLLATE utf8_unicode_ci NOT NULL,
   `pwd` text COLLATE utf8_unicode_ci NOT NULL,
   `permission` int(11) DEFAULT NULL,
+  `lastLoginIP` text COLLATE utf8_unicode_ci,
   `lastLogin` datetime DEFAULT NULL,
   PRIMARY KEY (`no`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- 테이블 데이터 GameServer.admin_table:~0 rows (대략적) 내보내기
+-- 테이블 데이터 GameServer.admin_table:~1 rows (대략적) 내보내기
 DELETE FROM `admin_table`;
 /*!40000 ALTER TABLE `admin_table` DISABLE KEYS */;
-INSERT INTO `admin_table` (`no`, `name`, `id`, `pwd`, `permission`, `lastLogin`) VALUES
-	(1, 'windowshyun', 'windowshyun', 'BNtpyDrQItq7J/dloqmpjA', NULL, '2020-02-20 15:57:45');
+INSERT INTO `admin_table` (`no`, `name`, `mail`, `pwd`, `permission`, `lastLoginIP`, `lastLogin`) VALUES
+	(1, 'windowshyun', 'kwon616@gmail.com', 'a3jLAk/tAmKrSntX9b1nUQ', NULL, '192.168.56.1', '2020-02-21 06:59:31');
 /*!40000 ALTER TABLE `admin_table` ENABLE KEYS */;
 
 -- 테이블 GameServer.menu 구조 내보내기
@@ -50,6 +51,12 @@ CREATE TABLE IF NOT EXISTS `menu` (
 -- 테이블 데이터 GameServer.menu:~0 rows (대략적) 내보내기
 DELETE FROM `menu`;
 /*!40000 ALTER TABLE `menu` DISABLE KEYS */;
+INSERT INTO `menu` (`me_no`, `me_order`, `me_suborder`, `me_level`, `me_class`, `me_name`, `me_icon`, `me_href`) VALUES
+	(1, 1, 0, 0, 'dropdown-header', '게임 설정', 'fas fa-hammer', ''),
+	(2, 2, 0, 0, 'dropdown-header', '게임 데이터', 'fas fa-table', ''),
+	(3, 3, 0, 0, 'dropdown-header', '유저 데이터', 'fas fa-user-cog', ''),
+	(4, 4, 0, 0, 'dropdown-header', '운영 도구', 'fas fa-tools', ''),
+	(5, 5, 0, 0, 'dropdown-header', '관리', 'fas fa-cog', '');
 /*!40000 ALTER TABLE `menu` ENABLE KEYS */;
 
 -- 테이블 GameServer.regist_code 구조 내보내기
@@ -77,13 +84,11 @@ CREATE TABLE IF NOT EXISTS `user_table` (
   `regtime` datetime NOT NULL,
   `lastLogin` datetime DEFAULT NULL,
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 테이블 데이터 GameServer.user_table:~1 rows (대략적) 내보내기
 DELETE FROM `user_table`;
 /*!40000 ALTER TABLE `user_table` DISABLE KEYS */;
-INSERT INTO `user_table` (`no`, `name`, `mail`, `pwd`, `level`, `code`, `token`, `regtime`, `lastLogin`) VALUES
-	(1, 'WindowsHyun', 'kwon616@gmail.com', 'BNtpyDrQItq7J/dloqmpjA', 10, 'ADMIN', 'BNtpyDrQItq7J/dloqmpjA', '2020-02-20 14:29:30', NULL);
 /*!40000 ALTER TABLE `user_table` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
