@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="kr">
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . "/head.php");
+include("./head.php");
 ?>
 
 <body class="bg-dark">
-	<?php include($_SERVER['DOCUMENT_ROOT'] . "/page/termsofuse.php"); ?>
+	<?php include("./page/termsofuse.php"); ?>
 </body>
 
 </html>

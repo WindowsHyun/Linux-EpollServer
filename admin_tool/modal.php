@@ -30,8 +30,8 @@
 			<div class="modal-body">
 			</div>
 			<div class="modal-footer">
-				<button type="button" id="confirm-cancle" class="btn btn-secondary" data-dismiss="modal">취소</button>
-				<button type="button" id="confirm-ok" class="btn btn-primary" data-dismiss="modal">확인</button>
+				<button type="button" id="confirm-cancle" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+				<button type="button" id="confirm-ok" class="btn btn-primary" data-dismiss="modal">Okay</button>
 			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
