@@ -1,5 +1,11 @@
 #!/bin/bash -x
 
+cd /var/www/html
+sudo rm -r admin_tool/
+
+cd ${WORKSPACE}
+sudo cp -r admin_tool /var/www/html/
+
 cd ${WORKSPACE}/LinuxEpollServer/LinuxEpollServer
 if [ "${BUILD_MODE}" = "Debug" ]
 then
