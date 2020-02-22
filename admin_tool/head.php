@@ -51,7 +51,7 @@ include("./common.php");
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script> -->
 
 
-    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="./img/favicon.ico" />
 
     <!-- Mobile top URL Delete [AOS, IOS] -->
     <meta name="theme-color" content="#343a40">

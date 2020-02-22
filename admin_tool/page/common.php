@@ -1,7 +1,6 @@
 <?php
-session_start();
-include("../util/login_session.php");
-include("../util/EncryptUtil.php");
+// session_start();
+include("../common.php");
 ?>
 <!-- Page level plugin JavaScript-->
 <!-- <script src="vendor/chart.js/Chart.min.js"></script> -->

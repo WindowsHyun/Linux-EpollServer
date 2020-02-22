@@ -22,16 +22,17 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Modal title</h4>
+				<h5 class="modal-title" id="modal-title">Modal title</h4>
 					<button class="close" type="button" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true"><img src="./img/favicon.ico" width="30px;"></span>
 					</button>
 			</div>
-			<div class="modal-body">
+			<div class="modal-body" id="modal-body">
 			</div>
+			<div name="modal-data-value" id="modal-data-value" hidden></div>
 			<div class="modal-footer">
-				<button type="button" id="confirm-cancle" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
-				<button type="button" id="confirm-ok" class="btn btn-primary" data-dismiss="modal">Okay</button>
+				<button type="button" id="modal-cancle" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+				<button type="button" id="modal-confirm" class="btn btn-primary" data-dismiss="modal">Okay</button>
 			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->

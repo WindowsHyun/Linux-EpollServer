@@ -1,11 +1,11 @@
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . "/page/common.php");
-include($_SERVER['DOCUMENT_ROOT'] . "/util/db_config.php");
-include($_SERVER['DOCUMENT_ROOT'] . "/util/define.php");
+include("../page/common.php");
+include("../../util/db_config.php");
+include("../../util/define.php");
 // 관리자 권한 체크 해야함.
 
 // menu DB 불러오기
-$sql = "SELECT * FROM `mypc`.`menu` ORDER BY me_order ASC , me_suborder ASC";
+$sql = "SELECT * FROM `" . $mysql_database . "`.`" . $mysql_menu . "` ORDER BY me_order ASC , me_suborder ASC";
 $result = $mysqli->query($sql);
 
 $menuArr = array();
@@ -98,9 +98,9 @@ $num = 1;
 
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
-    <li class="breadcrumb-item"><?=$Site_Title?></li>
-    <li class="breadcrumb-item">Admin</li>
-    <li class="breadcrumb-item active">Menu</li>
+    <li class="breadcrumb-item"><?= $Site_Title ?></li>
+    <li class="breadcrumb-item">운영도구</li>
+    <li class="breadcrumb-item active">운영자 아이디 관리</li>
 </ol>
 
 <!-- DataTables Example -->
@@ -129,7 +129,9 @@ $num = 1;
                         <form id="fixMenu_frm_<?php echo $data['me_no']; ?>">
                             <tr style="text-align: center;">
                                 <?php $me_no = $data['me_no']; ?>
-                                <td><?php echo $num; ?><input name="me_no_<?php echo $me_no; ?>" id="me_no_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_no']; ?>" hidden /></td>
+                                <td>
+                                    <?php echo $num; ?><input name="me_no_<?php echo $me_no; ?>" id="me_no_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_no']; ?>" hidden />
+                                </td>
                                 <td>
                                     <?php echo draw_SelectBox("me_order_$me_no", $ORDER_LIST, $data['me_order'], 'true'); ?>
                                 </td>
@@ -137,11 +139,21 @@ $num = 1;
                                     <?php echo draw_SelectBox("me_suborder_$me_no", $ORDER_LIST, $data['me_suborder']); ?></td>
                                 <td>
                                     <?php echo draw_SelectBox("me_level_$me_no", $LEVEL_LIST, $data['me_level']); ?></td>
-                                <td><input name="me_class_<?php echo $me_no; ?>" id="me_class_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_class']; ?>" style="width:100px;" /></td>
-                                <td><input name="me_name_<?php echo $me_no; ?>" id="me_name_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_name']; ?>" style="width:100px;" /></td>
-                                <td><input name="me_icon_<?php echo $me_no; ?>" id="me_icon_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_icon']; ?>" style="width:100px;" /></td>
-                                <td><input name="me_href_<?php echo $me_no; ?>" id="me_href_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_href']; ?>" style="width:100px;" /></td>
-                                <td><button type="button" onclick="editFixMenu('<?php print $me_no ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" onclick="deleteFixMenu('<?php print $me_no ?>');" class="btn btn-danger btn-sm">삭제</button></td>
+                                <td>
+                                    <input name="me_class_<?php echo $me_no; ?>" id="me_class_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_class']; ?>" style="width:100px;" />
+                                </td>
+                                <td>
+                                    <input name="me_name_<?php echo $me_no; ?>" id="me_name_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_name']; ?>" style="width:100px;" />
+                                </td>
+                                <td>
+                                    <input name="me_icon_<?php echo $me_no; ?>" id="me_icon_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_icon']; ?>" style="width:100px;" />
+                                </td>
+                                <td>
+                                    <input name="me_href_<?php echo $me_no; ?>" id="me_href_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_href']; ?>" style="width:100px;" />
+                                </td>
+                                <td>
+                                    <button type="button" onclick="editFixMenu('<?php print $me_no ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" onclick="deleteFixMenu('<?php print $me_no ?>');" class="btn btn-danger btn-sm">삭제</button>
+                                </td>
                                 <?php $num++;  ?>
                             </tr>
                         </form>
@@ -150,18 +162,30 @@ $num = 1;
                                 <form id="fixMenu_frm_<?php echo $data['me_no']; ?>">
                                     <tr style="text-align: center;">
                                         <?php $me_no = $data['me_no']; ?>
-                                        <td><?php echo $num; ?><input name="me_no_<?php echo $me_no; ?>" id="me_no_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_no']; ?>" hidden /></td>
+                                        <td>
+                                            <?php echo $num; ?><input name="me_no_<?php echo $me_no; ?>" id="me_no_<?php echo $me_no; ?>" type="text" value="<?php echo $data['me_no']; ?>" hidden />
+                                        </td>
                                         <td>
                                             <?php echo draw_SelectBox("me_order", $ORDER_LIST, $subdata['me_order'], 'true'); ?></td>
                                         <td>
                                             <?php echo draw_SelectBox("me_suborder", $ORDER_LIST, $subdata['me_suborder']); ?></td>
                                         <td>
                                             <?php echo draw_SelectBox("me_level", $LEVEL_LIST, $subdata['me_level']); ?></td>
-                                        <td><input name="me_class_<?php echo $me_no; ?>" id="me_class_<?php echo $me_no; ?>" type="text" value="<?php echo $subdata['me_class']; ?>" style="width:100px;" /></td>
-                                        <td><input name="me_name_<?php echo $me_no; ?>" id="me_name_<?php echo $me_no; ?>" type="text" value="<?php echo $subdata['me_name']; ?>" style="width:100px;" /></td>
-                                        <td><input name="me_icon_<?php echo $me_no; ?>" id="me_icon_<?php echo $me_no; ?>" type="text" value="<?php echo $subdata['me_icon']; ?>" style="width:100px;" /></td>
-                                        <td><input name="me_href_<?php echo $me_no; ?>" id="me_href_<?php echo $me_no; ?>" type="text" value="<?php echo $subdata['me_href']; ?>" style="width:100px;" /></td>
-                                        <td><button type="button" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" class="btn btn-danger btn-sm">삭제</button></td>
+                                        <td>
+                                            <input name="me_class_<?php echo $me_no; ?>" id="me_class_<?php echo $me_no; ?>" type="text" value="<?php echo $subdata['me_class']; ?>" style="width:100px;" />
+                                        </td>
+                                        <td>
+                                            <input name="me_name_<?php echo $me_no; ?>" id="me_name_<?php echo $me_no; ?>" type="text" value="<?php echo $subdata['me_name']; ?>" style="width:100px;" />
+                                        </td>
+                                        <td>
+                                            <input name="me_icon_<?php echo $me_no; ?>" id="me_icon_<?php echo $me_no; ?>" type="text" value="<?php echo $subdata['me_icon']; ?>" style="width:100px;" />
+                                        </td>
+                                        <td>
+                                            <input name="me_href_<?php echo $me_no; ?>" id="me_href_<?php echo $me_no; ?>" type="text" value="<?php echo $subdata['me_href']; ?>" style="width:100px;" />
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" class="btn btn-danger btn-sm">삭제</button>
+                                        </td>
                                     </tr>
                                 </form>
                                 <?php $num++;  ?>
@@ -225,6 +249,8 @@ $num = 1;
         content += ("입력하시겠습니까?");
         content += "</div>";
 
-        $('#confirmModal').modal({show : true});
+        $('#confirmModal').modal({
+            show: true
+        });
     }
 </script>

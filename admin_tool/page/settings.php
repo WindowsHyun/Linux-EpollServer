@@ -1,5 +1,6 @@
 <?php
-include("../page/common.php");
+include("./common.php");
+include("../util/EncryptUtil.php");
 ?>
 
 <script type="text/javascript">
@@ -25,31 +26,26 @@ include("../page/common.php");
             // 비밀번호 체크
             if (passPassword == false) {
                 alert("비밀번호가 서로 정확한지 확인하여 주세요.");
-                exit();
             }
             // 빈 텍스트 체크
             $("#changeMyAccount_frm").find("input[id='inputName']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("이름을 입력해 주세요.");
-                    exit();
                 }
             });
             $("#changeMyAccount_frm").find("input[id='inputEmail']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("이메일를 입력해 주세요.");
-                    exit();
                 }
             });
             $("#changeMyAccount_frm").find("input[id='inputPassword']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("비밀번호를 입력해 주세요.");
-                    exit();
                 }
             });
             $("#changeMyAccount_frm").find("input[id='confirmPassword']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("비밀번호를 입력해 주세요.");
-                    exit();
                 }
             });
             // 회원가입 처리
