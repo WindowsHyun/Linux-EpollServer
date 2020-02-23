@@ -26,7 +26,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 	}
 }
 
-$mb_level = DecryptSession($_SESSION['user_level'], $_SESSION['user_mail']);
+// $mb_level = DecryptSession($_SESSION['user_level'], $_SESSION['user_mail']);
+$mb_level = 2;
 ?>
 
 <script>

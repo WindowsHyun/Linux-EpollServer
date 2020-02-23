@@ -2,7 +2,7 @@
 -- 호스트:                          192.168.56.43
 -- 서버 버전:                        5.7.29-0ubuntu0.16.04.1 - (Ubuntu)
 -- 서버 OS:                        Linux
--- HeidiSQL 버전:                  10.3.0.5771
+-- HeidiSQL 버전:                  9.5.0.5196
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -13,10 +13,12 @@
 
 
 -- GameServer 데이터베이스 구조 내보내기
+DROP DATABASE IF EXISTS `GameServer`;
 CREATE DATABASE IF NOT EXISTS `GameServer` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */;
 USE `GameServer`;
 
 -- 테이블 GameServer.admin_table 구조 내보내기
+DROP TABLE IF EXISTS `admin_table`;
 CREATE TABLE IF NOT EXISTS `admin_table` (
   `no` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
@@ -32,34 +34,40 @@ CREATE TABLE IF NOT EXISTS `admin_table` (
 DELETE FROM `admin_table`;
 /*!40000 ALTER TABLE `admin_table` DISABLE KEYS */;
 INSERT INTO `admin_table` (`no`, `name`, `mail`, `pwd`, `permission`, `lastLoginIP`, `lastLogin`) VALUES
-	(1, 'windowshyun', 'kwon616@gmail.com', 'a3jLAk/tAmKrSntX9b1nUQ', NULL, '192.168.56.1', '2020-02-21 06:59:31');
+	(1, 'windowshyun', 'kwon616@gmail.com', 'a3jLAk/tAmKrSntX9b1nUQ', NULL, '192.168.56.1', '2020-02-23 13:41:08');
 /*!40000 ALTER TABLE `admin_table` ENABLE KEYS */;
 
 -- 테이블 GameServer.menu 구조 내보내기
+DROP TABLE IF EXISTS `menu`;
 CREATE TABLE IF NOT EXISTS `menu` (
   `me_no` int(11) NOT NULL AUTO_INCREMENT,
   `me_order` int(11) DEFAULT '0',
   `me_suborder` int(11) DEFAULT '0',
   `me_level` int(11) DEFAULT '0',
-  `me_class` text NOT NULL,
+  `me_class` text,
   `me_name` text NOT NULL,
   `me_icon` text NOT NULL,
-  `me_href` text NOT NULL,
+  `me_href` text,
   PRIMARY KEY (`me_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
 
--- 테이블 데이터 GameServer.menu:~0 rows (대략적) 내보내기
+-- 테이블 데이터 GameServer.menu:~10 rows (대략적) 내보내기
 DELETE FROM `menu`;
 /*!40000 ALTER TABLE `menu` DISABLE KEYS */;
 INSERT INTO `menu` (`me_no`, `me_order`, `me_suborder`, `me_level`, `me_class`, `me_name`, `me_icon`, `me_href`) VALUES
-	(1, 1, 0, 0, 'dropdown-header', '게임 설정', 'fas fa-hammer', ''),
-	(2, 2, 0, 0, 'dropdown-header', '게임 데이터', 'fas fa-table', ''),
-	(3, 3, 0, 0, 'dropdown-header', '유저 데이터', 'fas fa-user-cog', ''),
-	(4, 4, 0, 0, 'dropdown-header', '운영 도구', 'fas fa-tools', ''),
-	(5, 5, 0, 0, 'dropdown-header', '관리', 'fas fa-cog', '');
+	(1, 1, 0, 2, 'dropdown-header', '게임 설정', 'fas fa-hammer', '#'),
+	(2, 2, 0, 2, 'dropdown-header', '게임 데이터', 'fas fa-table', '#'),
+	(3, 3, 0, 2, 'dropdown-header', '유저 데이터', 'fas fa-user-cog', '#'),
+	(4, 4, 0, 2, 'dropdown-header', '운영 도구', 'fas fa-tools', '#'),
+	(5, 5, 0, 2, 'dropdown-header', '관리', 'fas fa-cog', '#'),
+	(6, 5, 2, 2, '', '데이터 업로드', 'fas fa-database', ''),
+	(7, 1, 1, 2, NULL, '기본 정보', 'fas fa-uesr-tie', NULL),
+	(8, 4, 1, 2, NULL, '운영자 아이디 관리', 'fas fa-user-tie', 'OperatingTools/adminMember'),
+	(9, 5, 1, 2, NULL, '메뉴 관리', 'fas fa-database', 'Setting/menu');
 /*!40000 ALTER TABLE `menu` ENABLE KEYS */;
 
 -- 테이블 GameServer.regist_code 구조 내보내기
+DROP TABLE IF EXISTS `regist_code`;
 CREATE TABLE IF NOT EXISTS `regist_code` (
   `no` int(11) NOT NULL AUTO_INCREMENT,
   `regist_code` text NOT NULL,
@@ -73,6 +81,7 @@ DELETE FROM `regist_code`;
 /*!40000 ALTER TABLE `regist_code` ENABLE KEYS */;
 
 -- 테이블 GameServer.user_table 구조 내보내기
+DROP TABLE IF EXISTS `user_table`;
 CREATE TABLE IF NOT EXISTS `user_table` (
   `no` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(11) NOT NULL,
@@ -86,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `user_table` (
   PRIMARY KEY (`no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 테이블 데이터 GameServer.user_table:~1 rows (대략적) 내보내기
+-- 테이블 데이터 GameServer.user_table:~0 rows (대략적) 내보내기
 DELETE FROM `user_table`;
 /*!40000 ALTER TABLE `user_table` DISABLE KEYS */;
 /*!40000 ALTER TABLE `user_table` ENABLE KEYS */;

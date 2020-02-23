@@ -1,6 +1,7 @@
 <?php
 include("../page/common.php");
 include("../../util/db_config.php");
+include("../../util/define_text.php");
 include("../../util/define.php");
 // 관리자 권한 체크 해야함.
 
@@ -25,63 +26,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- Modal 사용하려면 필수 -->
 <script type="text/javascript">
-    $(document).ready(function() {
-        // Enter 입력시 로그인 처리
-        $("#member_add_name").keydown(function(event) {
-            if (event.keyCode == 13) {
-                $("#addMenu_btn").trigger("click");
-            }
-        });
-        $("#member_add_email").keydown(function(event) {
-            if (event.keyCode == 13) {
-                $("#addMenu_btn").trigger("click");
-            }
-        });
-        $("#member_add_pwd").keydown(function(event) {
-            if (event.keyCode == 13) {
-                $("#addMenu_btn").trigger("click");
-            }
-        });
-        $("#member_add_permission").keydown(function(event) {
-            if (event.keyCode == 13) {
-                $("#addMenu_btn").trigger("click");
-            }
-        });
 
-        // 추가 버튼 클릭시 처리
-        $("#addMenu_btn").click(function() {
-            setVisible('#loading', true);
-            var btn = document.getElementById("addMenu_btn");
-            btn.style.backgroundColor = "#6c757d";
-            btn.style.borderColor = "#6c757d";
-            // 로그인 Post 처리
-            var dataFromForm = $('#addMember_frm').serialize();
-            $.ajax({
-                type: "POST",
-                data: dataFromForm,
-                url: "./util/admin/addMember_process.php",
-                success: function(data) {
-                    $("#console").html(data);
-                    checkTrueFalse(data);
-                    btn.style.backgroundColor = "#007bff";
-                    btn.style.borderColor = "#007bff";
-                    setVisible('#loading', false);
-                },
-                error: function(data) {
-                    alert("Error : " + data);
-                    setVisible('#loading', false);
-                }
-            });
-        });
-    });
-
-    function checkTrueFalse(data) {
-        setVisible('#loading', true);
-        $("#container-fluid").load("./page/OperatingTools/adminMember.php", function() {
-            // 페이지 로딩이 완료시 표시 끄기 [jQuery .load()]
-            setVisible('#loading', false);
-        });
-    }
 </script>
 
 <!-- Breadcrumbs-->
@@ -113,15 +58,18 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </thead>
                 <tbody>
                     <?php foreach ($adminMemberArr as $data) { ?>
-                        <tr style="text-align: center;">
+                        <tr style="text-align: center;" id="fixAdminMember_frm_<?= $data['no']; ?>">
                             <td>
                                 <?= $data['no']; ?>
+                                <input name="member_no" id="member_no" type="text" value="<?= $data['no']; ?>" hidden />
                             </td>
                             <td>
                                 <?= $data['name']; ?>
+                                <input name="member_name" id="member_name" type="text" value="<?= $data['name']; ?>" hidden />
                             </td>
                             <td>
                                 <?= $data['mail']; ?>
+                                <input name="member_mail" id="member_mail" type="text" value="<?= $data['mail']; ?>" hidden />
                             </td>
                             <td>
                                 <input name="member_pwd" id="member_pwd" type="password" value="" style="width:100%;" />
@@ -136,12 +84,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 <?= $data['lastLogin']; ?>
                             </td>
                             <td>
-                                <form id="fixAdminMember_frm_<?= $data['no']; ?>">
-                                    <input name="member_no" id="member_no" type="text" value="<?= $data['no']; ?>" hidden />
-                                    <input name="member_name" id="member_name" type="text" value="<?= $data['name']; ?>" hidden />
-                                    <input name="member_mail" id="member_mail" type="text" value="<?= $data['mail']; ?>" hidden />
-                                    <button type="button" onclick="editFixMenu('<?= $data['no']; ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" id="delMenu_btn" onclick="deleteFixMenu('<?= $data['no']; ?>', '<?= $data['mail']; ?>');" class="btn btn-danger btn-sm">삭제</button>
-                                </form>
+                                <button type="button" onclick="editFixMenu('<?= $data['no']; ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" id="delMenu_btn" onclick="deleteAdminMember('<?= $data['no']; ?>', '<?= $data['mail']; ?>');" class="btn btn-danger btn-sm">삭제</button>
                             </td>
                         </tr>
                     <?php } ?>
@@ -185,44 +128,116 @@ while ($row = mysqli_fetch_assoc($result)) {
 </p>
 
 <script type="text/javascript">
-    function deleteFixMenu(no, mail) {
-        var subject = "타이틀 테스트";
+    var doubleSubmitFlag = false;
+    $(document).ready(function() {
+        // Enter 입력시 로그인 처리
+        $("#member_add_name").keydown(function(event) {
+            if (event.keyCode == 13) {
+                $("#addMenu_btn").trigger("click");
+            }
+        });
+        $("#member_add_email").keydown(function(event) {
+            if (event.keyCode == 13) {
+                $("#addMenu_btn").trigger("click");
+            }
+        });
+        $("#member_add_pwd").keydown(function(event) {
+            if (event.keyCode == 13) {
+                $("#addMenu_btn").trigger("click");
+            }
+        });
+        $("#member_add_permission").keydown(function(event) {
+            if (event.keyCode == 13) {
+                $("#addMenu_btn").trigger("click");
+            }
+        });
+
+        // 추가 버튼 클릭시 처리
+        if (doubleSubmitFlag == false) {
+            $("#addMenu_btn").click(function() {
+                doubleSubmitFlag = true;
+                setVisible('#loading', true);
+                var btn = document.getElementById("addMenu_btn");
+                btn.style.backgroundColor = "#6c757d";
+                btn.style.borderColor = "#6c757d";
+                // 로그인 Post 처리
+                var dataFromForm = $('#addMember_frm').serialize();
+                dataFromForm = 'api=<?= ADMIN_ADD_MEMBER ?>&' + dataFromForm;
+                $.ajax({
+                    type: "POST",
+                    data: dataFromForm,
+                    url: "./util/api_process.php",
+                    success: function(data) {
+                        $("#console").html(data);
+                        checkTrueFalse(data);
+                        btn.style.backgroundColor = "#007bff";
+                        btn.style.borderColor = "#007bff";
+                        setVisible('#loading', false);
+                        doubleSubmitFlag = false;
+                    },
+                    error: function(data) {
+                        alert("Error : " + data);
+                        setVisible('#loading', false);
+                        doubleSubmitFlag = false;
+                    }
+                });
+            });
+        }
+    });
+
+    function checkTrueFalse(data) {
+        setVisible('#loading', true);
+        $("#container-fluid").load("./page/OperatingTools/adminMember.php", function() {
+            // 페이지 로딩이 완료시 표시 끄기 [jQuery .load()]
+            setVisible('#loading', false);
+        });
+    }
+
+    function deleteAdminMember(no, mail) {
+        var subject = "멤버 삭제";
         var content = "<div class='alert alert-warning' role='alert'>";
-        content += mail + " 아이디를 삭제하시겠습니까?";
+        content += "'" + mail + "'" + " 아이디를 삭제하시겠습니까?";
         content += "</div>";
-        $("#modal-title").text("삭제 확인");
+        $("#modal-title").text(subject);
         $("#modal-body").html(content);
         $("#modal-data-value").text(no);
-        var dataFromForm = $('#fixAdminMember_frm_' + no).serialize();
+        $("#modal-api-value").text('<?= ADMIN_DEL_MEMBER ?>');
         $('#confirmModal').modal({
             show: true
         });
     }
 
     $("#modal-confirm").click(function() {
-        $('#confirmModal').modal("hide");
-        setVisible('#loading', true);
-        var btn = document.getElementById("delMenu_btn");
-        btn.style.backgroundColor = "#6c757d";
-        btn.style.borderColor = "#6c757d";
-        // 로그인 Post 처리
-        var memberNo = $("#modal-data-value").text();
-        var dataFromForm = $('#fixAdminMember_frm_' + memberNo).serialize();
-        $.ajax({
-            type: "POST",
-            data: dataFromForm,
-            url: "./util/admin/delMember_process.php",
-            success: function(data) {
-                $("#console").html(data);
-                checkTrueFalse(data);
-                btn.style.backgroundColor = "#007bff";
-                btn.style.borderColor = "#007bff";
-                setVisible('#loading', false);
-            },
-            error: function(data) {
-                alert("Error : " + data);
-                setVisible('#loading', false);
-            }
-        });
+        if (doubleSubmitFlag == flase) {
+            doubleSubmitFlag = true;
+            $('#confirmModal').modal("hide");
+            setVisible('#loading', true);
+            var btn = document.getElementById("delMenu_btn");
+            btn.style.backgroundColor = "#6c757d";
+            btn.style.borderColor = "#6c757d";
+            // 로그인 Post 처리
+            var memberNo = $("#modal-data-value").text();
+            var api = $("#modal-api-value").text();
+            var dataFromForm = $('#fixAdminMember_frm_' + memberNo + ' :input').serialize();
+            dataFromForm = 'api=' + api + '&' + dataFromForm;
+            $.ajax({
+                type: "POST",
+                data: dataFromForm,
+                url: "./util/api_process.php",
+                success: function(data) {
+                    $("#console").html(data);
+                    checkTrueFalse(data);
+                    btn.style.backgroundColor = "#007bff";
+                    btn.style.borderColor = "#007bff";
+                    setVisible('#loading', false);
+                    doubleSubmitFlag = false;
+                },
+                error: function(data) {
+                    alert("Error : " + data);
+                    setVisible('#loading', false);
+                    doubleSubmitFlag = false;
+                }
+            });
+        }
     });
 </script>

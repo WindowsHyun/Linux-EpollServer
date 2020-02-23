@@ -30,6 +30,7 @@
 			<div class="modal-body" id="modal-body">
 			</div>
 			<div name="modal-data-value" id="modal-data-value" hidden></div>
+			<div name="modal-api-value" id="modal-api-value" hidden></div>
 			<div class="modal-footer">
 				<button type="button" id="modal-cancle" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
 				<button type="button" id="modal-confirm" class="btn btn-primary" data-dismiss="modal">Okay</button>
