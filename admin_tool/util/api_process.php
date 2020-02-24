@@ -74,18 +74,21 @@ switch ($API) {
 		$email = $_POST['member_add_email'];
 		$pwd = $_POST['member_add_pwd'];
 		$permission = $_POST['member_add_permission'];
+		$described = $_POST['member_add_described'];
 
-		if (!isset($name) || !isset($email) || !isset($pwd) || $name == "" || $email == "" || $pwd == "") {
+		if (!isset($name) || !isset($email) || !isset($pwd) || !isset($permission) || $name == "" || $email == "" || $pwd == "" || $permission == "") {
 			print "<script language=javascript> alert('비정상 적인 접근 입니다.'); location.replace('login'); </script>";
 			exit();
 		}
 
 		// 해당 DB 테이블에 해당 메일이 있는지 여부를 체크 한다.
 		$sql = sprintf(
-			"INSERT INTO `" . $mysql_database . "`.`" . $mysql_login_table . "` (`name`, `mail`, `pwd`) VALUES ('%s', '%s', '%s')",
+			"INSERT INTO `" . $mysql_database . "`.`" . $mysql_login_table . "` (`name`, `mail`, `pwd`, `permission`, `described`) VALUES ('%s', '%s', '%s', '%d', '%s')",
 			$mysqli->real_escape_string($name),
 			$mysqli->real_escape_string($email),
-			$mysqli->real_escape_string(Encrypt($pwd, $email))
+			$mysqli->real_escape_string(Encrypt($pwd, $email)),
+			$mysqli->real_escape_string($permission),
+			$mysqli->real_escape_string($described)
 		);
 		break;
 

@@ -29,6 +29,7 @@
 			</div>
 			<div class="modal-body" id="modal-body">
 			</div>
+			<div name="modal-btn-value" id="modal-btn-value" hidden></div>
 			<div name="modal-data-value" id="modal-data-value" hidden></div>
 			<div name="modal-api-value" id="modal-api-value" hidden></div>
 			<div class="modal-footer">

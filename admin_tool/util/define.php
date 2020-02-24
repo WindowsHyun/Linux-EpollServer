@@ -13,6 +13,14 @@ $LEVEL_LIST = array(
     10        => "[10] 관리자",
 );
 
+$PERMISSION_LIST = array(
+    11        => "[0] 숨기기",
+    1         => "[1] 비회원",
+    2         => "[2] 뷰어",
+    3         => "[3] 개발자",
+    4         => "[4] 관리자",
+);
+
 $ORDER_LIST = array(
     0         => "0",
     1         => "1",
@@ -43,7 +51,7 @@ function draw_SelectBox($className, $dataArray, $selectValue, $readonly='false')
         $readonlydata = "";
     }
 
-    $tag .= "<select name='$className' id='$className' $readonly>";
+    $tag .= "<select name='$className' id='$className' style='width:100%;' $readonly>";
     foreach ($dataArray as $key => $value) {
         if ($selectValue == $key) { 
             $tag .= "<option value='$key' selected='selected'>$value</option>";

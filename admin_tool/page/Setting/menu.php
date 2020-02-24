@@ -161,7 +161,7 @@ $num = 1;
                             </td>
                             <td><input name="me_href_add" id="me_href_add" type="text" value="" style="width:100px;" />
                             </td>
-                            <td><button id="addMenu_btn" type="button" class="btn btn-success btn-sm">추가</button></td>
+                            <td><button id="addMenu_btn" onclick="AddAdminMenu();" type="button" class="btn btn-success btn-sm">추가</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -179,67 +179,27 @@ $num = 1;
 
 <script type="text/javascript">
     var doubleSubmitFlag = false;
-    $(document).ready(function() {
-        // Enter 입력시 로그인 처리
-        $("#me_class_add").keydown(function(event) {
-            if (event.keyCode == 13) {
-                $("#addMenu_btn").trigger("click");
-            }
-        });
-        $("#me_name_add").keydown(function(event) {
-            if (event.keyCode == 13) {
-                $("#addMenu_btn").trigger("click");
-            }
-        });
-        $("#me_icon_add").keydown(function(event) {
-            if (event.keyCode == 13) {
-                $("#addMenu_btn").trigger("click");
-            }
-        });
-        $("#me_href_add").keydown(function(event) {
-            if (event.keyCode == 13) {
-                $("#addMenu_btn").trigger("click");
-            }
-        });
-
-        // AddMenu 클릭
-        if (doubleSubmitFlag == false) {
-            $("#addMenu_btn").click(function() {
-                doubleSubmitFlag = true;
-                setVisible('#loading', true);
-                var btn = document.getElementById("addMenu_btn");
-                btn.style.backgroundColor = "#6c757d";
-                btn.style.borderColor = "#6c757d";
-                // 로그인 Post 처리
-                var dataFromForm = $('#addMenu_frm').serialize();
-                dataFromForm = 'api=<?= ADMIN_ADD_MENU ?>&' + dataFromForm;
-                $.ajax({
-                    type: "POST",
-                    data: dataFromForm,
-                    url: "./util/api_process.php",
-                    success: function(data) {
-                        $("#console").html(data);
-                        checkTrueFalse(data);
-                        btn.style.backgroundColor = "#007bff";
-                        btn.style.borderColor = "#007bff";
-                        setVisible('#loading', false);
-                        doubleSubmitFlag = false;
-                    },
-                    error: function(data) {
-                        alert("Error : " + data);
-                        setVisible('#loading', false);
-                        doubleSubmitFlag = false;
-                    }
-                });
-            });
-        }
-    });
 
     function checkTrueFalse(data) {
         setVisible('#loading', true);
         $("#container-fluid").load("./page/Setting/menu.php", function() {
             // 페이지 로딩이 완료시 표시 끄기 [jQuery .load()]
             setVisible('#loading', false);
+        });
+    }
+
+    function AddAdminMenu() {
+        var subject = "메뉴 추가";
+        var content = "<div class='alert alert-warning' role='alert'>";
+        content += "메뉴를 추가하시겠습니까?";
+        content += "</div>";
+        $("#modal-title").text(subject);
+        $("#modal-body").html(content);
+        $("#modal-btn-value").text('addMenu_btn');
+        $("#modal-data-value").text('#addMenu_frm');
+        $("#modal-api-value").text('<?= ADMIN_ADD_MENU ?>');
+        $('#confirmModal').modal({
+            show: true
         });
     }
 
@@ -251,7 +211,8 @@ $num = 1;
 
         $("#modal-title").text(subject);
         $("#modal-body").html(content);
-        $("#modal-data-value").text(no);
+        $("#modal-btn-value").text('delMenu_btn');
+        $("#modal-data-value").text('#fixMenu_frm_' + no);
         $("#modal-api-value").text('<?= ADMIN_DEL_MENU ?>');
         $('#confirmModal').modal({
             show: true
@@ -263,13 +224,14 @@ $num = 1;
             doubleSubmitFlag = true;
             $('#confirmModal').modal("hide");
             setVisible('#loading', true);
-            var btn = document.getElementById("delMenu_btn");
+            var btnValue = $("#modal-btn-value").text();
+            var btn = document.getElementById(btnValue);
             btn.style.backgroundColor = "#6c757d";
             btn.style.borderColor = "#6c757d";
             // 로그인 Post 처리
-            var memberNo = $("#modal-data-value").text();
+            var formValue = $("#modal-data-value").text();
             var api = $("#modal-api-value").text();
-            var dataFromForm = $('#fixMenu_frm_' + memberNo + ' :input').serialize();
+            var dataFromForm = $(formValue).serialize();
             dataFromForm = 'api=' + api + '&' + dataFromForm;
             $.ajax({
                 type: "POST",

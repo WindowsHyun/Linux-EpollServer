@@ -70,6 +70,7 @@ if ($row['mail'] != $user_mail) {
 	$_SESSION['user_ip'] = login_process_get_ip();
 	$_SESSION['user_no'] = EncryptSession($row['no'], $user_mail);
 	$_SESSION['user_name'] = EncryptSession($row['name'], $user_mail);
+	$_SESSION['user_permission'] = EncryptSession($row['permission'], $user_mail);
 	echo "<meta http-equiv='refresh' content='0;url=index'>";
 }
 ?>
