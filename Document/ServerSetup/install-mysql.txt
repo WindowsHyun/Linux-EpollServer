@@ -20,6 +20,7 @@ sudo apt install libmysqlclient-dev
 
 - mysql 8.0 root 계정 비밀번호 변경
     ALTER user 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'windowshyun';
+    ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'windowshyun';
     CREATE USER 'root'@'%' IDENTIFIED BY 'windowshyun' PASSWORD EXPIRE NEVER;
     GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
     flush privileges;
