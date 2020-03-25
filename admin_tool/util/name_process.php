@@ -1,5 +1,5 @@
 <?php
-	include("db_config.php");
+	include("./db_config.php");
 	// 입력 값 확인
 	if( !isset($_POST['chkName']) ){
 		echo "비정상 적인 접근 입니다.";
@@ -20,7 +20,7 @@
 
 	$chk_name = $_POST['chkName'];
 
-	$sql = sprintf("SELECT `name` FROM `".$mysql_login_table."` WHERE `name` = \"%s\"",
+	$sql = sprintf("SELECT `name` FROM `".$mysql_member_login_table."` WHERE `name` = \"%s\"",
                     $mysqli->real_escape_string($chk_name) );
 	$result = $mysqli->query($sql);
 	$row = mysqli_fetch_assoc($result);

@@ -1,8 +1,5 @@
 <?php
-include("../page/common.php");
-include("../../util/db_config.php");
-include("../../util/define_text.php");
-include("../../util/define.php");
+include("_common.php");
 // 관리자 권한 체크 해야함.
 
 // menu DB 불러오기
@@ -17,7 +14,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $menuData['me_order'] = $row['me_order'];
     $menuData['me_suborder'] = $row['me_suborder'];
     $menuData['me_class'] = $row['me_class'];
-    $menuData['me_level'] = $row['me_level'];
+    $menuData['me_permission'] = $row['me_permission'];
     $menuData['me_name'] = $row['me_name'];
     $menuData['me_icon'] = $row['me_icon'];
     $menuData['me_href'] = $row['me_href'];
@@ -32,11 +29,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 $num = 1;
 ?>
-<!-- Modal 사용하려면 필수 -->
-<script type="text/javascript" src="vendor/jquery/jquery.js"></script>
-<script type="text/javascript" src="vendor/datatables/jquery.dataTables.js"></script>
-<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- Modal 사용하려면 필수 -->
+<p id="console" style="color:#007bff; font-size:90%" hidden></p>
 
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
@@ -78,9 +71,9 @@ $num = 1;
                             <td>
                                 <?= draw_SelectBox("me_suborder", $ORDER_LIST, $data['me_suborder']); ?></td>
                             <td>
-                                <?= draw_SelectBox("me_level", $LEVEL_LIST, $data['me_level']); ?></td>
+                                <?= draw_SelectBox("me_permission", $PERMISSION_LIST, $data['me_permission']); ?></td>
                             <td>
-                                <input name="me_class" id="me_class" type="text" value="<?= $data['me_class']; ?>" style="width:100px;" />
+                                <?= draw_SelectBox("me_class", $MENU_CLASS_LIST, $data['me_class']); ?>
                             </td>
                             <td>
                                 <input name="me_name" id="me_name" type="text" value="<?= $data['me_name']; ?>" style="width:100px;" />
@@ -92,7 +85,7 @@ $num = 1;
                                 <input name="me_href" id="me_href" type="text" value="<?= $data['me_href']; ?>" style="width:100px;" />
                             </td>
                             <td>
-                                <button type="button" onclick="editFixMenu('<?= $data['me_no']; ?>', '<?= $data['me_name']; ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" id="delMenu_btn" onclick="deleteFixMenu('<?= $data['me_no']; ?>', '<?= $data['me_name']; ?>');" class="btn btn-danger btn-sm">삭제</button>
+                                <button type="button" id="editMenu_btn" onclick="EditAdminMenu('<?= $data['me_no']; ?>', '<?= $data['me_name']; ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" id="delMenu_btn" onclick="deleteFixMenu('<?= $data['me_no']; ?>', '<?= $data['me_name']; ?>');" class="btn btn-danger btn-sm">삭제</button>
                             </td>
                             <?php $num++;  ?>
                         </tr>
@@ -108,9 +101,9 @@ $num = 1;
                                     <td>
                                         <?= draw_SelectBox("me_suborder", $ORDER_LIST, $subdata['me_suborder']); ?></td>
                                     <td>
-                                        <?= draw_SelectBox("me_level", $LEVEL_LIST, $subdata['me_level']); ?></td>
+                                        <?= draw_SelectBox("me_permission", $PERMISSION_LIST, $subdata['me_permission']); ?></td>
                                     <td>
-                                        <input name="me_class" id="me_class" type="text" value="<?= $subdata['me_class']; ?>" style="width:100px;" />
+                                        <?= draw_SelectBox("me_class", $MENU_CLASS_LIST, $subdata['me_class']); ?>
                                     </td>
                                     <td>
                                         <input name="me_name" id="me_name" type="text" value="<?= $subdata['me_name']; ?>" style="width:100px;" />
@@ -122,7 +115,7 @@ $num = 1;
                                         <input name="me_href" id="me_href" type="text" value="<?= $subdata['me_href']; ?>" style="width:100px;" />
                                     </td>
                                     <td>
-                                        <button type="button" onclick="editFixMenu('<?= $subdata['me_no']; ?>', '<?= $subdata['me_name']; ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" id="delMenu_btn" onclick="deleteFixMenu('<?= $subdata['me_no']; ?>', '<?= $subdata['me_name']; ?>');" class="btn btn-danger btn-sm">삭제</button>
+                                        <button type="button"  id="editMenu_btn" onclick="EditAdminMenu('<?= $subdata['me_no']; ?>', '<?= $subdata['me_name']; ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" id="delMenu_btn" onclick="deleteFixMenu('<?= $subdata['me_no']; ?>', '<?= $subdata['me_name']; ?>');" class="btn btn-danger btn-sm">삭제</button>
                                     </td>
                                 </tr>
                                 <?php $num++;  ?>
@@ -153,8 +146,8 @@ $num = 1;
                         <tr style="text-align: center;">
                             <td><?= draw_SelectBox("me_order_add", $ORDER_LIST, '1'); ?></td>
                             <td><?= draw_SelectBox("me_suborder_add", $ORDER_LIST, '0'); ?></td>
-                            <td><?= draw_SelectBox("me_level_add", $LEVEL_LIST, '2'); ?></td>
-                            <td><input name="me_class_add" id="me_class_add" type="text" value="" style="width:100px;" /></td>
+                            <td><?= draw_SelectBox("me_permission_add", $PERMISSION_LIST, '2'); ?></td>
+                            <td><?= draw_SelectBox("me_class_add", $MENU_CLASS_LIST, '0'); ?></td>
                             <td><input name="me_name_add" id="me_name_add" type="text" value="" style="width:100px;" />
                             </td>
                             <td><input name="me_icon_add" id="me_icon_add" type="text" value="" style="width:100px;" />
@@ -170,21 +163,41 @@ $num = 1;
     </div>
 </div>
 
-<p class="small text-center text-muted my-5">
+<!-- <p class="small text-center text-muted my-5">
     <em>
         <p id="console" style="color:#007bff; font-size:90%"></p>
     </em>
     <em>More table examples coming soon...</em><br>
-</p>
+</p> -->
 
 <script type="text/javascript">
     var doubleSubmitFlag = false;
 
     function checkTrueFalse(data) {
         setVisible('#loading', true);
-        $("#container-fluid").load("./page/Setting/menu.php", function() {
-            // 페이지 로딩이 완료시 표시 끄기 [jQuery .load()]
-            setVisible('#loading', false);
+        if (data != "TRUE") {
+            $("#console").html(data);
+        } else {
+            $("#container-fluid").load("./page/Setting/menu.php", function() {
+                // 페이지 로딩이 완료시 표시 끄기 [jQuery .load()]
+                setVisible('#loading', false);
+            });
+        }
+    }
+
+    function EditAdminMenu(no, name) {
+        var subject = "메뉴 수정";
+        var content = "<div class='alert alert-warning' role='alert'>";
+        content += name;
+        content += " 메뉴를 수정하시겠습니까?";
+        content += "</div>";
+        $("#modal-title").text(subject);
+        $("#modal-body").html(content);
+        $("#modal-btn-value").text('editMenu_btn');
+        $("#modal-data-value").text('#fixMenu_frm_' + no + ' :input');
+        $("#modal-api-value").text('<?= ADMIN_EDIT_MENU ?>');
+        $('#confirmModal').modal({
+            show: true
         });
     }
 
@@ -252,5 +265,12 @@ $num = 1;
                 }
             });
         }
+    });
+
+    $('#adminDataTable').DataTable({
+        responsive: true,
+        order: [
+            [0, "asc"]
+        ]
     });
 </script>

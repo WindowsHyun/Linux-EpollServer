@@ -1,0 +1,36 @@
+개발용 mysql-dev 설치
+sudo apt-get install mysql-server
+sudo apt install libmysqlclient-dev
+
+- Mysql 외부 접속 허용 처리
+    cd /etc/mysql/mysql.conf.d
+    sudo vi mysqld.cnf
+    bind-address 주석처리
+
+- Server sent charset (255) unknown to the client. Please, report to the developers
+    cd /etc/mysql
+    sudo vi my.cnf
+    [client]
+    default-character-set=utf8
+    [mysql]
+    default-character-set=utf8
+    [mysqld]
+    collation-server = utf8_unicode_ci
+    character-set-server = utf8
+
+- mysql 8.0 root 계정 비밀번호 변경
+    ALTER user 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'windowshyun';
+    ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'windowshyun';
+    CREATE USER 'root'@'%' IDENTIFIED BY 'windowshyun' PASSWORD EXPIRE NEVER;
+    GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+    flush privileges;
+
+- Visual Studio MySQL --libs 설정 방법
+    - 프로젝트 속성 -> 링커 -> 입력
+    - 추가 종속성
+    - `mysql_config --cflags --libs`
+    - 해당 값을 입력하면 된다.
+
+
+- PHP mysqli 설치
+    - sudo apt-get install php-mysql

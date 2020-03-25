@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kr">
+<?php include("./head.php"); ?>
 
-<?php
-include("head.php");
-include("./util/login_session.php");
-?>
 <script type="text/javascript">
     $(document).ready(function() {
         // 이메일 주소 중복 체크
         var passEmail = false;
-        $("#inputEmail").focusout(function(event) {
-            var emailVal = $("#inputEmail").val();
+        $("#inputEmailAddress").focusout(function(event) {
+            var emailVal = $("#inputEmailAddress").val();
             var exptext = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
             if (emailVal.match(exptext) != null) {
                 emailVal = "chkMail=" + emailVal;
@@ -70,8 +67,8 @@ include("./util/login_session.php");
 
         // 비밀번호 동일한지 체크
         var passPassword = false;
-        $("#confirmPassword").keyup(function(event) {
-            if ($("#inputPassword").val() == $("#confirmPassword").val()) {
+        $("#inputConfirmPassword").keyup(function(event) {
+            if ($("#inputPassword").val() == $("#inputConfirmPassword").val()) {
                 $("#passwordconsole").html("비밀번호를 정확하게 입력 하였습니다.");
                 var x = document.getElementById("passwordconsole");
                 x.style.color = "#007bff";
@@ -105,7 +102,7 @@ include("./util/login_session.php");
                     exit();
                 }
             });
-            $("#register_frm").find("input[id='inputEmail']").each(function(index) {
+            $("#register_frm").find("input[id='inputEmailAddress']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("이메일를 입력해 주세요.");
                     exit();
@@ -123,7 +120,7 @@ include("./util/login_session.php");
                     exit();
                 }
             });
-            $("#register_frm").find("input[id='confirmPassword']").each(function(index) {
+            $("#register_frm").find("input[id='inputConfirmPassword']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("비밀번호를 입력해 주세요.");
                     exit();
@@ -147,75 +144,75 @@ include("./util/login_session.php");
     });
 </script>
 
-<body class="bg-dark">
-    <div class="container">
-        <div class="card card-register mx-auto mt-5">
-            <div class="card-header">Register an Account</div>
-            <div class="card-body">
-                <form id="register_frm">
-                    <div class="form-group">
-                        <div class="form-label-group">
-                            <input type="name" id="inputName" name="inputName" class="form-control" placeholder="NickName" required="required">
-                            <label for="inputName">NickName</label>
-                        </div>
-                        <div class="text-left mb-4">
-                            <p id="nameconsole" style="padding-left:5px;color:#dc3545; font-size:90%"></p>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="form-label-group">
-                            <input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="Email address" required="required">
-                            <label for="inputEmail">Email address</label>
-                        </div>
-                        <div class="text-left mb-4">
-                            <p id="emailconsole" style="padding-left:5px;color:#dc3545; font-size:90%"></p>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="form-label-group">
-                            <input type="text" id="inputRegisterCode" name="inputRegisterCode" class="form-control" placeholder="Register Code" required="required">
-                            <label for="inputRegisterCode">Register Code</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="form-label-group">
-                                    <input type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Password" required="required">
-                                    <label for="inputPassword">Password</label>
+<body class="bg-primary">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-7">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header">
+                                    <h3 class="text-center font-weight-light my-4">Create Account</h3>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="inputName">NickName</label>
+                                            <input class="form-control py-4" id="inputName" type="text" aria-describedby="emailHelp" placeholder="Enter nickname" />
+                                        </div>
+                                        <div class="text-left mb-4">
+                                            <p id="nameconsole" style="padding-left:5px;color:#dc3545; font-size:90%"></p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="inputEmailAddress">Email</label>
+                                            <input class="form-control py-4" id="inputEmailAddress" type="email" aria-describedby="emailHelp" placeholder="Enter Email Address" />
+                                        </div>
+                                        <div class="text-left mb-4">
+                                            <p id="emailconsole" style="padding-left:5px;color:#dc3545; font-size:90%"></p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="inputRegisterCode">Register Code</label>
+                                            <input class="form-control py-4" id="inputRegisterCode" type="text" aria-describedby="emailHelp" placeholder="Enter Register Code" />
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputPassword">Password</label>
+                                                    <input class="form-control py-4" id="inputPassword" type="password" placeholder="Enter Password" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputConfirmPassword">Confirm Password</label>
+                                                    <input class="form-control py-4" id="inputConfirmPassword" type="password" placeholder="Confirm Password" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-center mb-4">
+                                            <p id="passwordconsole" style="padding-left:5px;color:#dc3545; font-size:90%"></p>
+                                        </div>
+                                        <div class="text-center mb-4">
+                                            <p id="console" style="color:#007bff; font-size:90%"></p>
+                                        </div>
+                                        <div class="form-group mt-4 mb-0">
+                                            <button id="register_btn" type="button" class="btn btn-primary btn-block">Create Account</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <div class="small"><a href="login">Have an account? Go to login</a></div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-label-group">
-                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm password" required="required">
-                                    <label for="confirmPassword">Confirm password</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center mb-4">
-                            <p id="passwordconsole" style="padding-left:5px;color:#dc3545; font-size:90%"></p>
                         </div>
                     </div>
-                    <div class="text-center mb-4">
-                        <p id="console" style="color:#007bff; font-size:90%"></p>
-                    </div>
-                    <button id="register_btn" type="button" class="btn btn-primary btn-block">Register</button>
-                </form>
-                <div class="text-center">
-                    <a class="d-block small mt-3" href="login">Login Page</a>
-                    <a class="d-block small" href="password">Forgot Password?</a>
                 </div>
-            </div>
+            </main>
+        </div>
+        <div id="layoutAuthentication_footer">
+            <?php include("./tail.php"); ?>
         </div>
     </div>
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
 </body>
 
 </html>

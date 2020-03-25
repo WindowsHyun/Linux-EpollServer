@@ -1,6 +1,6 @@
 <?php
-include("./common.php");
-include("../util/EncryptUtil.php");
+include("_common.php");
+// include("../util/EncryptUtil.php");
 ?>
 
 <script type="text/javascript">
@@ -26,26 +26,31 @@ include("../util/EncryptUtil.php");
             // 비밀번호 체크
             if (passPassword == false) {
                 alert("비밀번호가 서로 정확한지 확인하여 주세요.");
+                return 0;
             }
             // 빈 텍스트 체크
             $("#changeMyAccount_frm").find("input[id='inputName']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("이름을 입력해 주세요.");
+                    return 0;
                 }
             });
             $("#changeMyAccount_frm").find("input[id='inputEmail']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("이메일를 입력해 주세요.");
+                    return 0;
                 }
             });
             $("#changeMyAccount_frm").find("input[id='inputPassword']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("비밀번호를 입력해 주세요.");
+                    return 0;
                 }
             });
             $("#changeMyAccount_frm").find("input[id='confirmPassword']").each(function(index) {
                 if ($(this).val() == '') {
                     alert("비밀번호를 입력해 주세요.");
+                    return 0;
                 }
             });
             // 회원가입 처리
@@ -75,22 +80,22 @@ include("../util/EncryptUtil.php");
             <form id="changeMyAccount_frm">
                 <div class="form-group">
                     <div class="form-label-group">
+                        <label class="small mb-1" for="inputEmailAddress">Your email address</label>
                         <input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="Your email address" required="required" value="<?php echo $_SESSION['user_mail']; ?>" readonly="readonly">
-                        <label for="inputEmail">Your email address</label>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="form-label-group">
+                        <label class="small mb-1" for="inputName">Your site nickname</label>
                         <input type="text" id="inputName" name="inputName" class="form-control" placeholder="Your site nickname" required="required" autofocus="autofocus" value="<?php echo DecryptSession($_SESSION['user_name'], $_SESSION['user_mail']); ?>" readonly="readonly">
-                        <label for="inputName">Your site nickname</label>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="form-label-group">
+                        <label class="small mb-1" for="inputOriginalPassword">Your original password</label>
                         <input type="password" id="inputOriginalPassword" name="inputOriginalPassword" class="form-control" placeholder="Your original password" required="required">
-                        <label for="inputOriginalPassword">Your original password</label>
                     </div>
                 </div>
 
@@ -98,14 +103,14 @@ include("../util/EncryptUtil.php");
                     <div class="form-row">
                         <div class="col-md-6">
                             <div class="form-label-group">
+                                <label class="small mb-1" for="inputPassword">Password</label>
                                 <input type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Password" required="required">
-                                <label for="inputPassword">Password</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-label-group">
+                                <label class="small mb-1" for="confirmPassword">Confirm Password</label>
                                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm password" required="required">
-                                <label for="confirmPassword">Confirm password</label>
                             </div>
                         </div>
                     </div>

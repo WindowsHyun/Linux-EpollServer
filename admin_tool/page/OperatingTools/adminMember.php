@@ -1,12 +1,9 @@
 <?php
-include("../page/common.php");
-include("../../util/db_config.php");
-include("../../util/define_text.php");
-include("../../util/define.php");
+include("_common.php");
 // 관리자 권한 체크 해야함.
 
 // menu DB 불러오기
-$sql = "SELECT * FROM `" . $mysql_database . "`.`" . $mysql_login_table . "`";
+$sql = "SELECT * FROM `" . $mysql_database . "`.`" . $mysql_admin_login_table . "`";
 $result = $mysqli->query($sql);
 $adminMemberArr = array();
 while ($row = mysqli_fetch_assoc($result)) {
@@ -21,14 +18,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $adminMemberArr[] = $memberData;
 }
 ?>
-<!-- Modal 사용하려면 필수 -->
-<script type="text/javascript" src="vendor/jquery/jquery.js"></script>
-<script type="text/javascript" src="vendor/datatables/jquery.dataTables.js"></script>
-<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- Modal 사용하려면 필수 -->
-<script type="text/javascript">
-
-</script>
+<p id="console" style="color:#007bff; font-size:90%" hidden></p>
 
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
@@ -89,7 +79,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 <?= $data['lastLogin']; ?>
                             </td>
                             <td>
-                                <button type="button" onclick="editFixMenu('<?= $data['no']; ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" id="delMenu_btn" onclick="deleteAdminMember('<?= $data['no']; ?>', '<?= $data['mail']; ?>');" class="btn btn-danger btn-sm">삭제</button>
+                                <button type="button" id="editMenu_btn" onclick="editADminMember('<?= $data['no']; ?>', '<?= $data['mail']; ?>');" class="btn btn-primary btn-sm">수정</button>&nbsp;<button type="button" id="delMenu_btn" onclick="deleteAdminMember('<?= $data['no']; ?>', '<?= $data['mail']; ?>');" class="btn btn-danger btn-sm">삭제</button>
                             </td>
                         </tr>
                     <?php } ?>
@@ -127,26 +117,27 @@ while ($row = mysqli_fetch_assoc($result)) {
     </div>
 </div>
 
-<p class="small text-center text-muted my-5">
+<!-- <p class="small text-center text-muted my-5">
     <em>
         <p id="console" style="color:#007bff; font-size:90%"></p>
     </em>
     <em>More table examples coming soon...</em><br>
-</p>
+</p> -->
 
 <script type="text/javascript">
     var doubleSubmitFlag = false;
-    // $(document).ready(function() {
-    //     var doubleSubmitFlag = false;
-    //     doubleSubmitFlag = false;
-    // });
-
+    
     function checkTrueFalse(data) {
         setVisible('#loading', true);
-        $("#container-fluid").load("./page/OperatingTools/adminMember.php", function() {
-            // 페이지 로딩이 완료시 표시 끄기 [jQuery .load()]
-            setVisible('#loading', false);
-        });
+        //console
+        if (data != "TRUE") {
+            $("#console").html(data);
+        } else {
+            $("#container-fluid").load("./page/OperatingTools/adminMember.php", function() {
+                // 페이지 로딩이 완료시 표시 끄기 [jQuery .load()]
+                setVisible('#loading', false);
+            });
+        }
     }
 
     function AddAdminMember() {
@@ -159,6 +150,21 @@ while ($row = mysqli_fetch_assoc($result)) {
         $("#modal-btn-value").text('addMenu_btn');
         $("#modal-data-value").text('#addMember_frm');
         $("#modal-api-value").text('<?= ADMIN_ADD_MEMBER ?>');
+        $('#confirmModal').modal({
+            show: true
+        });
+    }
+
+    function editADminMember(no, mail) {
+        var subject = "멤버 수정";
+        var content = "<div class='alert alert-warning' role='alert'>";
+        content += "'" + mail + "'" + " 아이디를 수정하시겠습니까?";
+        content += "</div>";
+        $("#modal-title").text(subject);
+        $("#modal-body").html(content);
+        $("#modal-btn-value").text('editMenu_btn');
+        $("#modal-data-value").text('#fixAdminMember_frm_' + no + ' :input');
+        $("#modal-api-value").text('<?= ADMIN_EDIT_MEMBER ?>');
         $('#confirmModal').modal({
             show: true
         });
@@ -212,5 +218,12 @@ while ($row = mysqli_fetch_assoc($result)) {
                 }
             });
         }
+    });
+
+    $('#adminDataTable').DataTable({
+        responsive: true,
+        order: [
+            [0, "asc"]
+        ]
     });
 </script>

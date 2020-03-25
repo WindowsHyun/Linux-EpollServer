@@ -1,8 +1,6 @@
 <?php
 include("./db_config.php");
 include("./EncryptUtil.php");
-// AdminTool Disabled
-exit();
 
 $register_code = $_POST['inputRegisterCode'];
 $user_pw = $_POST['inputPassword'];
@@ -12,7 +10,7 @@ $regtime = "" . date("Y-m-d H:i:s") . "";
 
 // 이메일 중복 체크를 한번 더 한다.
 $sql = sprintf(
-	"SELECT mail FROM ".$mysql_login_table." WHERE mail = \"%s\"",
+	"SELECT mail FROM ".$mysql_member_login_table." WHERE mail = \"%s\"",
 	$mysqli->real_escape_string($user_email)
 );
 $result = $mysqli->query($sql);
@@ -41,7 +39,7 @@ if ($row['count'] > 0) {
 
 // 실제 가입 처리를 한다.
 $sql = sprintf(
-	" INSERT INTO `".$mysql_database."`.`".$mysql_login_table."` (`name`, `mail`, `pwd`, `level`, `code`, `token`, `regtime` , `lastLogin`) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+	" INSERT INTO `".$mysql_database."`.`".$mysql_member_login_table."` (`name`, `mail`, `pwd`, `level`, `code`, `token`, `regtime` , `lastLogin`) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
 	$mysqli->real_escape_string($user_name),
 	$mysqli->real_escape_string($user_email),
 	$mysqli->real_escape_string(Encrypt($user_pw, $user_email)),

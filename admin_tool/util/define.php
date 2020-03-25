@@ -1,4 +1,6 @@
 <?php
+include("define_text.php");
+
 $LEVEL_LIST = array(
     11        => "[0] 숨기기",
     1         => "[1] 비회원",
@@ -11,14 +13,6 @@ $LEVEL_LIST = array(
     8         => "[8] 회원",
     9         => "[9] 회원",
     10        => "[10] 관리자",
-);
-
-$PERMISSION_LIST = array(
-    11        => "[0] 숨기기",
-    1         => "[1] 비회원",
-    2         => "[2] 뷰어",
-    3         => "[3] 개발자",
-    4         => "[4] 관리자",
 );
 
 $ORDER_LIST = array(
@@ -38,6 +32,20 @@ $ORDER_LIST = array(
     13        => "13",
     14        => "14",
     15        => "15",
+);
+
+$PERMISSION_LIST = array(
+    PERMISSION_HIDE         => "[0] 숨기기",
+    PERMISSION_NOREGIST     => "[1] 비회원",
+    PERMISSION_VIEWER       => "[2] 뷰어",
+    PERMISSION_DEVELOP      => "[3] 개발자",
+    PERMISSION_ADMIN        => "[4] 관리자",
+);
+
+$MENU_CLASS_LIST = array(
+    HEADING_MENU        => "Heading Menu",
+    DROPDOWN_MENU       => "DropDown Menu",
+    LINK_PAGE           => "Link Page",
 );
 
 function draw_SelectBox($className, $dataArray, $selectValue, $readonly='false')

@@ -1,6 +1,6 @@
 <?php
-include("../util/db_config.php");
-include("../util/EncryptUtil.php");
+include("./db_config.php");
+include("./EncryptUtil.php");
 
 function login_process_get_ip(){
     $ipaddress = '';
@@ -22,13 +22,14 @@ function login_process_get_ip(){
 }
 
 // 입력 값 확인
-if (!isset($_POST['inputEmail']) || !isset($_POST['inputPassword'])) {
-	echo "비정상 적인 접근 입니다.";
+if (!isset($_POST['inputEmailAddress']) || !isset($_POST['inputPassword'])) {
+    echo "비정상 적인 접근 입니다.";
+    print_r($_POST);
 	exit;
 }
 
 // 공백 입력 확인
-if ($_POST['inputEmail'] == '' || $_POST['inputPassword'] == '') {
+if ($_POST['inputEmailAddress'] == '' || $_POST['inputPassword'] == '') {
 	echo "비정상 적인 접근 입니다.";
 	exit;
 }
@@ -39,11 +40,11 @@ if (strpos($_SERVER['HTTP_REFERER'], "login") == false) {
 	exit;
 }
 
-$user_mail = $_POST['inputEmail'];
+$user_mail = $_POST['inputEmailAddress'];
 $user_pw = $_POST['inputPassword'];
 
 $sql = sprintf(
-	"SELECT * FROM `".$mysql_login_table."` WHERE mail = \"%s\" and pwd = \"%s\"",
+	"SELECT * FROM `".$mysql_admin_login_table."` WHERE mail = \"%s\" and pwd = \"%s\"",
 	$mysqli->real_escape_string($user_mail),
 	$mysqli->real_escape_string(Encrypt($user_pw, $user_mail))
 );
@@ -51,14 +52,15 @@ $result = $mysqli->query($sql);
 $row = mysqli_fetch_assoc($result);
 
 if ($row['mail'] != $user_mail) {
-	echo "아이디 또는 패스워드가 잘못되었습니다.";
+    echo "아이디 또는 패스워드가 잘못되었습니다.";
+    echo "<br>";
 	exit;
 } else {
 	// 로그인 성공시, lastLogin 시간을 남긴다.
 	$userNo = $row['no'];
 	$loginTime = "" . date("Y-m-d H:i:s") . "";
 	$sql = sprintf(
-		"UPDATE `".$mysql_database."`.`".$mysql_login_table."` SET `lastLogin`='%s', `lastLoginIP`='%s'  WHERE `no`=%s",
+		"UPDATE `".$mysql_database."`.`".$mysql_admin_login_table."` SET `lastLogin`='%s', `lastLoginIP`='%s'  WHERE `no`=%s",
 		$mysqli->real_escape_string($loginTime),
 		$mysqli->real_escape_string(login_process_get_ip()),
 		$mysqli->real_escape_string($userNo)

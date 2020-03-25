@@ -1,5 +1,5 @@
 <?php
-include("../page/common.php");
+include("_common.php");
 ?>
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
